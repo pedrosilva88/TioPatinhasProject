@@ -12,14 +12,16 @@ zip_safe=False
 '''
 
 import asyncio
+import logging
 from island import *
 
 if __name__ == '__main__':
     print("Running Tio Patinhas")
-
-    island = Island()
-    vaultOPG = createOPGRetailVault()
+    asyncio.get_event_loop().set_debug(True)
+    util.logToConsole(logging.DEBUG)
     try:
-        asyncio.run(island.run(vaultOPG))
+        island = Island()
+        vaultOPG = createOPGRetailVault()
+        island.start(vaultOPG)
     except (KeyboardInterrupt, SystemExit):
         island.stop()
