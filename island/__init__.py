@@ -1,3 +1,4 @@
+from .vaults import *
 from .island import *
 
 def main():
