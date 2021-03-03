@@ -24,10 +24,10 @@ class Scanner:
                     tickers.append(row[0])
                     line_count += 1
         
-        self.tickersDownloaded = tickers
-        self.tickers = tickers
+        self.tickersDownloaded = tickers[:15]
+        self.tickers = tickers[:15]
         
-        self.tickersDownloaded = ['WMT']
-        self.tickers = ['WMT']
+        # self.tickersDownloaded = ['WMT']
+        # self.tickers = ['WMT']
 
         #return ['BIMI', 'COST', 'WMT', 'TJX', 'TGT']
