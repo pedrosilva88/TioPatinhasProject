@@ -18,7 +18,7 @@ from island import *
 if __name__ == '__main__':
     print("Running Tio Patinhas")
     asyncio.get_event_loop().set_debug(True)
-    util.logToConsole(logging.DEBUG)
+    #util.logToConsole(logging.DEBUG)
     try:
         island = Island()
         vaultOPG = createOPGRetailVault()
