@@ -1,4 +1,5 @@
 from .vaults import *
+from ._events import *
 from .island import *
 
 def main():
