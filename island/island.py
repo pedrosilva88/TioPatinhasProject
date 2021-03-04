@@ -1,13 +1,10 @@
 import asyncio
 import logging
 from enum import Enum
-from datetime import *
-from ib_insync import *
+from datetime import datetime
+from ib_insync import IB
 from .vaults import Vault
 from ._events import *
-from portfolio import Portfolio
-from order import Ticker as Tick
-from strategy import StrategyData, StrategyResult, StrategyResultType
 
 class Island(IslandEvents):
     ib: IB
@@ -47,35 +44,6 @@ class Island(IslandEvents):
         self._logger.info('Stopping')
         self.ib.disconnect()
         self._runner = None
-
-    def excuteTicker(self, ticker: Ticker):
-        print("[%i/%i %i:%i:%i] Ticker: %s" % (ticker.time.day, ticker.time.month, ticker.time.hour, ticker.time.minute, ticker.time.second, ticker.contract.symbol))
-        position = self.vault.portfolio.getPosition(ticker)
-        order = self.vault.portfolio.getOrder(ticker)
-        data = StrategyData(self.vault.getTicker(ticker.contract.symbol), ticker.time, ticker.close, ticker.open, ticker.last, position, order, self.vault.portfolio.cashBalance)
-        result = self.vault.strategy.run(data)
-        print("Ticker Result: %s" % result.type)
-        print("--------\n")
-        self.handleStrategyResult(result, ticker.contract)
-
-    def handleStrategyResult(self, result: StrategyResult, contract: Contract):
-        if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and
-            self.vault.portfolio.canCreateOrder(self.ib, result.order)):
-            return self.vault.portfolio.createOrder(self.ib, result.order)
-        elif (result.type == StrategyResultType.StrategyDateWindowExpired or result.type == StrategyResultType.DoNothing):
-            return self.unsubscribeTicker(contract)
-        elif (result.type == StrategyResultType.PositionExpired_Buy or result.type == StrategyResultType.PositionExpired_Sell):
-            return self.vault.portfolio.cancelPosition(self.ib, result.position)
-        elif result.type == StrategyResultType.KeepOrder:
-            return None #self.vault.portfolio.updateOrder(self.ib, result.order) Ainda preciso ver isto melhor. Preciso de olhar po Bid/Ask para fazer update do lmtPrice
-        elif result.type == StrategyResultType.StrategyDateWindowExpiredCancelOrder:
-            return self.vault.portfolio.cancelOrder(self.ib, result.order)
-        return
-
-    def unsubscribeTicker(self, contract: Contract):
-        ## Além de fazer cancelmarketData também devia de limpar na list de stocks que tenho no scanner
-        #self.ib.cancelMktData(contract)
-        return 
     
     async def runAsync(self):
         while self._runner:
@@ -87,7 +55,6 @@ class Island(IslandEvents):
                 await self.ib.reqCurrentTimeAsync()
 
                 self.vault.updatePortfolio()
-
                 self.ib.setTimeout(self.appTimeout)
                 self.subscribeEvents(self.ib)
 
@@ -95,12 +62,10 @@ class Island(IslandEvents):
                     self.waiter = asyncio.Future()
                     await self.waiter
                     self._logger.debug('Soft timeout')
-                    contracts = [Stock(ticker.symbol, 'SMART', 'USD') for ticker in self.vault.tickers]
-                    for contract in contracts:
-                        self.ib.reqMktData(contract)
+                    self.vault.subscribeTickers()
 
             except ConnectionRefusedError:
-                print("Connection Refused error")
+                print("🚨 Connection Refused error 🚨 ")
             except Warning as w:
                 self._logger.warning(w)
             except Exception as e:

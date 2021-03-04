@@ -14,10 +14,10 @@ class IslandEvents:
         self.vault.updatePortfolio()
 
     def onPendingTickersEvent(self, tickers: [Ticker]):
-        print("** 📈 Tickers Event 📈 **\n")
+        print("📈 Tickers Event 📈\n")
         for ticker in tickers:
-            self.excuteTicker(ticker)
-        print("** ** **\n")
+            self.vault.excuteTicker(ticker)
+        print("\n📈               📈\n")
 
     def onError(self, reqId, errorCode, errorString, contract):
         print("🚨 onErrorEvent 🚨")

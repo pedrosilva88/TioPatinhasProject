@@ -29,7 +29,6 @@ class StrategyOPG(Strategy):
 
     def run(self, strategyData: StrategyData):
         self.strategyData = strategyData
-        print("Close(%.2f) Open(%.2f)" % (self.strategyData.ystdClosePrice, self.strategyData.openPrice))
         if self.strategyData.position:
             if self.isPositionTimeExpired():
                 #print("Leave Position - Time expired")
@@ -65,7 +64,7 @@ class StrategyOPG(Strategy):
         if self.isGapValid():
             self.profitTarget = self.calculatePnl()
         else:
-            print("The GAP is poor or don't exist. Do nothing! GapPercentage(%.2f)" % self.gapPercentage)
+            print("❗️The GAP is poor or don't exist. Do nothing! GapPercentage(%.2f)❗️" % self.gapPercentage)
             return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing)
 
         type = StrategyResultType.Buy if self.gapType == GapType.Long else StrategyResultType.Sell
@@ -114,14 +113,10 @@ class StrategyOPG(Strategy):
         if self.gapType == GapType.Long:
             value = min(self.strategyData.openPrice, self.strategyData.lastPrice)
             return value + value * (self.gapPercentage/100 * self.gapProfitPercentage)
-            #         self.longGaps += 1
-            #         print("Should be long: ProfitPrice(%.2f) Open(%.2f) YClose(%.2f) High(%.2f)" % (profitPrice, self.stock['open'][1], self.stock['close'][0], self.stock['high'][1]))
         elif self.gapType == GapType.Short:
             value = max(self.strategyData.openPrice, self.strategyData.lastPrice)
             return value - value * (self.gapPercentage/100 * self.gapProfitPercentage)
-            #         self.shortGaps += 1
-            #         print("Should be short: ProfitPrice(%.2f) Open(%.2f) YClose(%.2f) Low(%.2f)" % (profitPrice, self.stock['open'][1], self.stock['close'][0], self.stock['low'][1]))
-        return -1
+       return -1
 
     def isProfitTargetReached(self):
         if (self.gapType == GapType.Long and self.strategyData.lastPrice >= profitTarget):
@@ -146,7 +141,7 @@ class StrategyOPG(Strategy):
         stopLossPrice = self.strategyData.lastPrice - stopLossPriceRatio if type == OrderType.Long else self.strategyData.lastPrice + stopLossPriceRatio
 
         size = min(portfolioLoss/stopLossPriceRatio, (totalCash*self.maxToInvestPerStockPercentage)/self.strategyData.lastPrice)
-        print("Last(%.2f) Open(%.2f) YClose(%.2f) Date(%s)" % (self.strategyData.lastPrice, self.strategyData.openPrice, self.strategyData.ystdClosePrice, self.strategyData.datetime))
-        print("Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f)" % (type, size, self.strategyData.lastPrice, self.profitTarget, stopLossPrice))
+        #print("Last(%.2f) Open(%.2f) YClose(%.2f) Date(%s)" % (self.strategyData.lastPrice, self.strategyData.openPrice, self.strategyData.ystdClosePrice, self.strategyData.datetime))
+        print("\t⭐️ Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (type, size, self.strategyData.lastPrice, self.profitTarget, stopLossPrice))
 
         return Order(type, self.strategyData.ticker, size, self.strategyData.lastPrice, OrderExecutionType.MarketPrice, self.profitTarget, stopLossPrice)

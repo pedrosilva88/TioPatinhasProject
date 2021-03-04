@@ -7,6 +7,19 @@ class GapType(Enum):
     Short = 2
 
 class StrategyResultType(Enum):
+    def __str__(self):
+        if self.value == 0: return "Ignore Event"
+        elif self.value == 1: return "Do nothing"
+        elif self.value == 2: return "Buy Ticker"
+        elif self.value == 3: return "Sell Ticker"
+        elif self.value == 4: return "Time expired (12:30) Sell Ticker"
+        elif self.value == 5: return "Time expired (12:30) Buy Ticker"
+        elif self.value == 6: return "Keep Position"
+        elif self.value == 7: return "Keep Order"
+        elif self.value == 8: return "Invalid Time for this Strategy"
+        elif self.value == 9: return "Invalid Time for this Strategy - Cancel Order"
+        else: return "💀"
+
     IgnoreEvent = 0
     DoNothing = 1
     Buy = 2

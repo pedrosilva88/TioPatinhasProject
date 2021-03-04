@@ -32,7 +32,7 @@ class Portfolio:
         if (not self.totalCashBalanceLastUpdate or currentDatetime.date != self.totalCashBalanceLastUpdate.date):
             self.totalCashBalance = float(account.value)
             self.totalCashBalanceLastUpdate = currentDatetime
-        print("--------\nTotal Cash: %s \nCash Balance: %s \nAvailable Cash: %s \n--------" % (self.totalCashBalance, self.cashBalance, self.cashAvailable))
+        print("💵 \nTotal Cash: %s \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.totalCashBalance, self.cashBalance, self.cashAvailable))
 
     def parsePositons(self, ib: IB, getTicker):
         items = ib.positions()
@@ -132,5 +132,5 @@ class Portfolio:
         canCreate = (order.price * order.size) <= self.cashAvailable
         if (not canCreate and 
             not hasOrder):
-            print("Can't create Order! Cause: already created or insufficient cash: %.2f" % self.cashAvailable) 
+            print("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: %.2f❗️\n" % self.cashAvailable) 
         return canCreate
