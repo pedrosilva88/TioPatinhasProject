@@ -18,9 +18,11 @@ class Scanner:
         
         with open(datapath) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
+            line_count = 0
             for row in csv_reader:
                 if line_count > 0:
                     tickers.append(Ticker(row[0], None))
+                line_count += 1
         
         self.tickersDownloaded = tickers[:15]
         self.tickers = tickers[:15]

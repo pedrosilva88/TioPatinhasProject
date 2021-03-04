@@ -1,13 +1,13 @@
 from enum import Enum
 from datetime import datetime
-from order import Order, OrderType, StockPosition
-from ib_insync import Ticker
+from order import Ticker, Order, OrderType, StockPosition
 
 class GapType(Enum):
     Long = 1
     Short = 2
 
 class StrategyResultType(Enum):
+    IgnoreEvent = 0
     DoNothing = 1
     Buy = 2
     Sell = 3
@@ -19,7 +19,7 @@ class StrategyResultType(Enum):
     StrategyDateWindowExpiredCancelOrder = 9
 
 class StrategyData:
-    def __init__(self, ticker: str,
+    def __init__(self, ticker: Ticker,
                        datetime: datetime, 
                        ystdClosePrice: float, 
                        openPrice: float, 
@@ -37,14 +37,16 @@ class StrategyData:
         self.totalCash = totalCash
 
 class StrategyResult:
-    ticker: str
+    ticker: Ticker
     type: StrategyResultType
     order: Order
+    position: StockPosition
 
     def __str__(self):
         return "Result for %s: %s\n" % (self.ticker, self.type.name)
 
-    def __init__(self, ticker, type, order = None):
+    def __init__(self, ticker: Ticker, type, order: Order = None, position: StockPosition = None):
         self.ticker = ticker
         self.type = type
         self.order = order
+        self.position = position
