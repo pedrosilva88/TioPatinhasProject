@@ -18,8 +18,8 @@ class StrategyOPG(Strategy):
     stopToLosePercentage: float = 0.05
     maxToInvestPerStockPercentage: float = 0.2
     positionTimeout = datetime.combine(date.today(),time(17,30))
-    strategyTimeValidation = datetime.combine(date.today(),time(14,30))
-    exchangeStartTime = time(14,30)
+    strategyTimeValidation = datetime.combine(date.today(),time(14,45))
+    exchangeStartTime = time(14,15)
 
     def __init__(self):
         self.strategyData = None
@@ -29,14 +29,14 @@ class StrategyOPG(Strategy):
 
     def run(self, strategyData: StrategyData):
         self.strategyData = strategyData
-
+        print("Close(%.2f) Open(%.2f)" % (self.strategyData.ystdClosePrice, self.strategyData.openPrice))
         if self.strategyData.position:
             if self.isPositionTimeExpired():
                 #print("Leave Position - Time expired")
                 if self.strategyData.position.type == OrderType.Long:
-                    return StrategyResult(strategyData.ticker, StrategyResultType.PositionExpired_Sell)    
+                    return StrategyResult(strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
                 elif self.strategyData.position.type == OrderType.Short:
-                    return StrategyResult(strategyData.ticker, StrategyResultType.PositionExpired_Buy)
+                    return StrategyResult(strategyData.ticker, StrategyResultType.PositionExpired_Buy, None, self.strategyData.position)
                 raise ValueError('Something is wrong. One of the conditions above should be triggered.')
             else:
                 #print("Lets pray for that position.")
@@ -46,22 +46,26 @@ class StrategyOPG(Strategy):
                 return StrategyResult(strategyData.ticker, StrategyResultType.StrategyDateWindowExpiredCancelOrder, self.strategyData.order)
             else:
                 #print("Lets pray for that order.")
-                return StrategyResult(strategyData.ticker, StrategyResultType.KeepOrder)
+                return StrategyResult(strategyData.ticker, StrategyResultType.KeepOrder, self.strategyData.order)
         elif not self.shouldRunStrategy():
             #print("Don't run strategy.")
             return StrategyResult(strategyData.ticker, StrategyResultType.StrategyDateWindowExpired)
             
         #print("Run Strategy for %s" % strategyData.ticker)
+        if (not self.isStrategyDataValid() or self.tickerAlreadyExecuted()):
+            return StrategyResult(strategyData.ticker, StrategyResultType.IgnoreEvent)
 
+        self.strategyData.ticker.lastExecute = self.strategyData.datetime
         self.gapPrice = self.strategyData.ystdClosePrice - self.strategyData.openPrice
         self.gapPercentage = abs(self.gapPrice/self.strategyData.ystdClosePrice*100)
         self.profitTarget = None
 
         self.determineGapType()
 
-        if self.isStrategyDataValid():
+        if self.isGapValid():
             self.profitTarget = self.calculatePnl()
         else:
+            print("The GAP is poor or don't exist. Do nothing! GapPercentage(%.2f)" % self.gapPercentage)
             return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing)
 
         type = StrategyResultType.Buy if self.gapType == GapType.Long else StrategyResultType.Sell
@@ -79,7 +83,18 @@ class StrategyOPG(Strategy):
                 self.strategyData.datetime.minute <= self.strategyTimeValidation.minute)
 
     def isStrategyDataValid(self):
+        return (self.strategyData.ystdClosePrice <= 0 and
+                self.strategyData.openPrice <= 0 and
+                self.strategyData.lastPrice <= 0)
+
+    def isGapValid(self):
         return (self.strategyData and self.gapType and self.gapPrice and self.gapPercentage)
+
+    def tickerAlreadyExecuted(self):
+        return (not self.strategyData.ticker.lastExecute or 
+            (self.strategyData.datetime.hour == self.strategyData.ticker.lastExecute.hour or
+            self.strategyData.datetime.minute == self.strategyData.ticker.lastExecute.minute or
+            self.strategyData.datetime.second <= self.strategyData.ticker.lastExecute.second))
 
     def determineGapType(self):
         if self.isLongGap():
@@ -116,10 +131,12 @@ class StrategyOPG(Strategy):
         return False
 
     def isPositionTimeExpired(self):
-        return (self.strategyData.datetime >= self.positionTimeout)
+        return (self.strategyData.datetime.hour >= self.positionTimeout.hour and 
+                self.strategyData.datetime.minute >= self.positionTimeout.minute)
 
     def isOrderTimeExpired(self):
-        return (self.strategyData.datetime >= self.positionTimeout)
+        return (self.strategyData.datetime.hour >= self.positionTimeout.hour and 
+                self.strategyData.datetime.minute >= self.positionTimeout.minute)
 
     def createOrder(self):
         type = OrderType.Long if self.gapType == GapType.Long else OrderType.Short
