@@ -134,6 +134,3 @@ class Portfolio:
             not hasOrder):
             print("Can't create Order! Cause: already created or insufficient cash: %.2f" % self.cashAvailable) 
         return canCreate
-
-
-
