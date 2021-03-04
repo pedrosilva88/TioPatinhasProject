@@ -24,6 +24,10 @@ class Vault:
         self.strategy = strategy
         self.portfolio = portfolio
 
+    @property
+    def tickers(self):
+        return self.vault.tickers
+        
     def getTicker(self, symbol: str):
         return self.scanner.getTicker(symbol)
 

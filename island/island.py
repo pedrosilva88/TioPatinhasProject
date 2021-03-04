@@ -6,6 +6,7 @@ from ib_insync import *
 from .vaults import Vault
 from ._events import *
 from portfolio import Portfolio
+from order import Ticker as Tick
 from strategy import StrategyData, StrategyResult, StrategyResultType
 
 class Island(IslandEvents):
@@ -38,6 +39,7 @@ class Island(IslandEvents):
     def start(self, vault: Vault):
         self._logger.info('Starting')
         self.vault = vault
+        self.vault.ib = self.ib
         self._runner = asyncio.ensure_future(self.runAsync())
         self.ib.run()
 
@@ -47,28 +49,33 @@ class Island(IslandEvents):
         self._runner = None
 
     def excuteTicker(self, ticker: Ticker):
+        print("[%i/%i %i:%i:%i] Ticker: %s" % (ticker.time.day, ticker.time.month, ticker.time.hour, ticker.time.minute, ticker.time.second, ticker.contract.symbol))
         position = self.vault.portfolio.getPosition(ticker)
         order = self.vault.portfolio.getOrder(ticker)
-        data = StrategyData(ticker.contract.symbol, ticker.time, ticker.close, ticker.open, ticker.last, position, order, self.vault.portfolio.cashBalance)
+        data = StrategyData(self.vault.getTicker(ticker.contract.symbol), ticker.time, ticker.close, ticker.open, ticker.last, position, order, self.vault.portfolio.cashBalance)
         result = self.vault.strategy.run(data)
-        self.handleStrategyResult(result)
+        print("Ticker Result: %s" % result.type)
+        print("--------\n")
+        self.handleStrategyResult(result, ticker.contract)
 
-    def handleStrategyResult(self, result: StrategyResult):
-        if (result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell):
-            return self.vault.portfolio.createOrder(self.ib, result.order) # Acabar esta function
+    def handleStrategyResult(self, result: StrategyResult, contract: Contract):
+        if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and
+            self.vault.portfolio.canCreateOrder(self.ib, result.order)):
+            return self.vault.portfolio.createOrder(self.ib, result.order)
         elif (result.type == StrategyResultType.StrategyDateWindowExpired or result.type == StrategyResultType.DoNothing):
-            return self.unsubscribeTicker(result.ticker) # Validar esta function com real market data
+            return self.unsubscribeTicker(contract)
         elif (result.type == StrategyResultType.PositionExpired_Buy or result.type == StrategyResultType.PositionExpired_Sell):
-            return self.vault.portfolio.cancelPosition() # Tratar desta function
+            return self.vault.portfolio.cancelPosition(self.ib, result.position)
         elif result.type == StrategyResultType.KeepOrder:
-            return self.vault.portfolio.updateOrder() # Tratar desta function
+            return None #self.vault.portfolio.updateOrder(self.ib, result.order) Ainda preciso ver isto melhor. Preciso de olhar po Bid/Ask para fazer update do lmtPrice
         elif result.type == StrategyResultType.StrategyDateWindowExpiredCancelOrder:
-            return self.vault.portfolio.cancelOrder() # Tratar desta function
+            return self.vault.portfolio.cancelOrder(self.ib, result.order)
         return
 
-    def unsubscribeTicker(self, ticker):
-        stock = Stock(ticker, "SMART", "USD")
-        self.ib.cancelMktData(stock)
+    def unsubscribeTicker(self, contract: Contract):
+        ## Além de fazer cancelmarketData também devia de limpar na list de stocks que tenho no scanner
+        #self.ib.cancelMktData(contract)
+        return 
     
     async def runAsync(self):
         while self._runner:
@@ -79,10 +86,7 @@ class Island(IslandEvents):
                 await self.ib.reqAllOpenOrdersAsync()
                 await self.ib.reqCurrentTimeAsync()
 
-                self.vault.portfolio.updatePortfolio(self.ib)
-                ## This need to be removed
-                self.ib.reqMarketDataType(3)
-                ##
+                self.vault.updatePortfolio()
 
                 self.ib.setTimeout(self.appTimeout)
                 self.subscribeEvents(self.ib)
@@ -91,7 +95,7 @@ class Island(IslandEvents):
                     self.waiter = asyncio.Future()
                     await self.waiter
                     self._logger.debug('Soft timeout')
-                    contracts = [Stock(symbol, 'SMART', 'USD') for symbol in self.vault.scanner.tickers]
+                    contracts = [Stock(ticker.symbol, 'SMART', 'USD') for ticker in self.vault.tickers]
                     for contract in contracts:
                         self.ib.reqMktData(contract)
 
