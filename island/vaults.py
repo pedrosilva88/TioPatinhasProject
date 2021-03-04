@@ -1,4 +1,5 @@
 from enum import Enum
+from ib_insync import IB
 from scanner import Scanner
 from strategy import Strategy, StrategyOPG
 from order import Order, StockPosition
@@ -12,6 +13,7 @@ class VaultType(Enum):
 
 class Vault:
     type: VaultType
+    ib: IB
     scanner: Scanner
     strategy: Strategy
     portfolio: Portfolio
@@ -21,6 +23,12 @@ class Vault:
         self.scanner = scanner
         self.strategy = strategy
         self.portfolio = portfolio
+
+    def getTicker(self, symbol: str):
+        return self.scanner.getTicker(symbol)
+
+    def updatePortfolio(self):
+        return self.portfolio.updatePortfolio(self.ib, self.getTicker)
 
 def createOPGRetailVault():
     scanner = Scanner()

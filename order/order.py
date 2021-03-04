@@ -22,9 +22,17 @@ class OrderState(Enum):
     ApiPending = "ApiPending"
     ApiCancelled = "ApiCancelled"
 
+class Ticker:
+    symbol: str
+    lastExecute: datetime
+
+    def __init__(self, symbol: str, lastExecute: datetime = None):
+        self.symbol = symbol
+        self.lastExecute = lastExecute
+
 class Order:
     type: OrderType
-    ticker: str
+    ticker: Ticker
     size: int
     price: float
     executionType: OrderExecutionType
@@ -32,7 +40,7 @@ class Order:
     stopLossPrice: float
     state: OrderState
 
-    def __init__(self, type, ticker, size, price, executionType, takeProfitPrice = None, stopLossPrice = None, state = OrderState.Submitted):
+    def __init__(self, type, ticker: Ticker, size, price, executionType, takeProfitPrice = None, stopLossPrice = None, state = OrderState.Submitted):
         self.type = type
         self.ticker = ticker
         self.size = int(size)
@@ -44,7 +52,7 @@ class Order:
 
 class StockPosition:
     type: OrderType
-    ticker: str
+    ticker: Ticker
     price: float
     size: int
     
