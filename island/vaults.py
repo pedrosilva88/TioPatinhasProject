@@ -9,7 +9,7 @@ from portfolio import Portfolio
 class VaultType(Enum):
     OPG_US_RTL = 1
     
-    def description(self):
+    def __str__(self):
         if self == OPG_US_RTL: return "Opening Price Gap for US Retailers"
 
 class Vault:

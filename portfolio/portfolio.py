@@ -60,7 +60,7 @@ class Portfolio:
                 profitPrice, stopLossPrice = self.parseSubOrders(item.order.orderId, type, subItems)
 
                 executionType = OrderExecutionType.LimitOrder if item.order.orderType == "LMT" else OrderExecutionType.MarketPrice
-                order = Order(type, getTicker(item.contract.symbol), item.order.totalQuantity, item.order.lmtPrice, executionType, profitPrice, stopLossPrice)
+                order = Order(type, self.getTicker(item.contract.symbol), item.order.totalQuantity, item.order.lmtPrice, executionType, profitPrice, stopLossPrice)
                 totalValue += item.order.lmtPrice * item.order.totalQuantity
                 list.append(order)
 
