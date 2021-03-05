@@ -24,6 +24,7 @@ class Vault:
         self.scanner = scanner
         self.strategy = strategy
         self.portfolio = portfolio
+        self.portfolio.getTicker = self.getTicker
 
     # Strategy
 
