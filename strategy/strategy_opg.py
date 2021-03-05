@@ -51,6 +51,7 @@ class StrategyOPG(Strategy):
             return StrategyResult(strategyData.ticker, StrategyResultType.StrategyDateWindowExpired)
             
         #print("Run Strategy for %s" % strategyData.ticker)
+
         if (not self.isStrategyDataValid() or self.tickerAlreadyExecuted()):
             return StrategyResult(strategyData.ticker, StrategyResultType.IgnoreEvent)
 
@@ -82,18 +83,20 @@ class StrategyOPG(Strategy):
                 self.strategyData.datetime.minute <= self.strategyTimeValidation.minute)
 
     def isStrategyDataValid(self):
-        return (self.strategyData.ystdClosePrice <= 0 and
-                self.strategyData.openPrice <= 0 and
-                self.strategyData.lastPrice <= 0)
+        return (self.strategyData.ystdClosePrice >= 0 and
+                self.strategyData.openPrice >= 0 and
+                self.strategyData.lastPrice >= 0)
 
     def isGapValid(self):
         return (self.strategyData and self.gapType and self.gapPrice and self.gapPercentage)
 
     def tickerAlreadyExecuted(self):
-        return (not self.strategyData.ticker.lastExecute or 
-            (self.strategyData.datetime.hour == self.strategyData.ticker.lastExecute.hour or
-            self.strategyData.datetime.minute == self.strategyData.ticker.lastExecute.minute or
-            self.strategyData.datetime.second <= self.strategyData.ticker.lastExecute.second))
+        if not self.strategyData.ticker.lastExecute:
+            return False
+
+        return (self.strategyData.datetime.hour == self.strategyData.ticker.lastExecute.hour and
+            self.strategyData.datetime.minute == self.strategyData.ticker.lastExecute.minute and
+            self.strategyData.datetime.second <= self.strategyData.ticker.lastExecute.second)
 
     def determineGapType(self):
         if self.isLongGap():
@@ -116,7 +119,6 @@ class StrategyOPG(Strategy):
         elif self.gapType == GapType.Short:
             value = max(self.strategyData.openPrice, self.strategyData.lastPrice)
             return value - value * (self.gapPercentage/100 * self.gapProfitPercentage)
-       return -1
 
     def isProfitTargetReached(self):
         if (self.gapType == GapType.Long and self.strategyData.lastPrice >= profitTarget):

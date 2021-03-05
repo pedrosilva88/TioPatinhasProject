@@ -1,10 +1,11 @@
 from datetime import *
 from strategy import *
+from order import Ticker
 
 def TestStrategyDataToShortWithAOpenPriceHigherThanLastPrice():
     print("Running Test to Short - OpenPrice > LastPrice")
     dt = datetime.combine(date.today(),time(14,30))
-    data = StrategyData('DummyStock', dt, 21, 22.27, 22.30, None, None, 2000)
+    data = StrategyData(Ticker('DummyStock'), dt, 21, 22.27, 22.30, None, None, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
@@ -21,7 +22,7 @@ def TestStrategyDataToShortWithAOpenPriceHigherThanLastPrice():
 def TestStrategyDataToShortWithAOpenPriceLowerThanLastPrice():
     print("Running Test to Short - OpenPrice < LastPrice")
     dt = datetime.combine(date.today(),time(14,30))
-    data = StrategyData('DummyStock', dt, 21, 22.27, 22.20, None, None, 2000)
+    data = StrategyData(Ticker('DummyStock'), dt, 21, 22.27, 22.20, None, None, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
@@ -38,7 +39,7 @@ def TestStrategyDataToShortWithAOpenPriceLowerThanLastPrice():
 def TestStrategyDataToLongWithAOpenPriceHigherThanLastPrice():
     print("Running Test to Long - OpenPrice > LastPrice")
     dt = datetime.combine(date.today(),time(14,30))
-    data = StrategyData('DummyStock', dt, 30.74, 28.45, 29.20, None, None, 2000)
+    data = StrategyData(Ticker('DummyStock'), dt, 30.74, 28.45, 29.20, None, None, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
@@ -55,7 +56,7 @@ def TestStrategyDataToLongWithAOpenPriceHigherThanLastPrice():
 def TestStrategyDataToLongWithAOpenPriceLowerThanLastPrice():
     print("Running Test to Long - OpenPrice < LastPrice")
     dt = datetime.combine(date.today(),time(14,30))
-    data = StrategyData('DummyStock', dt, 30.74, 28.45, 28.30, None, None, 2000)
+    data = StrategyData(Ticker('DummyStock'), dt, 30.74, 28.45, 28.30, None, None, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
@@ -72,7 +73,7 @@ def TestStrategyDataToLongWithAOpenPriceLowerThanLastPrice():
 def TestStrategyDataTooLateToRunThisStrategy():
     print("Running Test - Too late to run - (9:45)")
     dt = datetime.combine(date.today(),time(14,46))
-    data = StrategyData('DummyStock', dt, 30.74, 28.45, 28.30, None, None, 2000)
+    data = StrategyData(Ticker('DummyStock'), dt, 30.74, 28.45, 28.30, None, None, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
@@ -85,8 +86,8 @@ def TestStrategyDataTooLateToRunThisStrategy():
 def TestStrategyDataForLongPositionForTimeout():
     print("Running Test - Long position - Time expired - (12:30)")
     dt = datetime.combine(date.today(),time(17,35))
-    position = StockPosition('DummyStock', 28.30, 14, OrderType.Long)
-    data = StrategyData('DummyStock', dt, 30.74, 28.45, 28.30, position, None, 2000)
+    position = StockPosition(Ticker('DummyStock'), 28.30, 14, OrderType.Long)
+    data = StrategyData(Ticker('DummyStock'), dt, 30.74, 28.45, 28.30, position, None, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
@@ -100,8 +101,8 @@ def TestStrategyDataForLongPositionForTimeout():
 def TestStrategyDataForShortPositionForTimeout():
     print("Running Test - Short position - Time expired - (12:30)")
     dt = datetime.combine(date.today(),time(17,35))
-    position = StockPosition('DummyStock', 28.30, 14, OrderType.Short)
-    data = StrategyData('DummyStock', dt, 21, 22.27, 22.30, position, None, 2000)
+    position = StockPosition(Ticker('DummyStock'), 28.30, 14, OrderType.Short)
+    data = StrategyData(Ticker('DummyStock'), dt, 21, 22.27, 22.30, position, None, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
@@ -115,8 +116,8 @@ def TestStrategyDataForShortPositionForTimeout():
 def TestStrategyDataForShortPositionDoNothing():
     print("Running Test - Short position - Nothing to do")
     dt = datetime.combine(date.today(),time(16,35))
-    position = StockPosition('DummyStock', 28.30, 14, OrderType.Short)
-    data = StrategyData('DummyStock', dt, 21, 22.27, 22.30, position, None, 2000)
+    position = StockPosition(Ticker('DummyStock'), 28.30, 14, OrderType.Short)
+    data = StrategyData(Ticker('DummyStock'), dt, 21, 22.27, 22.30, position, None, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
@@ -128,9 +129,9 @@ def TestStrategyDataForShortPositionDoNothing():
         printTestFailure()
 
 def TestStrategyDataDateWindowExpiredWithoutPosition():
-    print("Running Test - Short position - Nothing to do")
-    dt = datetime.combine(date.today(),time(14,35))
-    data = StrategyData('DummyStock', dt, 21, 22.27, 22.30, None, None, 2000)
+    print("Running Test - Date Window Expired - Nothing to do")
+    dt = datetime.combine(date.today(),time(14,55))
+    data = StrategyData(Ticker('DummyStock'), dt, 21, 22.27, 22.30, None, None, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
@@ -143,8 +144,8 @@ def TestStrategyDataDateWindowExpiredWithoutPosition():
 def TestStrategyDataWithDateWindowExpiredWithOrder():
     print("Running Test - Short order - Strategy time expired")
     dt = datetime.combine(date.today(),time(17,35))
-    order = Order(OrderType.Short, 'DummyStock', 14, 28.3, OrderExecutionType.MarketPrice)
-    data = StrategyData('DummyStock', dt, 21, 22.27, 22.30, None, order, 2000)
+    order = Order(OrderType.Short, Ticker('DummyStock'), 14, 28.3, OrderExecutionType.MarketPrice)
+    data = StrategyData(Ticker('DummyStock'), dt, 21, 22.27, 22.30, None, order, 2000)
     strategy = StrategyOPG()
     result = strategy.run(data)
 
