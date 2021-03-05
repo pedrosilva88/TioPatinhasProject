@@ -8,6 +8,7 @@ class Portfolio:
     pendingOrdersMarketValue: float
     positions: [StockPosition]
     orders: [Order]
+    getTicker = None
 
     @property
     def cashAvailable(self):
@@ -20,9 +21,9 @@ class Portfolio:
         self.totalCashBalance = 0
         self.totalCashBalanceLastUpdate = None
 
-    def updatePortfolio(self, ib: IB, getTicker):
-        self.positions = self.parsePositons(ib, getTicker)
-        self.orders = self.parseOrders(ib, getTicker)
+    def updatePortfolio(self, ib: IB):
+        self.positions = self.parsePositons(ib)
+        self.orders = self.parseOrders(ib)
         
         accountValues: [AccountValue] = ib.accountValues()
         account = [d for d in accountValues if d.tag == "AvailableFunds"].pop()
@@ -34,28 +35,29 @@ class Portfolio:
             self.totalCashBalanceLastUpdate = currentDatetime
         print("💵 \nTotal Cash: %s \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.totalCashBalance, self.cashBalance, self.cashAvailable))
 
-    def parsePositons(self, ib: IB, getTicker):
+    def parsePositons(self, ib: IB):
         items = ib.positions()
         list = []
         totalValue = 0
         for item in items:
             type = OrderType.Long if item.position > 0 else OrderType.Short
-            position = StockPosition(getTicker(item.contract.symbol), item.avgCost, item.position, type)
+            position = StockPosition(self.getTicker(item.contract.symbol), item.avgCost, item.position, type)
             totalValue += item.avgCost * item.position
             list.append(position)
         
         self.stockMarketValue = totalValue
         return list
 
-    def parseOrders(self, ib: IB, getTicker):
+    def parseOrders(self, ib: IB):
         items = ib.trades()
         subItems = self.filterSubOrders(items)
         list: [Order] = []
         totalValue = 0
         for item in items:
-            if (item.orderStatus.status == OrderState.Submitted.value and not item.order.ocaGroup):
+            if ((item.orderStatus.status == OrderState.PendingSubmit.value or 
+                item.orderStatus.status == OrderState.Submitted.value) and item.order.parentId == 0):
                 type = OrderType.Long if item.order.totalQuantity > 0 else OrderType.Short
-                profitPrice, stopLossPrice = self.parseSubOrders(item.order.permId, type, subItems)
+                profitPrice, stopLossPrice = self.parseSubOrders(item.order.orderId, type, subItems)
 
                 executionType = OrderExecutionType.LimitOrder if item.order.orderType == "LMT" else OrderExecutionType.MarketPrice
                 order = Order(type, getTicker(item.contract.symbol), item.order.totalQuantity, item.order.lmtPrice, executionType, profitPrice, stopLossPrice)
@@ -68,15 +70,15 @@ class Portfolio:
     def filterSubOrders(self, orders: [Trade]):
         list = []
         for item in orders:
-            if item.order.ocaGroup:
+            if item.order.parentId > 0:
                 list.append(item)
         return list
 
-    def parseSubOrders(self, permId: int, type: OrderType, subOrders: [Trade]):
+    def parseSubOrders(self, orderId: int, type: OrderType, subOrders: [Trade]):
         profitPrice = None
         stopLossPrice = None
         for item in subOrders:
-            if int(item.order.ocaGroup) == permId:
+            if int(item.order.parentId) == orderId:
                 if item.order.orderType == 'STP':
                     stopLossPrice = item.order.auxPrice
                 else:

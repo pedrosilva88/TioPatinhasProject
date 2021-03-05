@@ -63,12 +63,13 @@ class Vault:
 
         elif result.type == StrategyResultType.StrategyDateWindowExpiredCancelOrder:
             return self.cancelOrder(result.order)
+
         return
 
     # Portfolio
 
     def updatePortfolio(self):
-        return self.portfolio.updatePortfolio(self.ib, self.getTicker)
+        return self.portfolio.updatePortfolio(self.ib)
 
     def getPosition(self, ticker: Ticker):
         return self.portfolio.getPosition(ticker)

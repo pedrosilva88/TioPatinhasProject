@@ -1,24 +1,45 @@
 
+- Update Orders
+       * Validar se há novos dados a serem atualizados
 
-# Preciso de olhar po Bid/Ask para definir o lmtPrice que coloco na Order
+- Look at `Bid/Ask`
+       * Para definir o `lmtPrice` que coloco na Order
+       * Atualizar o `LmtPrice` de uma Order olhando para o `LastBid` & `LastAsk`
 
-# Deixar de ter MarketOrders e passar a ter LmtPrice Order
+- Calcular comissions
+       * Preciso saber quanto uma order me vai custar, antes de a executar. Isto porque pode não compensar executar essa order.
 
-# Atualizar o LmtPrice de uma Order olhando para o LastBid & LastAsk
+- Usar o cancelMktData para deixar de escutar uma derterminada stock
+       * Isto aqui tem de ser mais inteligente. Se mudar de dia tenho que restar a lista de stocks.
 
-# Ter uma lógica para escolher o ECN em vez de ser o SMART. ne que seja para já o BYX
+- Select `ECN` 
+       * Ter uma lógica para escolher o `ECN` em vez de ser o `SMART`. 
+       * Nem que seja para já o `BYX`
+       * Ver a aula do Mohsen onde explica as `ECN` e as suas `Fees`
 
-# Usar o cancelMktData para deixar de escutar uma derterminada stock
+- Stock(ticker, `SMART`, `USD`)
+       * Perceber como posso ter a currency dinamica
+       * Se tiver a criar uma `Stock USA` tem de ser `USD` se for uma `Stock UK` tem que ser `POUND`
 
-# Stock(ticker, "SMART", "USD") Esta parte do "SMART" e "USD" tem que ser mais dinamica
+- Multi Country
+       * Implementar lógica para conseguir correr em vários países diferentes horas. Podia começar por UK e USA.
+       * Devo ter uma logica de timeout para o script "descansar" e acordar quando for necessario. Exemplo: UK começa às 8:30 e o script teria que estar atento até ao 12:30h, depois poderia estar em standby até às 14:30h que é a hora que a exchange de USA abre.
 
-# Quando tiver a trabalhar em multiplos paises devo usar um logica de timeout para o script "descansar" e acordar quando for necessario
+- Bot de Telgram
+       * Receber informação (Saldo, Positions, Orders)
+              * Estado das orders/positions
+       * Enviar Acçoes (Cancelar Tudo, Desligar o Script, Resetar o script)
+       * Reports
 
-# Ter um bot ligado ao telegram para me dar relatorios, estado actual de orders/positions, cacelar orders. 
+- Base de dados local.
+       * Ia guardando dados recollhidos ao longo do decorrer do script.
+       * Saldo, Compras, Vendas, Preços...
+       * Pode ser interessante para gerar relatorios
 
-# Tenho que conseguir calcular as comissoes que cada order me vai custar. Isto tudo antes de executar a order. Pode não compensar executar a order.
-
-
+- Package de Reports
+       * Este pack olharia para uma eventual BD e apartir daí gerava os relatórios.
+       * Podiam também ser enviados por email, para o bot telegram
+       * Exportar em CSV.
 
 
 
@@ -29,6 +50,7 @@
 # cancelPositions
 
 ### ib.reqPositions ###
+
 [Position(account='DU3352788', contract=Stock(conId=75197507, symbol='EXPR', exchange='NYSE', currency='USD', localSymbol='EXPR', tradingClass='EXPR'), position=5.0, avgCost=2.8), Position(account='DU3352788', contract=Stock(conId=47527197, symbol='EVK', exchange='NASDAQ', currency='USD', localSymbol='EVK', tradingClass='NMS'), position=0.0, avgCost=0.0), Position(account='DU3352788', contract=Stock(conId=47527197, symbol='EVK', exchange='NASDAQ', currency='USD', localSymbol='EVK', tradingClass='NMS'), position=0.0, avgCost=0.0), Position(account='DU3352788', contract=Stock(conId=47527197, symbol='EVK', exchange='NASDAQ', currency='USD', localSymbol='EVK', tradingClass='NMS'), position=-5.0, avgCost=3.29), Position(account='DU3352788', contract=Stock(conId=75197507, symbol='EXPR', exchange='NYSE', currency='USD', localSymbol='EXPR', tradingClass='EXPR'), position=5.0, avgCost=2.828), Position(account='DU3352788', contract=Stock(conId=47527197, symbol='EVK', exchange='NASDAQ', currency='USD', localSymbol='EVK', tradingClass='NMS'), position=-5.0, avgCost=3.2541642)]
 
 ### ib.positions() ###
@@ -125,70 +147,6 @@ Trade(contract=Stock(conId=27021698, symbol='OGZD', right='?', exchange='SMART',
        Trade(contract=Stock(conId=27021698, symbol='OGZD', right='?', exchange='SMART', currency='USD', localSymbol='OGZD', tradingClass='OGZD'), 
               order=Order(permId=1438599792, action='SELL', totalQuantity=4.0, orderType='STP', lmtPrice=0.0, auxPrice=2.1, tif='DAY', ocaGroup='1438599791', ocaType=3, orderRef='MktDepth', trailStopPrice=2.1, openClose='', eTradeOnly=False, firmQuoteOnly=False, volatilityType=0, deltaNeutralOrderType='None', referencePriceType=0, account='DU3352788', clearingIntent='IB', adjustedOrderType='None', cashQty=0.0, dontUseAutoPriceForHedge=True), orderStatus=OrderStatus(orderId=0, status='PreSubmitted', filled=0.0, remaining=4.0, avgFillPrice=0.0, permId=1438599792, parentId=0, lastFillPrice=0.0, clientId=0, whyHeld='trigger', mktCapPrice=0.0), fills=[], log=[TradeLogEntry(time=datetime.datetime(2021, 3, 3, 10, 1, 49, 980829, tzinfo=datetime.timezone.utc), status='PreSubmitted', message='')])]
 
-
-
-
-2021-03-03 14:30:39.224173+00:00
-Type(OrderType.Short) Size(2) Price(119.45) ProfitPrice(119.28) StopLoss(125.42)
-Result for GME: Sell 💚
-
-2021-03-03 14:30:39.224173+00:00
-The GAP is poor or don't exist. Do nothing! 1.38 - -0.21 ( 15.23 - 15.44 )
-Result for M: DoNothing 💚
-
-2021-03-03 14:30:39.224173+00:00
-The GAP is poor or don't exist. Do nothing! 0.75 - -0.02 ( 2.65 - 2.67 )
-Result for EXPR: DoNothing 💚
-
-2021-03-03 14:30:34.040289+00:00
-The GAP is poor or don't exist. Do nothing! 1.23 - -0.34 ( 27.73 - 28.07 )
-Result for BBBY: DoNothing 💚
-
-2021-03-03 14:30:39.222953+00:00
-The GAP is poor or don't exist. Do nothing! 0.98 - 0.13 ( 13.23 - 13.10 )
-Result for CLNE: DoNothing 💚
-
-2021-03-03 14:30:39.224173+00:00
-The GAP is poor or don't exist. Do nothing! 0.55 - 0.71 ( 130.11 - 129.40 )
-Result for WMT: DoNothing 💚
-
-2021-03-03 14:30:39.224173+00:00
-The GAP is poor or don't exist. Do nothing! 0.04 - 0.01 ( 25.73 - 25.72 )
-Result for GPS: DoNothing 💚
-
-2021-03-03 14:30:37.274656+00:00
-The GAP is poor or don't exist. Do nothing! 0.63 - 0.30 ( 47.44 - 47.14 )
-Result for WBA: DoNothing 💚
-
-2021-03-03 14:30:39.224173+00:00
-The GAP is poor or don't exist. Do nothing! 0.77 - 0.51 ( 66.21 - 65.70 )
-Result for TJX: DoNothing 💚
-
-2021-03-03 14:30:37.274656+00:00
-The GAP is poor or don't exist. Do nothing! 0.81 - 0.08 ( 9.91 - 9.83 )
-Result for LOTZ: DoNothing 💚
-
-2021-03-03 14:30:39.224173+00:00
-The GAP is poor or don't exist. Do nothing! 0.24 - 0.26 ( 107.20 - 106.94 )
-Result for SBUX: DoNothing 💚
-
-2021-03-03 14:30:39.224173+00:00
-The GAP is poor or don't exist. Do nothing! 22.48 - -4.05 ( 18.02 - 22.07 )
-Result for MIK: DoNothing 💚
-
-2021-03-03 14:30:39.224173+00:00
-Type(OrderType.Long) Size(8) Price(35.40) ProfitPrice(36.01) StopLoss(33.63)
-Result for JWN: Buy 💔 (Earnings) # ainda nao terminou
-
-2021-03-03 14:30:41.147125+00:00
-Type(OrderType.Short) Size(13) Price(21.93) ProfitPrice(22.85) StopLoss(23.03)
-Result for VUZI: Sell 💚
-
-2021-03-03 14:30:43.152379+00:00
-The GAP is poor or don't exist. Do nothing! 0.84 - -0.48 ( 57.36 - 57.84 )
-Result for KSS: DoNothing 💚
-
---------
 
 [AccountValue(account='DU3352788', tag='AccountCode', value='DU3352788', currency='', modelCode=''), 
 AccountValue(account='DU3352788', tag='AccountOrGroup', value='DU3352788', currency='BASE', modelCode=''), 
