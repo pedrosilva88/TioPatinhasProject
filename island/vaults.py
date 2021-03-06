@@ -1,5 +1,6 @@
 from enum import Enum
-from ib_insync import IB, Ticker, Contract, Stock
+from datetime import datetime
+from ib_insync import IB, Ticker as ibTicker, Contract as ibContract
 from helpers import logExecutionTicker
 from scanner import Scanner
 from strategy import Strategy, StrategyOPG, StrategyData, StrategyResult, StrategyResultType
@@ -18,12 +19,16 @@ class Vault:
     scanner: Scanner
     strategy: Strategy
     portfolio: Portfolio
+    lastExecutions: dict()
 
     def __init__(self, type: VaultType, scanner: Scanner, strategy: Strategy, portfolio: Portfolio):
         self.type = type
         self.scanner = scanner
         self.strategy = strategy
         self.portfolio = portfolio
+        self.lastExecutions = {}
+
+        # TODO: Validar se preciso mesmo disto
         self.portfolio.getTicker = self.getTicker
 
     # Strategy
@@ -31,7 +36,7 @@ class Vault:
     def runStrategy(self, data: StrategyData):
         return self.strategy.run(data)
 
-    def excuteTicker(self, ticker: Ticker):
+    def excuteTicker(self, ticker: ibTicker):
         position = self.getPosition(ticker)
         order = self.getOrder(ticker)
 
@@ -45,6 +50,7 @@ class Vault:
                             self.portfolio.cashBalance)
 
         result = self.runStrategy(data)
+        registerLastExecution(ticker.contract, ticker.time)
         logExecutionTicker(data, result)
         self.handleStrategyResult(result, ticker.contract)
 
@@ -66,6 +72,17 @@ class Vault:
             return self.cancelOrder(result.order)
 
         return
+
+    def registerLastExecution(self, contract: ibContract, datetime: datetime):
+        self.lastExecutions[contract.symbol] = datetime
+    
+    def shouldRunStrategy(self, contract: ibContract, newDatetime: datetime):
+        if not self.lastExecutions[contract.symbol]:
+            return True
+        newDatetime = newDatetime.replace(microsecond=0)
+        datetime = self.lastExecutions[contract.symbol].replace(microsecond=0)
+        return newDatetime > datetime
+
 
     # Portfolio
 

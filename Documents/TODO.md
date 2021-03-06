@@ -4,6 +4,8 @@
               * Main Order
               * Profit Order
               * Stop Loss Order
+       * Devia validar se compensa investir na stock mesmo que exista GAP. 
+              * Se o lastPrice for muito proximo do valor de fecho pode já não compensar
 
 - Look to `Volume` and `News`
        * Tenho que perceber se o `volume` é muito a cima do habitual
@@ -19,6 +21,9 @@
 
 - Usar o `cancelMktData` para deixar de escutar uma derterminada stock
        * Isto aqui tem de ser mais inteligente. Se mudar de dia tenho que restar a lista de stocks.
+
+- Create Order Issue
+       * Neste momento o createOrder só permite criar `LimitOrder`. Era interessante poder criar pelo menos `MarketOrder`.
 
 - Select `ECN` 
        * Ter uma lógica para escolher o `ECN` em vez de ser o `SMART`. 
