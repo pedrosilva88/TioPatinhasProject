@@ -1,10 +1,10 @@
 import os, sys
 import csv
-from order import Ticker
+from ib_insync import Contract as ibContract, Stock as ibStock
 
 class Scanner:
-    tickersDownloaded: [Ticker]
-    tickers: [Ticker]
+    stocksDownloaded: [ibStock]
+    stocks: [ibStock]
 
     def __init__(self):
         self.tickersDownloaded = []
@@ -14,19 +14,19 @@ class Scanner:
         modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
         datapath = os.path.join(modpath, 'scanner/Data/CSV/OPG_Retails_SortFromBackTest.csv')
         #datapath = os.path.join(modpath, 'scanner/Data/CSV/OPG_Retails.csv')
-        tickers = []
+        stocks = []
         
         with open(datapath) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
             for row in csv_reader:
                 if line_count > 0:
-                    tickers.append(Ticker(row[0], None))
+                    stocks.append(ibStock(row[1], row[3], row[2]))
                 line_count += 1
         
-        self.tickersDownloaded = tickers[:15]
-        self.tickers = tickers[:15]
+        self.stocksDownloaded = stocks[:15]
+        self.stocks = stocks[:15]
 
     def getTicker(self, symbol: str):
-        ticker = [d for d in self.tickers if d.symbol == symbol].pop()
+        ticker = [d for d in self.stocks if d.symbol == symbol].pop()
         return ticker
