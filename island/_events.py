@@ -16,7 +16,7 @@ class IslandEvents:
     def onPendingTickersEvent(self, tickers: [Ticker]):
         print("📈 Tickers Event 📈\n")
         for ticker in tickers:
-            self.vault.excuteTicker(ticker)
+            self.vault.executeTicker(ticker)
         print("\n📈               📈\n")
 
     def onError(self, reqId, errorCode, errorString, contract):

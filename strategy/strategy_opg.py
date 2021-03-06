@@ -42,12 +42,27 @@ class StrategyOPG(Strategy):
         self.determineGapType()
 
         if self.isGapValid():
-            type = StrategyResultType.Buy if self.gapType == OrderAction.Buy else StrategyResultType.Sell
-            order = self.createOrder()
-            return StrategyResult(strategyData.ticker, type, order)
+            if self.strategyData.order:
+                self.updateCurrentOrder()
+                return StrategyResult(self.strategyData.ticker, StrategyResultType.KeepOrder, self.strategyData.order)
+            else:
+                type = StrategyResultType.Buy if self.gapType == OrderAction.Buy else StrategyResultType.Sell
+                order = self.createOrder()
+                return StrategyResult(strategyData.ticker, type, order)
         else:
             print("❗️The GAP is poor or don't exist. Do nothing! GapPercentage(%.2f)❗️" % self.gapPercentage)
             return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing)
+    
+    # Constructor
+
+    def fetchInformation(self):
+        self.closePrice = self.strategyData.ticker.close
+        self.openPrice = self.strategyData.ticker.open
+        self.lastPrice = self.strategyData.ticker.last
+        self.askPrice = self.strategyData.ticker.ask
+        self.bidPrice = self.strategyData.ticker.last
+        self.avgVolume = self.strategyData.ticker.avVolume
+        self.datetime = self.strategyData.ticker.time
 
     # Validations
 
@@ -58,7 +73,7 @@ class StrategyOPG(Strategy):
         elif self.strategyData.order:
             return self.handleOrder()
 
-        elif not self.datetimeIsValidForStrategy():
+        if not self.datetimeIsValidForStrategy():
             return StrategyResult(self.strategyData.ticker, StrategyResultType.StrategyDateWindowExpired)
 
         elif not self.isStrategyDataValid():
@@ -72,12 +87,12 @@ class StrategyOPG(Strategy):
                 self.isDatetimeAfterExchangeStartTime())
 
     def isDatetimeInThePeriodToRunThisStrategy(self):
-        datetime = self.datetime.replace(microsecond=0)
+        datetime = self.datetime.replace(microsecond=0, tzinfo=None)
         maxDatetime = self.runStrategyMaxTime.replace(microsecond=0)
         return datetime <= maxDatetime
 
     def isDatetimeAfterExchangeStartTime(self):
-        datetime = self.datetime.replace(microsecond=0)
+        datetime = self.datetime.replace(microsecond=0, tzinfo=None)
         startTime = self.runStrategyStartTime.replace(microsecond=0)
         return datetime >= startTime
 
@@ -103,7 +118,7 @@ class StrategyOPG(Strategy):
     def isShortGap(self):
         return (self.gapPrice < 0 and self.gapPercentage > self.minGap and self.gapPercentage < self.maxGap)
 
-    #Handlers
+    # Handlers
 
     def handlePosition(self):
         if self.isTimeForThisStartegyExpired():
@@ -117,13 +132,12 @@ class StrategyOPG(Strategy):
     def handleOrder(self):
         if self.isTimeForThisStartegyExpired(): 
             return StrategyResult(self.strategyData.ticker, StrategyResultType.StrategyDateWindowExpiredCancelOrder, self.strategyData.order)
-        else:
-            return StrategyResult(self.strategyData.ticker, StrategyResultType.KeepOrder, self.strategyData.order)
+        return None
 
     # Calculations
 
     def calculatePnl(self):
-        price = self.orderPrice()
+        price = self.getOrderPrice()
         if self.gapType == OrderAction.Buy:
             value = min(self.openPrice, price)
             return value + value * (self.gapPercentage/100 * self.gapProfitPercentage)
@@ -139,38 +153,51 @@ class StrategyOPG(Strategy):
         else:
             self.gapType = None
 
-    def orderPrice(self):
+    def getOrderPrice(self):
         return self.bidPrice if self.gapType == OrderAction.Buy else self.askPrice
 
-    # Constructor
+    def getStopLossPrice(self):
+        price = self.getOrderPrice()
+        totalCash = self.strategyData.totalCash
+        portfolioLoss = totalCash * self.willingToLose
+        stopLossPriceRatio = price*self.stopToLosePercentage
 
-    def fetchInformation(self):
-        self.closePrice = self.strategyData.ticker.close
-        self.openPrice = self.strategyData.ticker.open
-        self.lastPrice = self.strategyData.ticker.last
-        self.askPrice = self.strategyData.ticker.ask
-        self.bidPrice = self.strategyData.ticker.last
-        self.avgVolume = self.strategyData.ticker.avVolume
-        self.datetime = self.strategyData.ticker.time
+        return price - stopLossPriceRatio if self.gapType == OrderAction.Buy else price + stopLossPriceRatio
+
+    def getSize(self):
+        price = self.getOrderPrice()
+        totalCash = self.strategyData.totalCash
+        portfolioLoss = totalCash * self.willingToLose
+        stopLossPriceRatio = price*self.stopToLosePercentage
+
+        return int(min(portfolioLoss/stopLossPriceRatio, (totalCash*self.maxToInvestPerStockPercentage)/price))
 
     # Final Operations
 
     def createOrder(self):
         action = self.gapType
-        totalCash = self.strategyData.totalCash
-        price = self.orderPrice()
-
+        price = self.getOrderPrice()
         profitTarget = self.calculatePnl()
-        
-        portfolioLoss = totalCash * self.willingToLose
-        stopLossPriceRatio = price*self.stopToLosePercentage
-        stopLossPrice = price - stopLossPriceRatio if self.gapType == OrderAction.Buy else price + stopLossPriceRatio
-
-        size = int(min(portfolioLoss/stopLossPriceRatio, (totalCash*self.maxToInvestPerStockPercentage)/price))
+        stopLossPrice = self.getStopLossPrice()
+        size = self.getSize()
 
         print("\t⭐️ Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
         profitOrder = Order(action.reverse, OrderType.LimitOrder, size, profitTarget)
         stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, stopLossPrice)
+        return Order(action=action, type=OrderType.LimitOrder, totalQuantity=size, price=price, takeProfitOrder=profitOrder, stopLossOrder=stopLossOrder)
 
-        return Order(action, OrderType.LimitOrder, size, price, profitOrder, stopLossOrder)
+    def updateCurrentOrder(self):
+        price = self.getOrderPrice()
+        profitTarget = self.calculatePnl()
+        stopLossPrice = self.getStopLossPrice()
+        size = self.getSize()
+
+        self.strategyData.order.lmtPrice = price
+        self.strategyData.order.totalQuantity = size
+
+        self.strategyData.order.takeProfitOrder.lmtPrice = profitTarget
+        self.strategyData.order.takeProfitOrder.totalQuantity = size
+
+        self.strategyData.order.stopLossOrder.auxPrice = stopLossPrice
+        self.strategyData.order.stopLossOrder.totalQuantity = size

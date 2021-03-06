@@ -13,10 +13,11 @@ zip_safe=False
 
 import asyncio
 import logging
+from helpers import logInitTioPatinhas
 from island import *
 
 if __name__ == '__main__':
-    print("🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆\n🦆 Running Tio Patinhas 🦆\n🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆\n")
+    logInitTioPatinhas()
     asyncio.get_event_loop().set_debug(True)
     #util.logToConsole(logging.DEBUG)
     try:

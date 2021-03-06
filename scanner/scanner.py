@@ -13,7 +13,6 @@ class Scanner:
     def getOPGRetailers(self):
         modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
         datapath = os.path.join(modpath, 'scanner/Data/CSV/OPG_Retails_SortFromBackTest.csv')
-        #datapath = os.path.join(modpath, 'scanner/Data/CSV/OPG_Retails.csv')
         stocks = []
         
         with open(datapath) as csv_file:
@@ -21,7 +20,7 @@ class Scanner:
             line_count = 0
             for row in csv_reader:
                 if line_count > 0:
-                    stocks.append(ibStock(row[1], row[3], row[2]))
+                    stocks.append(ibStock(row[0], row[1], row[2]))
                 line_count += 1
         
         self.stocksDownloaded = stocks[:15]
