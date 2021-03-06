@@ -1,17 +1,20 @@
 from datetime import datetime
-from ib_insync import IB, Trade, Ticker, Stock, LimitOrder, MarketOrder, StopOrder
-from order import Ticker as Tick, Order, OrderType, OrderState, OrderExecutionType, StockPosition
+from ib_insync import IB, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder
+from models import OrderType
 
 class Portfolio:
     cashBalance: float
     stockMarketValue: float
     pendingOrdersMarketValue: float
-    positions: [StockPosition]
-    orders: [Order]
+
+    positions: [ibPosition]
+    trades: [ibTrade]
+
     getTicker = None
 
     @property
     def cashAvailable(self):
+        # TODO: Tenho que rever isto
         return max(self.cashBalance - self.stockMarketValue - self.pendingOrdersMarketValue - 400, 0)
 
     def __init__(self):
@@ -22,8 +25,12 @@ class Portfolio:
         self.totalCashBalanceLastUpdate = None
 
     def updatePortfolio(self, ib: IB):
-        self.positions = self.parsePositons(ib)
-        self.orders = self.parseOrders(ib)
+        # TODO: Validar se posso remover isto e a parte de baixo funciona
+        # self.positions = self.parsePositons(ib)
+        # self.trades = self.filterForCurrentOrders(ib)
+
+        self.positions = ib.positions()
+        self.trades = ib.openTrades()
         
         accountValues: [AccountValue] = ib.accountValues()
         account = [d for d in accountValues if d.tag == "AvailableFunds"].pop()
@@ -35,103 +42,73 @@ class Portfolio:
             self.totalCashBalanceLastUpdate = currentDatetime
         print("💵 \nTotal Cash: %s \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.totalCashBalance, self.cashBalance, self.cashAvailable))
 
-    def parsePositons(self, ib: IB):
-        items = ib.positions()
-        list = []
+    def calcPositionsValue(self, ib: IB):
         totalValue = 0
-        for item in items:
-            type = OrderType.Long if item.position > 0 else OrderType.Short
-            position = StockPosition(self.getTicker(item.contract.symbol), item.avgCost, item.position, type)
-            totalValue += item.avgCost * item.position
-            list.append(position)
-        
+        for item in self.positions:
+            totalValue += item.avgCost * item.position        
         self.stockMarketValue = totalValue
-        return list
 
-    def parseOrders(self, ib: IB):
-        items = ib.trades()
-        subItems = self.filterSubOrders(items)
-        list: [Order] = []
+    def calcOpenTradesValue(self, ib: IB):
         totalValue = 0
-        for item in items:
-            if ((item.orderStatus.status == OrderState.PendingSubmit.value or 
-                item.orderStatus.status == OrderState.Submitted.value) and item.order.parentId == 0):
-                type = OrderType.Long if item.order.totalQuantity > 0 else OrderType.Short
-                profitPrice, stopLossPrice = self.parseSubOrders(item.order.orderId, type, subItems)
-
-                executionType = OrderExecutionType.LimitOrder if item.order.orderType == "LMT" else OrderExecutionType.MarketPrice
-                order = Order(type, self.getTicker(item.contract.symbol), item.order.totalQuantity, item.order.lmtPrice, executionType, profitPrice, stopLossPrice)
+        for item in self.trades:
+            if item.order.parentId == 0:
                 totalValue += item.order.lmtPrice * item.order.totalQuantity
-                list.append(order)
-
         self.pendingOrdersMarketValue = totalValue
-        return list
 
-    def filterSubOrders(self, orders: [Trade]):
-        list = []
-        for item in orders:
-            if item.order.parentId > 0:
-                list.append(item)
-        return list
-
-    def parseSubOrders(self, orderId: int, type: OrderType, subOrders: [Trade]):
-        profitPrice = None
-        stopLossPrice = None
-        for item in subOrders:
-            if int(item.order.parentId) == orderId:
-                if item.order.orderType == 'STP':
-                    stopLossPrice = item.order.auxPrice
-                else:
-                    profitPrice = item.order.lmtPrice
-        return profitPrice, stopLossPrice
-
-    def getPosition(self, ticker: Ticker):
+    def getPosition(self, contract: Contract):
         for position in self.positions:
-            if position.ticker.symbol == ticker.contract.symbol:
+            if position.contract.symbol == contract.symbol:
                 return position
         return None
     
-    def getOrder(self, ticker: Ticker):
-        for order in self.orders:
-            if order.ticker.symbol == ticker.contract.symbol:
-                return order
-        return None
+    def getTradeOrders(self, contract: ibContract):
+        mainOrder = None
+        profitOrder = None
+        stopLossOrder = None
 
-    def createOrder(self, ib: IB, order: Order):
+        for trade in self.trades:
+            if trade.contract.symbol == contract.symbol:
+                order = trade.order
+                if isinstance(order, LimitOrder) and order.parentId == 0:
+                    mainOrder = order
+                elif isinstance(order, LimitOrder) and order.parentId > 0:
+                    profitOrder = order
+                elif isinstance(order, StopOrder) and order.parentId > 0:
+                    stopLossOrder = order
+        return mainOrder, profitOrder, stopLossOrder
+
+    def createOrder(self, ib: IB, contract: ibContract, orderType: OrderType, order: ibOrder, profitOrder: ibOrder = None, stopLossOrder: ibOrder = None):
         ## self.orders.append(order) Check if this is necessary
-        stock = Stock(order.ticker.symbol, "SMART", "USD")
-        type = "BUY" if order.type == OrderType.Long else "SELL"
-        if (not order.takeProfitPrice and not order.stopLossPrice):
-            limitOrder = LimitOrder(type, order.size, order.price)
+
+        if (not profitOrder and not stopLossOrder):
+            limitOrder = LimitOrder(orderType, order.size, order.price)
             ib.placeOrder(stock, limitOrder)
         else:
-            bracket = ib.bracketOrder(type, order.size, order.price, order.takeProfitPrice, order.stopLossPrice)
+            bracket = ib.bracketOrder(orderType, order.totalQuantity, order.lmtPrice, profitOrder.lmtPrice, stopLossOrder.auxPrice)
 
             for o in bracket:
                 if ((isinstance(o, LimitOrder) and o.lmtPrice > 0) or
                     (isinstance(o, StopOrder) and o.auxPrice > 0)):
                     ib.placeOrder(stock, o)
-        self.orders = self.parseOrders(ib)
+
+        self.trades = self.openTrades(ib)
     
-    def updateOrder(self, ib: IB, order: Order):
+    def updateOrder(self, ib: IB, contract: ibContract):
         self.createOrder(ib, order) # Isto ainda tem que ser bem testado
 
     def cancelOrder(self, ib: IB, order: Order):
-        for trade in ib.trades():
-            if (trade.orderStatus.status == OrderState.PendingSubmit.value and 
-                not trade.order.ocaGroup and
-                order.ticker.symbol == trade.contract.symbol):
+        for trade in self.trades:
+            if (trade.order.parentId == 0 and
+                contract.symbol == trade.contract.symbol):
                 ib.cancelOrder(trade.order)
 
-    def cancelPosition(self, ib: IB, position: StockPosition):
-        stock = Stock(position.ticker.symbol, 'SMART', 'USD')
-        type = "BUY" if order.type == OrderType.Long else "SELL"
-        order = MarketOrder(type, position.size)
-        ib.placeOrder(stock, order)
+    def cancelPosition(self, ib: IB, orderType: OrderType, position: ibPosition):
+        order = MarketOrder(orderType, position.size)
+        ib.placeOrder(position.contract, order)
 
-    def canCreateOrder(self, ib: IB, order: Order):
-        hasOrder = len([d for d in self.orders if d.ticker.symbol == order.ticker.symbol]) > 0
-        canCreate = (order.price * order.size) <= self.cashAvailable
+    def canCreateOrder(self, ib: IB, contract: ibContract, order: ibOrder):
+        hasOrder = len([d for d in self.trades if d.contract.symbol == contract.symbol]) > 0
+        canCreate = (order.lmtPrice * order.totalQuantity) <= self.cashAvailable
         if (not canCreate and 
             not hasOrder):
             print("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: %.2f❗️\n" % self.cashAvailable) 
