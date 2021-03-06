@@ -1,4 +1,4 @@
-from .order import *
+from .models import *
 
 def main():
     return (u'*Orders*\n'
