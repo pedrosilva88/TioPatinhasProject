@@ -16,10 +16,9 @@ class TelegramService():
     __init__(self):
         self.updater = Updater(token=self.token, use_context=True)
         self.dispatcher = updater.dispatcher
-        start_handler = CommandHandler('start', start)
+        
+        dispatcher.add_handler(CommandHandler('start', start))
         dispatcher.add_handler(CommandHandler('bad_command', bad_command))
-        dispatcher.add_handler(start_handler)
-        dispatcher.add_handler(echo_handler)
 
     def run(self):
         self.updater.start_polling()
