@@ -180,13 +180,45 @@ def TestStrategyDataWithDateWindowExpiredWithOrder():
     else:
         printTestFailure()
 
+def TestStrategyDataWithOrderNeedsToBeUpdated():
+    print("Running Test - Receive Ticker to create Long Order - then - Ticker with a higher bid")
+    dt = datetime.combine(date.today(),time(14,30,5))
+    ticker = dummyTicker(datetime=dt, close=5.3, open=5, last=5.1, ask=5.2, bid=5.1)
+    data = StrategyData(ticker, None, None, 2000)
+
+    strategy = StrategyOPG()
+    result = strategy.run(data)
+    isStepValid_1 = False
+
+    if (result.type == StrategyResultType.Buy and 
+        result.order and
+        result.order.action == OrderAction.Buy and
+        result.order.totalQuantity == 78 and
+        result.order.lmtPrice == 5.1 and
+        result.order.takeProfitOrder.lmtPrice == 5.20 and
+        result.order.stopLossOrder.auxPrice == 4.84):
+        isStepValid_1 = True
+
+    dt = datetime.combine(date.today(),time(14,30,8))
+    order = result.order
+    ticker = dummyTicker(datetime=dt, close=5.3, open=5, last=5.1, ask=5.2, bid=5.14)
+    data = StrategyData(ticker, None, order, 2000)
+    result = strategy.run(data)
+
+    if (result.type == StrategyResultType.KeepOrder and 
+        result.order and
+        result.order.action == OrderAction.Buy and
+        result.order.totalQuantity == 77 and
+        result.order.lmtPrice == 5.14 and
+        result.order.takeProfitOrder.lmtPrice == 5.2 and
+        result.order.stopLossOrder.auxPrice == 4.88 and
+        isStepValid_1):
+        printTestSuccess()
+    else:
+        printTestFailure()
+
 def printTestSuccess():
     print ("Test Succeeded ✅")
 
 def printTestFailure():
     print ("Test Failed ❌")
-
-
-## TODO TESTS
-#   
-#   * Tenho um order em curso para esta Stock, logo não devo correr a estratégia

@@ -20,6 +20,8 @@ def runStrategyTests():
     TestStrategyDataDateWindowExpiredWithoutPosition()
     print ("\n------------------------------------\n")
     TestStrategyDataWithDateWindowExpiredWithOrder()
+    print ("\n------------------------------------\n")
+    TestStrategyDataWithOrderNeedsToBeUpdated()
 
     print ("\n")
     

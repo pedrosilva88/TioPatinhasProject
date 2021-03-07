@@ -108,7 +108,11 @@ class Portfolio:
         self.trades = ib.openTrades()
     
     def updateOrder(self, ib: IB, contract: ibContract, order: ibOrder, profitOrder: LimitOrder = None, stopLossOrder: StopOrder = None):
-        self.createOrder(ib, contract, order, profitOrder, stopLossOrder)
+        o,p,s = self.getTradeOrders()
+        if ((isinstance(o, LimitOrder) and o.lmtPrice != order.lmtPrice) or
+            (isinstance(o, LimitOrder) and p.lmtPrice != profitOrder.lmtPrice) or
+            (isinstance(s, StopOrder) and s.auxPrice != stopLossOrder.auxPrice)):
+                self.createOrder(ib, contract, order, profitOrder, stopLossOrder)
 
     def cancelOrder(self, ib: IB, contract: ibContract):
         for trade in self.trades:

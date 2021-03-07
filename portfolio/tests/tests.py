@@ -1,19 +1,41 @@
 
 # TODO: Testar o updateOrder
 
-# ## Unit tests
-# from ib_insync import *
-# from order import Order as TOrder
-# from portfolio import *
-# 
-# ib = IB()
-# ib.connect('127.0.0.1', 7497, clientId=99)
+from ib_insync import IB, Order as ibOrder, Stock as ibStock
+from portfolio import *
 
-# portfolio = Portfolio()
-# order = TOrder(OrderType.Long, "CABK", 4, 2.482, OrderExecutionType.LimitOrder)
+def runIB():
+    ib = IB()
+    ib.connect('127.0.0.1', 7497, clientId=99)
+    return ib
 
-# order = TOrder(OrderType.Long, "CABK", 4, 2.482, OrderExecutionType.LimitOrder, 10, 1)
+def TestPortfolioCreateBracketOrder():
+    ib = runIB()
+    portfolio = Portfolio()
+    contract = ibStock("CABK", "SMART", "EUR")
+    order = LimitOrder("BUY", 10, 1)
+    profitOrder = LimitOrder("Sell", 10, 1.5)
+    stopOrder = StopOrder("Sell", 10, 0.8)
 
-# portfolio.createOrder(ib, order)
+    portfolio.createOrder(ib, contract, order, profitOrder, stopOrder)
 
-# portfolio.cancelOrder(ib, order)
+    if len(portfolio.trades()) > 0:
+        printTestSuccess()
+    else:
+        printTestFailure()
+
+def TestPortfolioUpdateOrder():
+    ib = runIB()
+    portfolio = Portfolio()
+
+    if len(portfolio.trades()) > 0:
+        printTestSuccess()
+    else:
+        printTestFailure()
+
+
+def printTestSuccess():
+    print ("Test Succeeded ✅")
+
+def printTestFailure():
+    print ("Test Failed ❌")

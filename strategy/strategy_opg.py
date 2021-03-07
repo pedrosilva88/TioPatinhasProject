@@ -60,7 +60,7 @@ class StrategyOPG(Strategy):
         self.openPrice = self.strategyData.ticker.open
         self.lastPrice = self.strategyData.ticker.last
         self.askPrice = self.strategyData.ticker.ask
-        self.bidPrice = self.strategyData.ticker.last
+        self.bidPrice = self.strategyData.ticker.bid
         self.avgVolume = self.strategyData.ticker.avVolume
         self.datetime = self.strategyData.ticker.time
 
@@ -194,11 +194,13 @@ class StrategyOPG(Strategy):
         stopLossPrice = self.getStopLossPrice()
         size = self.getSize()
 
-        self.strategyData.order.lmtPrice = price
-        self.strategyData.order.totalQuantity = size
+        print("\t⭐️ Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
-        self.strategyData.order.takeProfitOrder.lmtPrice = profitTarget
-        self.strategyData.order.takeProfitOrder.totalQuantity = size
+        self.strategyData.order.lmtPrice = round(price,2)
+        self.strategyData.order.totalQuantity = int(size)
 
-        self.strategyData.order.stopLossOrder.auxPrice = stopLossPrice
-        self.strategyData.order.stopLossOrder.totalQuantity = size
+        self.strategyData.order.takeProfitOrder.lmtPrice = round(profitTarget, 2)
+        self.strategyData.order.takeProfitOrder.totalQuantity = int(size)
+
+        self.strategyData.order.stopLossOrder.auxPrice = round(stopLossPrice, 2)
+        self.strategyData.order.stopLossOrder.totalQuantity = int(size)
