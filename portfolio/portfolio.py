@@ -41,7 +41,7 @@ class Portfolio:
         self.calcPositionsValue()
         self.calcOpenTradesValue()
 
-        accountValues: [AccountValue] = ib.accountSummary()
+        accountValues: [AccountValue] = ib.accountValues()
         account = [d for d in accountValues if d.tag == "AvailableFunds"].pop()
         self.cashBalance = float(account.value)
 

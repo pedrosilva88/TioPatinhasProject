@@ -51,8 +51,8 @@ class Island(IslandEvents):
                 await asyncio.sleep(self.appStartupTime)
                 await self.ib.connectAsync(self.host, self.port, self.clientId, self.connectTimeout,
                     self.readonly, self.account)
+                await self.ib.accountSummaryAsync()
                 await self.ib.reqAllOpenOrdersAsync()
-                await self.ib.reqCurrentTimeAsync()
 
                 self.vault.updatePortfolio()
                 self.ib.setTimeout(self.appTimeout)

@@ -128,3 +128,106 @@ AccountValue(account='DU3352788', tag='LookAheadMaintMarginReq', value='4.83', c
 AccountValue(account='DU3352788', tag='MaintMarginReq', value='4.83', currency='EUR', modelCode=''), 
 AccountValue(account='DU3352788', tag='NetLiquidation', value='2330.97', currency='EUR', modelCode=''), 
 AccountValue(account='DU3352788', tag='TotalCashValue', value='2330.97', currency='EUR', modelCode='')]
+
+## Account Values ##
+AccountValue(account='DU3352788', tag='AvailableFunds', value='2326.14', currency='EUR', modelCode=''),
+
+AccountValue(account='DU3352788', tag='StockMarketValue', value='0.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='StockMarketValue', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='StockMarketValue', value='0.00', currency='USD', modelCode=''),
+
+AccountValue(account='DU3352788', tag='TotalCashBalance', value='2330.9694', currency='BASE', modelCode=''), 
+AccountValue(account='DU3352788', tag='TotalCashBalance', value='2491.99', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='TotalCashBalance', value='-191.84', currency='USD', modelCode=''),
+
+AccountValue(account='DU3352788', tag='TotalCashValue', value='2330.97', currency='EUR', modelCode=''),
+
+AccountValue(account='DU3352788', tag='CashBalance', value='2330.9694', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='CashBalance', value='2491.99', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='CashBalance', value='-191.84', currency='USD', modelCode=''),
+
+AccountValue(account='DU3352788', tag='ExcessLiquidity', value='2326.14', currency='EUR', modelCode=''),
+
+AccountValue(account='DU3352788', tag='FullAvailableFunds', value='2326.14', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='FullExcessLiquidity', value='2326.14', currency='EUR', modelCode=''),
+
+AccountValue(account='DU3352788', tag='NetLiquidation', value='2330.97', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='NetLiquidationByCurrency', value='2330.9694', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='NetLiquidationByCurrency', value='2491.99', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='NetLiquidationByCurrency', value='-191.84', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='NetLiquidationUncertainty', value='0.00', currency='EUR', modelCode=''),
+
+AccountValue(account='DU3352788', tag='LookAheadAvailableFunds', value='2326.14', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='LookAheadExcessLiquidity', value='2326.14', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='LookAheadInitMarginReq', value='4.83', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='LookAheadMaintMarginReq', value='4.83', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='LookAheadNextChange', value='0', currency='', modelCode=''),
+
+AccountValue(account='DU3352788', tag='ExchangeRate', value='1.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='ExchangeRate', value='1.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='ExchangeRate', value='0.8393487', currency='USD', modelCode=''),
+
+AccountValue(account='DU3352788', tag='Currency', value='BASE', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='Currency', value='EUR', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='Currency', value='USD', currency='USD', modelCode=''),
+
+## ## ## ## ## ## ## ## ## ## ## 
+
+[AccountValue(account='DU3352788', tag='AccountCode', value='DU3352788', currency='', modelCode=''),
+AccountValue(account='DU3352788', tag='AccountOrGroup', value='DU3352788', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='AccountOrGroup', value='DU3352788', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='AccountOrGroup', value='DU3352788', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='AccountReady', value='true', currency='', modelCode=''),
+AccountValue(account='DU3352788', tag='AccountType', value='INDIVIDUAL', currency='', modelCode=''),
+AccountValue(account='DU3352788', tag='AccruedCash', value='0.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='AccruedCash', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='AccruedCash', value='0.00', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='AccruedDividend', value='0.00', currency='EUR', modelCode=''),
+
+AccountValue(account='DU3352788', tag='Billable', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='BuyingPower', value='15507.59', currency='EUR', modelCode=''),
+
+AccountValue(account='DU3352788', tag='Cushion', value='0.997928', currency='', modelCode=''),
+AccountValue(account='DU3352788', tag='EquityWithLoanValue', value='2330.97', currency='EUR', modelCode=''),
+
+AccountValue(account='DU3352788', tag='FullInitMarginReq', value='4.83', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='FullMaintMarginReq', value='4.83', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='FundValue', value='0.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='FundValue', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='FundValue', value='0.00', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='FutureOptionValue', value='0.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='FutureOptionValue', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='FutureOptionValue', value='0.00', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='FuturesPNL', value='0.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='FuturesPNL', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='FuturesPNL', value='0.00', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='FxCashBalance', value='0.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='FxCashBalance', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='FxCashBalance', value='0.00', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='GrossPositionValue', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='Guarantee', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='IndianStockHaircut', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='InitMarginReq', value='4.83', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='IssuerOptionValue', value='0.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='IssuerOptionValue', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='IssuerOptionValue', value='0.00', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='Leverage-S', value='0.00', currency='', modelCode=''),
+
+AccountValue(account='DU3352788', tag='MaintMarginReq', value='4.83', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='NLVAndMarginInReview', value='false', currency='', modelCode=''),
+
+AccountValue(account='DU3352788', tag='PASharesValue', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='PhysicalCertificateValue', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='PostExpirationExcess', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='PostExpirationMargin', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='RealCurrency', value='EUR', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='RealCurrency', value='EUR', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='RealCurrency', value='USD', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='RealizedPnL', value='0.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='RealizedPnL', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='RealizedPnL', value='0.00', currency='USD', modelCode=''),
+AccountValue(account='DU3352788', tag='SegmentTitle-S', value='CFD', currency='', modelCode=''),
+
+AccountValue(account='DU3352788', tag='UnrealizedPnL', value='0.00', currency='BASE', modelCode=''),
+AccountValue(account='DU3352788', tag='UnrealizedPnL', value='0.00', currency='EUR', modelCode=''),
+AccountValue(account='DU3352788', tag='UnrealizedPnL', value='0.00', currency='USD', modelCode=''),
