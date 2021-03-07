@@ -122,6 +122,7 @@ class StrategyOPG(Strategy):
 
     def handlePosition(self):
         if self.isTimeForThisStartegyExpired():
+            # TODO: Validar se o Position Size é negativo quando estou a fazer short
             if self.strategyData.position.position > 0:
                 return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
             elif self.strategyData.position.position < 0:

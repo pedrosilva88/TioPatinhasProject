@@ -15,6 +15,13 @@ class Portfolio:
         # TODO: Tenho que rever isto
         return max(self.cashBalance - self.stockMarketValue - self.pendingOrdersMarketValue - 400, 0)
 
+        # GrossPositionValue - The sum of the absolute value of all stock and equity option positions
+        # AvailableFunds - This value tells what you have available for trading
+        # FullAvailableFunds - Available funds of whole portfolio with no discounts or intraday credits
+        # TotalCashValue
+
+        # AccruedCash — Total accrued cash value of stock, commodities and securities
+
     def __init__(self):
         self.positions = []
         self.trades = []
@@ -34,7 +41,7 @@ class Portfolio:
         self.calcPositionsValue()
         self.calcOpenTradesValue()
 
-        accountValues: [AccountValue] = ib.accountValues()
+        accountValues: [AccountValue] = ib.accountSummary()
         account = [d for d in accountValues if d.tag == "AvailableFunds"].pop()
         self.cashBalance = float(account.value)
 
@@ -84,7 +91,7 @@ class Portfolio:
         return mainOrder, profitOrder, stopLossOrder
 
     def createOrder(self, ib: IB, contract: ibContract, order: ibOrder, profitOrder: LimitOrder = None, stopLossOrder: StopOrder = None):
-        ## self.orders.append(order) Check if this is necessary
+        ## self.orders.append(order) # TODO: Check if this is necessary
 
         if (not profitOrder and not stopLossOrder):
             limitOrder = LimitOrder(order.action, order.size, order.price)
@@ -97,7 +104,8 @@ class Portfolio:
                     (isinstance(o, StopOrder) and o.auxPrice > 0)):
                     ib.placeOrder(contract, o)
 
-        self.trades = self.openTrades(ib)
+        # TODO: Validar se o openTrades funciona tal como espero
+        self.trades = ib.openTrades()
     
     def updateOrder(self, ib: IB, contract: ibContract, order: ibOrder, profitOrder: LimitOrder = None, stopLossOrder: StopOrder = None):
         self.createOrder(ib, contract, order, profitOrder, stopLossOrder)
