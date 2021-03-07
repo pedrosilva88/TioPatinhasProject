@@ -27,8 +27,32 @@ def TestPortfolioCreateBracketOrder():
 def TestPortfolioUpdateOrder():
     ib = runIB()
     portfolio = Portfolio()
+    contract = ibStock("CABK", "SMART", "EUR")
+    order = LimitOrder("BUY", 10, 1)
+    profitOrder = LimitOrder("Sell", 10, 1.5)
+    stopOrder = StopOrder("Sell", 10, 0.8)
+
+    portfolio.createOrder(ib, contract, order, profitOrder, stopOrder)
+
+    o, p, s = portfolio.getTradeOrders(contract)
+    o.lmtPrice = 1.1
+    p.lmtPrice = 1.6
+    s.auxPrice = 0.9
+
+    portfolio.updateOrder(ib, contract, o, p, s)
 
     if len(portfolio.trades()) > 0:
+        printTestSuccess()
+    else:
+        printTestFailure()
+
+def TestPortfolioCancelOrder():
+    ib = runIB()
+    portfolio = Portfolio()
+    contract = ibStock("CABK", "SMART", "EUR")
+    portfolio.cancelOrder(ib, contract)
+
+    if len(portfolio.trades()) == 0:
         printTestSuccess()
     else:
         printTestFailure()
