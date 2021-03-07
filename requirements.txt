@@ -1,2 +1,3 @@
 ib_insync
 bs4
+python-telegram-bot
