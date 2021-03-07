@@ -1,9 +1,9 @@
 
 - Update Orders
        * Validar se há novos dados a serem atualizados
-              * Main Order
-              * Profit Order
-              * Stop Loss Order
+              * Main Order ✅
+              * Profit Order ✅
+              * Stop Loss Order ✅
        * Devia validar se compensa investir na stock mesmo que exista GAP. 
               * Se o lastPrice for muito proximo do valor de fecho pode já não compensar
 
@@ -13,8 +13,8 @@
        * Olhar para noticias e perceber se têm um ranking. E apartir disso tomar decisoesse faz sentido apostar ou não.
 
 - Look at `Bid/Ask`
-       * Para definir o `lmtPrice` que coloco na Order
-       * Atualizar o `LmtPrice` de uma Order olhando para o `LastBid` & `LastAsk`
+       * Para definir o `lmtPrice` que coloco na Order ✅
+       * Atualizar o `LmtPrice` de uma Order olhando para o `LastBid` & `LastAsk` ✅
 
 - Calcular `comissions`
        * Preciso saber quanto uma order me vai custar, antes de a executar. Isto porque pode não compensar executar essa order.
