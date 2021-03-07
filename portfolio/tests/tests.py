@@ -33,7 +33,6 @@ def TestPortfolioUpdateOrder():
     else:
         printTestFailure()
 
-
 def printTestSuccess():
     print ("Test Succeeded ✅")
 
