@@ -6,6 +6,7 @@ from models import Order
 from scanner import Scanner
 from strategy import Strategy, StrategyOPG, StrategyData, StrategyResult, StrategyResultType
 from portfolio import Portfolio
+from earnings_calendar import EarningsCalendar
 
 class VaultType(Enum):
     OPG_US_RTL = 1
@@ -19,6 +20,7 @@ class Vault:
     scanner: Scanner
     strategy: Strategy
     portfolio: Portfolio
+    earningsCalendar: EarningsCalendar
     lastExecutions: dict()
 
     def __init__(self, type: VaultType, scanner: Scanner, strategy: Strategy, portfolio: Portfolio):
@@ -26,7 +28,13 @@ class Vault:
         self.scanner = scanner
         self.strategy = strategy
         self.portfolio = portfolio
+        self.earningsCalendar = EarningsCalendar()
         self.lastExecutions = {}
+        
+        if self.strategy.shouldGetStockEarnings():
+            print("🗓  Requesting earnings calendar 🗓")
+            self.earningsCalendar.requestEarnings(self.stocks, self.handleEarningsCalendar)
+        print("🗓 Finished 🗓\n")
 
     # Strategy
 
@@ -50,8 +58,8 @@ class Vault:
 
     def handleStrategyResult(self, result: StrategyResult, contract: ibContract):
         if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and
-            self.canCreateOrder(result.order)):
-            return self.createOrder(result.order)
+            self.canCreateOrder(contract, result.order)):
+            return self.createOrder(contract, result.order)
 
         elif (result.type == StrategyResultType.StrategyDateWindowExpired or result.type == StrategyResultType.DoNothing):
             return self.unsubscribeTicker(contract)
@@ -60,7 +68,7 @@ class Vault:
             return self.cancelPosition(result.position)
 
         elif result.type == StrategyResultType.KeepOrder:
-            return self.updateOrder(result.order)
+            return self.updateOrder(ticker.contract, result.order)
 
         elif result.type == StrategyResultType.StrategyDateWindowExpiredCancelOrder:
             return self.cancelOrder(result.ticker.contract)
@@ -78,18 +86,24 @@ class Vault:
         return newDatetime > datetime
                 # and (newDatetime.second - datetime.second) >= 2 # Caso queira dar um intervalo de 2 segundos por Ticker event
 
+    def handleEarningsCalendar(self, contract: ibContract, date: datetime):
+        today = datetime.today().date()
+        if date.date() == today:
+            print("%s have earnings today! Will be ignored" % contract.symbol)
+            self.stocks.remove(contract)
+
     # Portfolio
 
     def updatePortfolio(self):
         return self.portfolio.updatePortfolio(self.ib)
 
     def getPosition(self, ticker: ibTicker):
-        return self.portfolio.getPosition(ticker)
+        return self.portfolio.getPosition(ticker.contract)
 
     # Portfolio - Manage Orders
 
-    def canCreateOrder(self, order: Order):
-        return self.portfolio.canCreateOrder(self.ib, order)
+    def canCreateOrder(self, contract: ibContract, order: Order):
+        return self.portfolio.canCreateOrder(self.ib, contract, order)
 
     def getOrder(self, ticker: ibTicker):
         mainOrder, profitOrder, stopLossOrder = self.portfolio.getTradeOrders(ticker.contract)
