@@ -84,7 +84,7 @@ class Portfolio:
             limitOrder = LimitOrder(order.action, order.totalQuantity, order.lmtPrice)
             ib.placeOrder(contract, limitOrder)
         else:
-            bracket = ib.bracketOrder(order.action, order.totalQuantity, order.lmtPrice, profitOrder.lmtPrice, stopLossOrder.auxPrice)
+            bracket = ib.bracketOrder(order.action.value, order.totalQuantity, order.lmtPrice, profitOrder.lmtPrice, stopLossOrder.auxPrice)
 
             for o in bracket:
                 if ((isinstance(o, LimitOrder) and o.lmtPrice > 0) or

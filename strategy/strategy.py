@@ -6,3 +6,8 @@ class Strategy:
         """
         Override This method
         """
+
+    def shouldGetStockEarnings(self):
+        """
+        Override This method
+        """

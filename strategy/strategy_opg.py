@@ -88,7 +88,7 @@ class StrategyOPG(Strategy):
 
     def isDatetimeInThePeriodToRunThisStrategy(self):
         datetime = self.datetime.replace(microsecond=0, tzinfo=None)
-        maxDatetime = self.runStrategyMaxTime.replace(microsecond=0)
+        maxDatetime = self.runStrategyMaxTime.replace(microsecond=0, tzinfo=None)
         return datetime <= maxDatetime
 
     def isDatetimeAfterExchangeStartTime(self):
@@ -105,8 +105,8 @@ class StrategyOPG(Strategy):
                 self.datetime)
 
     def isTimeForThisStartegyExpired(self):
-        datetime = self.datetime.replace(microsecond=0)
-        holdTimeout = self.strategyHoldTimeout.replace(microsecond=0)
+        datetime = self.datetime.replace(microsecond=0, tzinfo=None)
+        holdTimeout = self.strategyHoldTimeout.replace(microsecond=0, tzinfo=None)
         return datetime > holdTimeout
 
     def isGapValid(self):
@@ -117,6 +117,9 @@ class StrategyOPG(Strategy):
 
     def isShortGap(self):
         return (self.gapPrice < 0 and self.gapPercentage > self.minGap and self.gapPercentage < self.maxGap)
+
+    def shouldGetStockEarnings(self):
+        return True
 
     # Handlers
 
