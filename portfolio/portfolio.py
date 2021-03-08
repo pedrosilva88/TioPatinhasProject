@@ -54,7 +54,8 @@ class Portfolio:
     # Orders
 
     def canCreateOrder(self, ib: IB, contract: ibContract, order: ibOrder):
-        hasOrder = len([d for d in self.trades if d.contract.symbol == contract.symbol]) > 0
+        #today = datetime.now() TODO: Tenho que validar se esta trade pertence ao dia de hoje
+        hasOrder = len([d for d in ib.trades() if d.contract.symbol == contract.symbol]) > 0
         canCreate = (order.lmtPrice * order.totalQuantity) <= self.cashAvailable
         if (not canCreate and 
             not hasOrder):

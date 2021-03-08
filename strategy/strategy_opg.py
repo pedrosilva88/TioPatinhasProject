@@ -182,7 +182,7 @@ class StrategyOPG(Strategy):
         stopLossPrice = self.getStopLossPrice()
         size = self.getSize()
 
-        print("⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
+        print("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
         profitOrder = Order(action.reverse, OrderType.LimitOrder, size, profitTarget)
         stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, stopLossPrice)
@@ -194,7 +194,7 @@ class StrategyOPG(Strategy):
         stopLossPrice = self.getStopLossPrice()
         size = self.getSize()
 
-        print("⭐️ [Upadte] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
+        print("\t⭐️ [Upadte] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
         self.strategyData.order.lmtPrice = round(price,2)
         self.strategyData.order.totalQuantity = int(size)
