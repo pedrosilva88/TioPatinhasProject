@@ -105,7 +105,7 @@ class Vault:
                             type=profitOrder.orderType,
                             totalQuantity=profitOrder.totalQuantity,
                             price=profitOrder.lmtPrice,
-                            parentId=profitOrder.parentId)
+                            parentId=mainOrder.parentId)
 
         if stopLossOrder:
             stopLoss = Order(orderId=stopLossOrder.orderId, 
@@ -113,7 +113,7 @@ class Vault:
                             type=stopLossOrder.orderType,
                             totalQuantity=stopLossOrder.totalQuantity,
                             price=stopLossOrder.auxPrice,
-                            parentId=stopLossOrder.parentId)
+                            parentId=mainOrder.parentId)
 
         return Order(orderId=mainOrder.orderId, 
                         action=mainOrder.action, 

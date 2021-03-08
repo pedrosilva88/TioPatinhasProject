@@ -52,6 +52,7 @@ class Island(IslandEvents):
                 await self.ib.connectAsync(self.host, self.port, self.clientId, self.connectTimeout,
                     self.readonly, self.account)
                 await self.ib.accountSummaryAsync()
+                await self.ib.reqPositionsAsync()
                 await self.ib.reqAllOpenOrdersAsync()
 
                 self.vault.updatePortfolio()
