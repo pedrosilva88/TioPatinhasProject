@@ -30,9 +30,11 @@ class Order(ibOrder):
             self.takeProfitOrder = ibLimitOrder(action=takeProfitOrder.action, 
                                                 totalQuantity=takeProfitOrder.totalQuantity, 
                                                 lmtPrice=round(takeProfitOrder.lmtPrice, 2),
-                                                parentId=parentId)
+                                                parentId=parentId,
+                                                orderId=takeProfitOrder.orderId)
         if isinstance(stopLossOrder, Order):
             self.stopLossOrder = ibStopOrder(action=stopLossOrder.action, 
                                             totalQuantity=stopLossOrder.totalQuantity, 
                                             stopPrice=round(stopLossOrder.lmtPrice, 2),
-                                            parentId=parentId)
+                                            parentId=parentId,
+                                            orderId=stopLossOrder.orderId)
