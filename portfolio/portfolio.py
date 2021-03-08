@@ -4,23 +4,17 @@ from models import OrderType
 
 class Portfolio:
     cashBalance: float
-    stockMarketValue: float
+    grossPositionsValue: float
     pendingOrdersMarketValue: float
+
+    exchangeUSDRate: float = 1
 
     positions: [ibPosition]
     trades: [ibTrade]
 
     @property
     def cashAvailable(self):
-        # TODO: Tenho que rever isto
-        return max(self.cashBalance - self.stockMarketValue - self.pendingOrdersMarketValue - 400, 0)
-
-        # GrossPositionValue - The sum of the absolute value of all stock and equity option positions
-        # AvailableFunds - This value tells what you have available for trading
-        # FullAvailableFunds - Available funds of whole portfolio with no discounts or intraday credits
-        # TotalCashValue
-
-        # AccruedCash — Total accrued cash value of stock, commodities and securities
+        return max(self.cashBalance - self.grossPositionsValue - self.pendingOrdersMarketValue - 400, 0)
 
     def __init__(self):
         self.positions = []
@@ -32,36 +26,29 @@ class Portfolio:
     # Account
 
     def updatePortfolio(self, ib: IB):
-        # TODO: Validar se posso remover isto e a parte de baixo funciona
-        # self.positions = self.parsePositons(ib)
-        # self.trades = self.filterForCurrentOrders(ib)
-
         self.positions = ib.positions()
         self.trades = ib.openTrades()
-        self.calcPositionsValue()
+
+        for account in ib.accountValues():
+            if account.tag == "AvailableFunds":
+                self.cashBalance = float(account.value)
+            elif account.tag == "GrossPositionValue":
+                self.grossPositionsValue = float(account.value)
+            elif (account.tag == "ExchangeRate" and account.currency == "USD"):
+                self.exchangeUSDRate = float(account.value)
+
         self.calcOpenTradesValue()
-
-        accountValues: [AccountValue] = ib.accountValues()
-        account = [d for d in accountValues if d.tag == "AvailableFunds"].pop()
-        self.cashBalance = float(account.value)
-
         currentDatetime = datetime.now()
         if (not self.totalCashBalanceLastUpdate or currentDatetime.date != self.totalCashBalanceLastUpdate.date):
-            self.totalCashBalance = float(account.value)
+            self.totalCashBalance = float(self.cashBalance)
             self.totalCashBalanceLastUpdate = currentDatetime
         print("💵 \nTotal Cash: %s \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.totalCashBalance, self.cashBalance, self.cashAvailable))
-
-    def calcPositionsValue(self):
-        totalValue = 0
-        for item in self.positions:
-            totalValue += item.avgCost * item.position        
-        self.stockMarketValue = totalValue
 
     def calcOpenTradesValue(self):
         totalValue = 0
         for item in self.trades:
             if item.order.parentId == 0:
-                totalValue += item.order.lmtPrice * item.order.totalQuantity
+                totalValue += (item.order.lmtPrice * self.exchangeUSDRate) * abs(item.order.totalQuantity)
         self.pendingOrdersMarketValue = totalValue
 
     # Orders
@@ -82,38 +69,38 @@ class Portfolio:
         for trade in self.trades:
             if trade.contract.symbol == contract.symbol:
                 order = trade.order
-                if isinstance(order, LimitOrder) and order.parentId == 0:
+                if (isinstance(order, LimitOrder) or (isinstance(order, ibOrder) and order.lmtPrice > 0)) and order.parentId == 0:
                     mainOrder = order
-                elif isinstance(order, LimitOrder) and order.parentId > 0:
+                elif (isinstance(order, LimitOrder) or (isinstance(order, ibOrder) and order.orderType ==
+                OrderType.LimitOrder.value)) and order.parentId > 0:
                     profitOrder = order
-                elif isinstance(order, StopOrder) and order.parentId > 0:
+                elif (isinstance(order, StopOrder) or (isinstance(order, ibOrder) and order.orderType == OrderType.StopOrder.value)) and order.parentId > 0:
                     stopLossOrder = order
         return mainOrder, profitOrder, stopLossOrder
 
     def createOrder(self, ib: IB, contract: ibContract, order: ibOrder, profitOrder: LimitOrder = None, stopLossOrder: StopOrder = None):
-        ## self.orders.append(order) # TODO: Check if this is necessary
-
         if (not profitOrder and not stopLossOrder):
-            limitOrder = LimitOrder(order.action, order.size, order.price)
-            ib.placeOrder(stock, limitOrder)
+            limitOrder = LimitOrder(order.action, order.totalQuantity, order.lmtPrice)
+            ib.placeOrder(contract, limitOrder)
         else:
-            bracket = ib.bracketOrder(orderType, order.totalQuantity, order.lmtPrice, profitOrder.lmtPrice, stopLossOrder.auxPrice)
+            bracket = ib.bracketOrder(order.action, order.totalQuantity, order.lmtPrice, profitOrder.lmtPrice, stopLossOrder.auxPrice)
 
             for o in bracket:
                 if ((isinstance(o, LimitOrder) and o.lmtPrice > 0) or
                     (isinstance(o, StopOrder) and o.auxPrice > 0)):
                     ib.placeOrder(contract, o)
 
-        # TODO: Validar se o openTrades funciona tal como espero
         self.trades = ib.openTrades()
     
     def updateOrder(self, ib: IB, contract: ibContract, order: ibOrder, profitOrder: LimitOrder = None, stopLossOrder: StopOrder = None):
-        o,p,s = self.getTradeOrders()
-        if ((isinstance(o, LimitOrder) and o.lmtPrice != order.lmtPrice) or
-            (isinstance(o, LimitOrder) and p.lmtPrice != profitOrder.lmtPrice) or
-            (isinstance(s, StopOrder) and s.auxPrice != stopLossOrder.auxPrice)):
-                self.createOrder(ib, contract, order, profitOrder, stopLossOrder)
-
+        o,p,s = self.getTradeOrders(contract)
+        if ((isinstance(o, LimitOrder) or (isinstance(o, ibOrder) and o.lmtPrice > 0)) and o.lmtPrice != order.lmtPrice):
+            ib.placeOrder(contract, order)
+        if ((isinstance(p, LimitOrder) or (isinstance(p, ibOrder) and p.lmtPrice > 0)) and p.lmtPrice != profitOrder.lmtPrice):
+            ib.placeOrder(contract, profitOrder)
+        if ((isinstance(s, StopOrder) or (isinstance(s, ibOrder) and s.auxPrice > 0)) and s.auxPrice != stopLossOrder.auxPrice):
+            ib.placeOrder(contract, stopLossOrder)
+                
     def cancelOrder(self, ib: IB, contract: ibContract):
         for trade in self.trades:
             if (trade.order.parentId == 0 and
