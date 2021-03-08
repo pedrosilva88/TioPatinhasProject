@@ -76,6 +76,7 @@ class Vault:
         newDatetime = newDatetime.replace(microsecond=0, tzinfo=None)
         datetime = self.lastExecutions[contract.symbol].replace(microsecond=0, tzinfo=None)
         return newDatetime > datetime
+                # and (newDatetime.second - datetime.second) >= 2 # Caso queira dar um intervalo de 2 segundos por Ticker event
 
     # Portfolio
 
