@@ -1,4 +1,16 @@
 
+- Bugs
+       - Houve um caso da VUZI a (03/08) em que começou com um GAP de short e passado 2 minutos desceu tanto que o GAP passou a ser de LONG.
+              * O bug que aconteceu foi que ao minuto 1 eu criei uma order de SELL e no minuto 2 os lmtPrices dessa orders foram atualizados para  valores de BUY, mas o tipo da action não muda, só muda os lmtPrices e Sizes.
+              * Ou seja, aqui preciso também analisar se o lmtPrice faz sentido atualizar ou até mesmo criar
+       - Há também a questão do Total Cash. O valor quando tenho várias apostas não parece correto.
+              * Pode ter a ver com as apostas de Short em que o broker tira dinheiro para "maintenance"
+              * As questões das comissões também não ta ser calculada pode tar aí um problema
+       - Uma das que apostei mais uma vez teve earning na sua abertura. ✅
+              * É muito importante validar isso ✅
+       
+
+
 - Update Orders
        * Validar se há novos dados a serem atualizados
               * Main Order ✅
