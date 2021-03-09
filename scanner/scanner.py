@@ -23,8 +23,8 @@ class Scanner:
                     stocks.append(ibStock(row[0], row[1], row[2]))
                 line_count += 1
         
-        self.stocksDownloaded = stocks[:15]
-        self.stocks = stocks[:15]
+        self.stocksDownloaded = stocks[:80]
+        self.stocks = stocks[:80]
 
         # self.stocksDownloaded = [ibStock("CABK", "SMART", "EUR")]
         # self.stocks = [ibStock("CABK", "SMART", "EUR")]

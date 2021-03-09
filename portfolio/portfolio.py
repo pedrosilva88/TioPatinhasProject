@@ -1,6 +1,6 @@
 from datetime import datetime
-from ib_insync import IB, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder
-from models import OrderType
+from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder
+from models import OrderType, OrderAction
 
 class Portfolio:
     cashBalance: float
@@ -116,6 +116,16 @@ class Portfolio:
                 return position
         return None
     
-    def cancelPosition(self, ib: IB, orderType: OrderType, position: ibPosition):
-        order = MarketOrder(orderType, position.size)
-        ib.placeOrder(position.contract, order)
+    def cancelPosition(self, ib: IB, orderAction: OrderAction, position: ibPosition):
+        stock = Stock(position.contract.symbol, "SMART", position.contract.currency)
+        order = MarketOrder(orderAction, abs(position.position))
+        ib.placeOrder(stock, order)
+
+        o,p,s = self.getTradeOrders(stock)
+        if o:
+            ib.cancelOrder(o)
+        if p:
+            ib.cancelOrder(p)
+        if s:
+            ib.cancelOrder(s)
+        

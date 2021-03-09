@@ -5,8 +5,9 @@ from models import Order, OrderAction, OrderType
 
 class StrategyOPG(Strategy):
     # Constants
-    minGap: int = 2
+    minGap: int = 3
     maxGap: int = 8
+    maxLastGap: int = 9
     gapProfitPercentage: float = 0.7
     willingToLose: float = 0.02
     stopToLosePercentage: float = 0.05
@@ -20,6 +21,9 @@ class StrategyOPG(Strategy):
     gapPrice: float= None
     gapPercentage: float = None
     gapType: OrderAction = None
+
+    gapLastPrice: float = None
+    gapLastPercentage: float = None
 
     closePrice: float = None
     openPrice: float = None
@@ -41,6 +45,10 @@ class StrategyOPG(Strategy):
         self.gapPercentage = abs(self.gapPrice/self.closePrice*100)
         self.determineGapType()
 
+        lastPrice = self.getOrderPrice()
+        self.gapLastPrice = self.closePrice - lastPrice if self.gapType == OrderAction.Buy else lastPrice - self.closePrice
+        self.gapLastPercentage = self.gapLastPrice/self.closePrice*100
+
         if self.isGapValid():
             if self.strategyData.order:
                 self.updateCurrentOrder()
@@ -50,8 +58,12 @@ class StrategyOPG(Strategy):
                 order = self.createOrder()
                 return StrategyResult(strategyData.ticker, type, order)
         else:
-            print("❗️The GAP is poor or don't exist. Do nothing! GapPercentage(%.2f)❗️" % self.gapPercentage)
-            return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing)
+            if self.strategyData.order:
+                print("❗️ The GAP is becoming poor for this order!❗️")
+                return StrategyResult(strategyData.ticker, StrategyResultType.KeepOrder, self.strategyData.order)
+            else:
+                print("❗️The GAP is poor or don't exist. Do nothing! GapPercentage(%.2f) GapLastPercentage(%.2f)❗️" % (self.gapPercentage, self.gapLastPercentage))
+                return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing)
     
     # Constructor
 
@@ -110,10 +122,11 @@ class StrategyOPG(Strategy):
         return datetime > holdTimeout
 
     def isGapValid(self):
-        return (self.gapType and self.gapPrice and self.gapPercentage)
+        return (self.gapType and self.gapPrice and self.gapPercentage and 
+                self.gapLastPercentage >= self.minGap and self.gapLastPercentage <= self.maxLastGap)
     
     def isLongGap(self):
-        return (self.gapPrice > 0 and self.gapPercentage > self.minGap and self.gapPercentage < self.maxGap)
+        return (self.gapPrice > 0 and self.gapPercentage >= self.minGap and self.gapPercentage <= self.maxGap)
 
     def isShortGap(self):
         return (self.gapPrice < 0 and self.gapPercentage > self.minGap and self.gapPercentage < self.maxGap)

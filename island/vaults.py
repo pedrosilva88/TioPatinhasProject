@@ -2,7 +2,7 @@ from enum import Enum
 from datetime import datetime
 from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition
 from helpers import logExecutionTicker
-from models import Order
+from models import Order, OrderAction
 from scanner import Scanner
 from strategy import Strategy, StrategyOPG, StrategyData, StrategyResult, StrategyResultType
 from portfolio import Portfolio
@@ -30,11 +30,6 @@ class Vault:
         self.portfolio = portfolio
         self.earningsCalendar = EarningsCalendar()
         self.lastExecutions = {}
-        
-        if self.strategy.shouldGetStockEarnings():
-            print("🗓  Requesting earnings calendar 🗓")
-            self.earningsCalendar.requestEarnings(self.stocks, self.handleEarningsCalendar)
-        print("🗓 Finished 🗓\n")
 
     # Strategy
 
@@ -65,10 +60,11 @@ class Vault:
             return self.unsubscribeTicker(contract)
 
         elif (result.type == StrategyResultType.PositionExpired_Buy or result.type == StrategyResultType.PositionExpired_Sell):
-            return self.cancelPosition(result.position)
+            orderAction = OrderAction.Buy.value if result.type == StrategyResultType.PositionExpired_Buy else OrderAction.Sell.value
+            return self.cancelPosition(orderAction, result.position)
 
         elif result.type == StrategyResultType.KeepOrder:
-            return self.updateOrder(ticker.contract, result.order)
+            return self.updateOrder(result.ticker.contract, result.order)
 
         elif result.type == StrategyResultType.StrategyDateWindowExpiredCancelOrder:
             return self.cancelOrder(result.ticker.contract)
@@ -86,11 +82,19 @@ class Vault:
         return newDatetime > datetime
                 # and (newDatetime.second - datetime.second) >= 2 # Caso queira dar um intervalo de 2 segundos por Ticker event
 
+    # Earning Calendar
+
     def handleEarningsCalendar(self, contract: ibContract, date: datetime):
         today = datetime.today().date()
         if date.date() == today:
             print("%s have earnings today! Will be ignored" % contract.symbol)
             self.stocks.remove(contract)
+
+    def getEraningsCalendarIfNecessary(self):
+        if self.strategy.shouldGetStockEarnings():
+            print("🗓  Requesting earnings calendar 🗓")
+            self.earningsCalendar.requestEarnings(self.stocks, self.handleEarningsCalendar)
+        print("🗓  Finished 🗓\n")
 
     # Portfolio
 
@@ -155,8 +159,8 @@ class Vault:
 
     # Portfolio - Manage Positions
 
-    def cancelPosition(self, position: ibPosition):
-        return self.portfolio.cancelPosition(self.ib, position)
+    def cancelPosition(self, orderAction: OrderAction, position: ibPosition):
+        return self.portfolio.cancelPosition(self.ib, orderAction, position)
 
     # Scanner
 
