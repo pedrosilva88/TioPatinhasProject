@@ -7,6 +7,10 @@ class IslandEvents:
     def onUpdateEvent(self):
         self.vault.updatePortfolio()
 
+    def onBarUpdate(self, bars, hasNewBar):
+        print(len(bars))
+        print(bars[-1])
+
     def onOpenOrderEvent(self, trade):
         self.vault.updatePortfolio()
 
@@ -44,6 +48,7 @@ class IslandEvents:
         ib.accountSummaryEvent += self.onAccountSummaryEvent
         ib.openOrderEvent += self.onOpenOrderEvent
         ib.updateEvent += self.onUpdateEvent
+        ib.barUpdateEvent += self.onBarUpdate
 
     def unsubscribeEvents(self, ib: IB):
         ib.timeoutEvent -= self.onTimeout
@@ -53,3 +58,4 @@ class IslandEvents:
         ib.accountSummaryEvent -= self.onAccountSummaryEvent
         ib.openOrderEvent -= self.onOpenOrderEvent
         ib.updateEvent -= self.onUpdateEvent
+        ib.barUpdateEvent -= self.onBarUpdate

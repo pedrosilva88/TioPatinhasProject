@@ -37,6 +37,7 @@ class Vault:
         return self.strategy.run(data)
 
     def executeTicker(self, ticker: ibTicker):
+        print("Volume(%.2f) - AVVolume(%.2f) - RTVolume(%.2f)" % (ticker.volume, ticker.avVolume, ticker.rtVolume))
         if self.shouldRunStrategy(ticker.contract, ticker.time):
             position = self.getPosition(ticker)
             order = self.getOrder(ticker)
@@ -185,6 +186,7 @@ class Vault:
 
     def subscribeTicker(self, contract: ibContract):
         self.ib.reqMktData(contract)
+        self.ib.reqRealTimeBars(contract, 60, 'MIDPOINT', False)
 
 def createOPGRetailVault():
     scanner = Scanner()

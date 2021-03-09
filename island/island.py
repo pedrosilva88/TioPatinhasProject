@@ -55,6 +55,7 @@ class Island(IslandEvents):
                 await self.ib.reqPositionsAsync()
                 await self.ib.reqAllOpenOrdersAsync()
 
+                self.vault.getEraningsCalendarIfNecessary() # Isto aqui pode ser async. Preciso de estudar melhor
                 self.vault.updatePortfolio()
                 self.ib.setTimeout(self.appTimeout)
                 self.subscribeEvents(self.ib)

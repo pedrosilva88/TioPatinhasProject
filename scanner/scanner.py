@@ -26,8 +26,8 @@ class Scanner:
         self.stocksDownloaded = stocks[:80]
         self.stocks = stocks[:80]
 
-        # self.stocksDownloaded = [ibStock("CABK", "SMART", "EUR")]
-        # self.stocks = [ibStock("CABK", "SMART", "EUR")]
+        #self.stocksDownloaded = [ibStock("VUZI", "SMART", "USD")]
+        #self.stocks = [ibStock("VUZI", "SMART", "USD")]
 
     def getTicker(self, symbol: str):
         ticker = [d for d in self.stocks if d.symbol == symbol].pop()
