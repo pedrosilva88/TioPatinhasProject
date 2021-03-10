@@ -7,6 +7,9 @@ class Portfolio:
     grossPositionsValue: float
     pendingOrdersMarketValue: float
 
+    totalCashBalance: float
+    totalCashBalanceLastUpdate: datetime
+
     exchangeUSDRate: float = 1
 
     positions: [ibPosition]
@@ -30,7 +33,7 @@ class Portfolio:
         self.trades = ib.openTrades()
 
         for account in ib.accountValues():
-            if account.tag == "AvailableFunds":
+            if account.tag == "FullExcessLiquidity":
                 self.cashBalance = float(account.value)
             elif account.tag == "GrossPositionValue":
                 self.grossPositionsValue = float(account.value)
@@ -38,8 +41,8 @@ class Portfolio:
                 self.exchangeUSDRate = float(account.value)
 
         self.calcOpenTradesValue()
-        currentDatetime = datetime.now()
-        if (not self.totalCashBalanceLastUpdate or currentDatetime.date != self.totalCashBalanceLastUpdate.date):
+        currentDatetime = datetime.now().replace(microsecond=0, tzinfo=None)
+        if (not self.totalCashBalanceLastUpdate or currentDatetime.date() != self.totalCashBalanceLastUpdate.date()):
             self.totalCashBalance = float(self.cashBalance)
             self.totalCashBalanceLastUpdate = currentDatetime
         print("💵 \nTotal Cash: %s \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.totalCashBalance, self.cashBalance, self.cashAvailable))

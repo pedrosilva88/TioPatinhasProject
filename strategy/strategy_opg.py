@@ -10,7 +10,7 @@ class StrategyOPG(Strategy):
     maxLastGap: int = 9
     gapProfitPercentage: float = 0.7
     willingToLose: float = 0.02
-    stopToLosePercentage: float = 0.05
+    stopToLosePercentage: float = 0.15
     maxToInvestPerStockPercentage: float = 0.2
     strategyHoldTimeout: datetime = datetime.combine(date.today(),time(17,30))
     runStrategyMaxTime: datetime = datetime.combine(date.today(),time(14,45))
@@ -176,7 +176,6 @@ class StrategyOPG(Strategy):
     def getStopLossPrice(self):
         price = self.getOrderPrice()
         totalCash = self.strategyData.totalCash
-        portfolioLoss = totalCash * self.willingToLose
         stopLossPriceRatio = price*self.stopToLosePercentage
 
         return price - stopLossPriceRatio if self.gapType == OrderAction.Buy else price + stopLossPriceRatio

@@ -4,6 +4,10 @@
               * Pode ter a ver com as apostas de Short em que o broker tira dinheiro para "maintenance"
               * As questões das comissões também não ta ser calculada pode tar aí um problema
 
+       - GTIM - Nesta Stock aconteceu que bateu num OPG para short entao criou uma order. Entretanto o valor desceu tanto que já ultrapasou o profit que eu criei pa essa order. Se essa não for executado e o valor já for muito baixo também deveria cancelar essa order.
+
+       - Tou a usar mal o position sizing, devia estar a mandar o TotalCash
+
 - Look to `Volume` and `News`
        * Tenho que perceber se o `volume` é muito a cima do habitual
        * Tenho que perceber se houve anuncio de `Earnings` ou `Dividens`
@@ -29,7 +33,31 @@
 
 - Multi Country
        * Implementar lógica para conseguir correr em vários países diferentes horas. Podia começar por UK e USA.
-       * Devo ter uma logica de timeout para o script "descansar" e acordar quando for necessario. Exemplo: UK começa às 8:30 e o script teria que estar atento até ao 12:30h, depois poderia estar em standby até às 14:30h que é a hora que a exchange de USA abre.
+       * Devo ter uma logica de timeout para o script "descansar" e acordar quando for necessario. Exemplo: UK começa às 8:00 e o script teria que estar atento até ao 12:30h, depois poderia estar em standby até às 14:30h que é a hora que a exchange de USA abre.
+
+       * UK:
+              - Arranque do Script: 07:45
+              - Abre: 8:00
+              - Startegy Ate: 8:15
+              - Cancel All: 12:00
+
+       * USA:
+              - Arranque do Script: 14:15
+              - Abre: 14:30
+              - Startegy Ate: 14:45
+              - Cancel All: 17:30
+
+       * Hong Kong:
+              - Arranque do Script: 23:45
+              - Abre: 00:00
+              - Startegy Ate: 00:15
+              - Cancel All: 03:00
+
+       * India
+              - Arranque do Script: 03:30
+              - Abre: 03:45
+              - Startegy Ate: 04:00
+              - Cancel All: 07:00
 
 - Bot de Telegram
        * Receber informação (Saldo, Positions, Orders)

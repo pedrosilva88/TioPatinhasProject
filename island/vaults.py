@@ -37,7 +37,7 @@ class Vault:
         return self.strategy.run(data)
 
     def executeTicker(self, ticker: ibTicker):
-        print("Volume(%.2f) - AVVolume(%.2f) - RTVolume(%.2f)" % (ticker.volume, ticker.avVolume, ticker.rtVolume))
+        #print("Volume(%.2f) - AVVolume(%.2f) - RTVolume(%.2f)" % (ticker.volume, ticker.avVolume, ticker.rtVolume))
         if self.shouldRunStrategy(ticker.contract, ticker.time):
             position = self.getPosition(ticker)
             order = self.getOrder(ticker)
@@ -45,7 +45,7 @@ class Vault:
             data = StrategyData(ticker, 
                                 position, 
                                 order, 
-                                self.portfolio.cashBalance)
+                                self.portfolio.totalCashBalance)
 
             result = self.runStrategy(data)
             self.registerLastExecution(ticker.contract, ticker.time)
@@ -182,11 +182,13 @@ class Vault:
     def unsubscribeTicker(self, contract: ibContract):
         ## Além de fazer cancelmarketData também devia de limpar na list de stocks que tenho no scanner
         self.ib.cancelMktData(contract)
+        # self.ib.cancelRealTimeBars()
         return 
 
     def subscribeTicker(self, contract: ibContract):
         self.ib.reqMktData(contract)
-        self.ib.reqRealTimeBars(contract, 60, 'MIDPOINT', False)
+        #self.ib.reqHistoricalDataAsync(contract, '', '5 D', '1 min', "TRADES", True, 1, True)
+        #self.ib.reqRealTimeBars(contract, 5, 'TRADES', True)
 
 def createOPGRetailVault():
     scanner = Scanner()

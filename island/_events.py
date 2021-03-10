@@ -5,11 +5,11 @@ from .vaults import Vault
 
 class IslandEvents:
     def onUpdateEvent(self):
-        self.vault.updatePortfolio()
+        None
+        #self.vault.updatePortfolio()
 
     def onBarUpdate(self, bars, hasNewBar):
-        print(len(bars))
-        print(bars[-1])
+        print("🕯 %s: %s 🕯" % (bars.contract.symbol, bars[-1]))
 
     def onOpenOrderEvent(self, trade):
         self.vault.updatePortfolio()
