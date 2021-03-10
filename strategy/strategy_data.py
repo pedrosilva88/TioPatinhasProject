@@ -27,6 +27,7 @@ class StrategyResultType(Enum):
     KeepOrder = 7
     StrategyDateWindowExpired = 8
     StrategyDateWindowExpiredCancelOrder = 9
+    CancelOrder = 10
 
 class StrategyData:
     ticker: ibTicker

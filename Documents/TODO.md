@@ -1,12 +1,6 @@
 
 - Bugs
-       - Há também a questão do Total Cash. O valor quando tenho várias apostas não parece correto.
-              * Pode ter a ver com as apostas de Short em que o broker tira dinheiro para "maintenance"
-              * As questões das comissões também não ta ser calculada pode tar aí um problema
-
        - GTIM - Nesta Stock aconteceu que bateu num OPG para short entao criou uma order. Entretanto o valor desceu tanto que já ultrapasou o profit que eu criei pa essa order. Se essa não for executado e o valor já for muito baixo também deveria cancelar essa order.
-
-       - Tou a usar mal o position sizing, devia estar a mandar o TotalCash
 
 - Look to `Volume` and `News`
        * Tenho que perceber se o `volume` é muito a cima do habitual
@@ -81,7 +75,8 @@
               * Ou seja, aqui preciso também analisar se o lmtPrice faz sentido atualizar ou até mesmo criar ✅
        - Uma das que apostei mais uma vez teve earning na sua abertura. ✅
               * É muito importante validar isso ✅
-
+       - Há também a questão do Total Cash. O valor quando tenho várias apostas não parece correto. ✅
+              * Pode ter a ver com as apostas de Short em que o broker tira dinheiro para "maintenance" ✅
 
 - Update Orders ✅
        * Validar se há novos dados a serem atualizados ✅

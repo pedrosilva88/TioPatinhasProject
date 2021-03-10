@@ -67,7 +67,8 @@ class Vault:
         elif result.type == StrategyResultType.KeepOrder:
             return self.updateOrder(result.ticker.contract, result.order)
 
-        elif result.type == StrategyResultType.StrategyDateWindowExpiredCancelOrder:
+        elif (result.type == StrategyResultType.CancelOrder or result.type == StrategyResultType.StrategyDateWindowExpiredCancelOrder):
+            self.unsubscribeTicker(contract)
             return self.cancelOrder(result.ticker.contract)
 
         return

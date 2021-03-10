@@ -59,8 +59,12 @@ class StrategyOPG(Strategy):
                 return StrategyResult(strategyData.ticker, type, order)
         else:
             if self.strategyData.order:
-                print("❗️ The GAP is becoming poor for this order!❗️")
-                return StrategyResult(strategyData.ticker, StrategyResultType.KeepOrder, self.strategyData.order)
+                if self.isLastPriceReachingProfitOrder():
+                    print("❗️ Order cancelled!❗️")
+                    return StrategyResult(strategyData.ticker, StrategyResultType.CancelOrder, self.strategyData.order)
+                else:
+                    print("❗️ The GAP is becoming poor for this order!❗️")
+                    return StrategyResult(strategyData.ticker, StrategyResultType.KeepOrder, self.strategyData.order)
             else:
                 print("❗️The GAP is poor or don't exist. Do nothing! GapPercentage(%.2f) GapLastPercentage(%.2f)❗️" % (self.gapPercentage, self.gapLastPercentage))
                 return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing)
@@ -133,6 +137,12 @@ class StrategyOPG(Strategy):
 
     def shouldGetStockEarnings(self):
         return True
+
+    def isLastPriceReachingProfitOrder(self):
+        lastPrice = self.getOrderPrice()
+        profitPrice = self.strategyData.order.takeProfitOrder.lmtPrice
+        isReachingProfit = lastPrice < profitPrice if self.strategyData.order.action == OrderAction.Buy else lastPrice > profitPrice
+        return isReachingProfit
 
     # Handlers
 
