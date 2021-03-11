@@ -33,7 +33,7 @@
               - Arranque do Script: 07:45
               - Abre: 8:00
               - Startegy Ate: 8:15
-              - Cancel All: 12:00
+              - Cancel All: 11:00
 
        * USA:
               - Arranque do Script: 14:15
@@ -41,11 +41,19 @@
               - Startegy Ate: 14:45
               - Cancel All: 17:30
 
-       * Hong Kong:
+       * Japan - Tokyo:
               - Arranque do Script: 23:45
               - Abre: 00:00
               - Startegy Ate: 00:15
               - Cancel All: 03:00
+              - Closes: 06:00
+
+       * Shangai:
+              - Arranque do Script: 01:15
+              - Abre: 01:30
+              - Startegy Ate: 01:45
+              - Cancel All: 03:00
+              - Closes: 05:00
 
        * India
               - Arranque do Script: 03:30
