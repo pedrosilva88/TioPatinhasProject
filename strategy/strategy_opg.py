@@ -10,7 +10,7 @@ class StrategyOPG(Strategy):
     maxLastGap: int = 9
     gapProfitPercentage: float = 0.7
     willingToLose: float = 0.02
-    stopToLosePercentage: float = 0.15
+    stopToLosePercentage: float = 0.1
     maxToInvestPerStockPercentage: float = 0.2
     strategyHoldTimeout: datetime = datetime.combine(date.today(),time(17,30))
     runStrategyMaxTime: datetime = datetime.combine(date.today(),time(14,45))
