@@ -13,13 +13,14 @@ zip_safe=False
 
 import asyncio
 import logging
-from helpers import logInitTioPatinhas
+from helpers import logInitTioPatinhas, createLog
 from island import *
 
 if __name__ == '__main__':
     logInitTioPatinhas()
     asyncio.get_event_loop().set_debug(True)
-    #util.logToConsole(logging.DEBUG)
+    createLog()
+    #util.logToFile("logs/tioPatinhas.log",logging.DEBUG)
     try:
         island = Island()
         vaultOPG = createOPGRetailVault()

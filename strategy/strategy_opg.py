@@ -60,13 +60,13 @@ class StrategyOPG(Strategy):
         else:
             if self.strategyData.order:
                 if self.isLastPriceReachingProfitOrder():
-                    print("❗️ Order cancelled!❗️")
+                    log("❗️ Order cancelled!❗️")
                     return StrategyResult(strategyData.ticker, StrategyResultType.CancelOrder, self.strategyData.order)
                 else:
-                    print("❗️ The GAP is becoming poor for this order!❗️")
+                    log("❗️ The GAP is becoming poor for this order!❗️")
                     return StrategyResult(strategyData.ticker, StrategyResultType.KeepOrder, self.strategyData.order)
             else:
-                print("❗️The GAP is poor or don't exist. Do nothing! GapPercentage(%.2f) GapLastPercentage(%.2f)❗️" % (self.gapPercentage, self.gapLastPercentage))
+                log("❗️The GAP is poor or don't exist. Do nothing! %s GapPercentage(%.2f) GapLastPercentage(%.2f)❗️" % (self.strategyData.ticker.contract.symbol, self.gapPercentage, self.gapLastPercentage))
                 return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing)
     
     # Constructor
@@ -207,7 +207,7 @@ class StrategyOPG(Strategy):
         stopLossPrice = self.getStopLossPrice()
         size = self.getSize()
 
-        print("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
+        log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
         profitOrder = Order(action.reverse, OrderType.LimitOrder, size, profitTarget)
         stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, stopLossPrice)
@@ -219,7 +219,7 @@ class StrategyOPG(Strategy):
         stopLossPrice = self.getStopLossPrice()
         size = self.getSize()
 
-        print("\t⭐️ [Upadte] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
+        log("\t⭐️ [Upadte] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
         self.strategyData.order.lmtPrice = round(price,2)
         self.strategyData.order.totalQuantity = int(size)

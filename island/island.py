@@ -5,6 +5,7 @@ from datetime import datetime
 from ib_insync import IB
 from .vaults import Vault
 from ._events import *
+from helpers import log
 
 class Island(IslandEvents):
     ib: IB
@@ -67,7 +68,7 @@ class Island(IslandEvents):
                     self.vault.subscribeTickers()
 
             except ConnectionRefusedError:
-                print("🚨 Connection Refused error 🚨 ")
+                log("🚨 Connection Refused error 🚨 ")
             except Warning as w:
                 self._logger.warning(w)
             except Exception as e:

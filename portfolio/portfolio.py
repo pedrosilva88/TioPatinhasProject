@@ -1,6 +1,7 @@
 from datetime import datetime
 from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder
 from models import OrderType, OrderAction
+from helpers import log
 
 class Portfolio:
     cashBalance: float
@@ -45,7 +46,7 @@ class Portfolio:
         if (not self.totalCashBalanceLastUpdate or currentDatetime.date() != self.totalCashBalanceLastUpdate.date()):
             self.totalCashBalance = float(self.cashBalance)
             self.totalCashBalanceLastUpdate = currentDatetime
-        print("💵 \nTotal Cash: %s \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.totalCashBalance, self.cashBalance, self.cashAvailable))
+        log("💵 \nTotal Cash: %s \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.totalCashBalance, self.cashBalance, self.cashAvailable))
 
     def calcOpenTradesValue(self):
         totalValue = 0
@@ -62,7 +63,7 @@ class Portfolio:
         canCreate = (order.lmtPrice * order.totalQuantity) <= self.cashAvailable
         if (not canCreate and 
             not hasOrder):
-            print("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: %.2f❗️\n" % self.cashAvailable) 
+            log("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: %.2f❗️\n" % self.cashAvailable) 
         return canCreate
 
     def getTradeOrders(self, contract: ibContract):

@@ -7,6 +7,7 @@ from scanner import Scanner
 from strategy import Strategy, StrategyOPG, StrategyData, StrategyResult, StrategyResultType
 from portfolio import Portfolio
 from earnings_calendar import EarningsCalendar
+from helpers import log
 
 class VaultType(Enum):
     OPG_US_RTL = 1
@@ -37,7 +38,7 @@ class Vault:
         return self.strategy.run(data)
 
     def executeTicker(self, ticker: ibTicker):
-        #print("Volume(%.2f) - AVVolume(%.2f) - RTVolume(%.2f)" % (ticker.volume, ticker.avVolume, ticker.rtVolume))
+        #log("Volume(%.2f) - AVVolume(%.2f) - RTVolume(%.2f)" % (ticker.volume, ticker.avVolume, ticker.rtVolume))
         if self.shouldRunStrategy(ticker.contract, ticker.time):
             position = self.getPosition(ticker)
             order = self.getOrder(ticker)
@@ -89,14 +90,14 @@ class Vault:
     def handleEarningsCalendar(self, contract: ibContract, date: datetime):
         today = datetime.today().date()
         if date.date() == today:
-            print("%s have earnings today! Will be ignored" % contract.symbol)
+            log("%s have earnings today! Will be ignored" % contract.symbol)
             self.stocks.remove(contract)
 
     def getEraningsCalendarIfNecessary(self):
         if self.strategy.shouldGetStockEarnings():
-            print("🗓  Requesting earnings calendar 🗓")
+            log("🗓  Requesting earnings calendar 🗓")
             self.earningsCalendar.requestEarnings(self.stocks, self.handleEarningsCalendar)
-        print("🗓  Finished 🗓\n")
+        log("🗓  Finished 🗓\n")
 
     # Portfolio
 
