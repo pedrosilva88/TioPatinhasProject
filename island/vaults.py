@@ -156,7 +156,7 @@ class Vault:
         stopLossOrder = order.stopLossOrder
         return self.portfolio.updateOrder(self.ib, contract, newOrder, profitOrder, stopLossOrder)
 
-    def cancelOrder(self, contract: ibContract, order: Order):
+    def cancelOrder(self, contract: ibContract):
         return self.portfolio.cancelOrder(self.ib, contract)
 
     # Portfolio - Manage Positions
