@@ -1,3 +1,5 @@
 ib_insync
 bs4
 yahoo_earnings_calendar
+IPython
+pandas

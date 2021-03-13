@@ -1,5 +1,6 @@
 from enum import Enum
 from datetime import *
+from helpers import log
 from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType
 from models import Order, OrderAction, OrderType
 
@@ -103,13 +104,13 @@ class StrategyOPG(Strategy):
                 self.isDatetimeAfterExchangeStartTime())
 
     def isDatetimeInThePeriodToRunThisStrategy(self):
-        datetime = self.datetime.replace(microsecond=0, tzinfo=None)
-        maxDatetime = self.runStrategyMaxTime.replace(microsecond=0, tzinfo=None)
+        datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
+        maxDatetime = self.runStrategyMaxTime.replace(microsecond=0, tzinfo=None).time()
         return datetime <= maxDatetime
 
     def isDatetimeAfterExchangeStartTime(self):
-        datetime = self.datetime.replace(microsecond=0, tzinfo=None)
-        startTime = self.runStrategyStartTime.replace(microsecond=0)
+        datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
+        startTime = self.runStrategyStartTime.replace(microsecond=0).time()
         return datetime >= startTime
 
     def isStrategyDataValid(self):
