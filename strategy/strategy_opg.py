@@ -1,5 +1,6 @@
 from enum import Enum
 from datetime import *
+from helpers import log
 from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType
 from models import Order, OrderAction, OrderType
 
