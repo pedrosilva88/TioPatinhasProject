@@ -10,7 +10,7 @@ class IslandEvents:
         #self.vault.updatePortfolio()
 
     def onBarUpdate(self, bars, hasNewBar):
-        log("🕯 %s: %s 🕯" % (bars.contract.symbol, bars[-1]))
+        print("🕯 %s: %s 🕯" % (bars.contract.symbol, bars[-1]))
 
     def onOpenOrderEvent(self, trade):
         self.vault.updatePortfolio()
@@ -19,10 +19,10 @@ class IslandEvents:
         self.vault.updatePortfolio()
 
     def onPendingTickersEvent(self, tickers: [Ticker]):
-        #log("📈 Tickers Event 📈\n")
+        print("📈 Tickers Event 📈\n")
         for ticker in tickers:
             self.vault.executeTicker(ticker)
-        #log("\n📈               📈\n")
+        print("\n📈               📈\n")
 
     def onError(self, reqId, errorCode, errorString, contract):
         log("🚨 onErrorEvent 🚨")
