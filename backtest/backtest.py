@@ -48,8 +48,8 @@ class BackTest():
 
     def __init__(self):
         util.startLoop()
-        # self.ib = IB()
-        # self.ib.connect('127.0.0.1', 7497, clientId=16)
+        self.ib = IB()
+        self.ib.connect('127.0.0.1', 7497, clientId=16)
         self.strategy = StrategyOPG()
         self.results = dict()
 
@@ -199,18 +199,19 @@ class BackTest():
         nDays = days
         durationDays = ("%d D" % (nDays+1))
         today = datetime.now().replace(microsecond=0, tzinfo=None).date()
-        startDate = today-timedelta(days=nDays)
+        startDate = today-timedelta(days=nDays+1)
         
         minute_bars: [BarData] = []
         while startDate <= today:
             print("Historical Data: %s - %s" % (stock.symbol, startDate))
-            bars: [BarData] = self.ib.reqHistoricalData(stock, endDateTime=startDate, 
+            endtime = startDate+timedelta(days=1)
+            bars: [BarData] = self.ib.reqHistoricalData(stock, endDateTime=endtime, 
                                                     durationStr='5 D', 
                                                     barSizeSetting='1 min', 
                                                     whatToShow='TRADES',
                                                     useRTH=True,
                                                     formatDate=1)
-            startDate = startDate+timedelta(days=5)
+            startDate = startDate+timedelta(days=6)
             minute_bars += bars
 
         day_bars: [BarData] = self.ib.reqHistoricalData(stock, endDateTime='', 
@@ -336,6 +337,7 @@ class BackTest():
         scanner = Scanner()
         scanner.getOPGRetailers(path='../scanner/Data/CSV/US/OPG_Retails_SortFromBackTest.csv')
         stocks = scanner.stocks
+        # stocks = [Stock("AAPL", "SMART", "USD")]
         total = len(stocks)
         current = 0
         for stock in stocks:
@@ -346,14 +348,20 @@ class BackTest():
             else:
                 print("")
 
-            mBars, dBars = self.downloadHistoricDataFromIB(stock, 200)
+            mBars, dBars = self.downloadHistoricDataFromIB(stock, 15)
+            # current = None
+            # for bar in mBars:
+            #     newDate = bar.date.replace(microsecond=0, tzinfo=None).date()
+            #     if not current or current != newDate:
+            #         current = newDate
+            #         print(bar.date)
             models = self.createListOfBackTestModels(stock, mBars, dBars)
             self.saveDataInCSVFile(stock.symbol, models)
 
 if __name__ == '__main__':
     try:
         backtest = BackTest()
-        #backtest.downloadStocksToCSVFile()
-        backtest.run()
+        backtest.downloadStocksToCSVFile()
+        #backtest.run()
     except (KeyboardInterrupt, SystemExit):
         None
