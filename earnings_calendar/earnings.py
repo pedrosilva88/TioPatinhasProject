@@ -1,7 +1,7 @@
-import sys
 from datetime import datetime
 from ib_insync import Contract as ibContract
 from yahoo_earnings_calendar import YahooEarningsCalendar
+from helpers import *
 
 class EarningsCalendar():
     yec: YahooEarningsCalendar
@@ -15,15 +15,11 @@ class EarningsCalendar():
         for contract in contracts:
             try:
                 current +=1
-                sys.stdout.write("\t Contracts: %i/%i \r" % (current, total) )
-                if current <= total-1:
-                    sys.stdout.flush()
-                else:
-                    print("")
+                logCounter("Earnings", total, current)
 
                 timeinterval = self.yec.get_next_earnings_date(contract.symbol)
                 nextEarningDate = datetime.utcfromtimestamp(timeinterval)
                 callback(contract, nextEarningDate)
             except Exception as e:
-                None
+                print(e)
             

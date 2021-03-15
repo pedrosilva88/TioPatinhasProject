@@ -1,4 +1,5 @@
 from logging import *
+import sys
 from strategy import StrategyData, StrategyResult, StrategyResultType
 
 def createLog():
@@ -39,13 +40,19 @@ def logExecutionTicker(data: StrategyData, result: StrategyResult):
                                                                                                             data.ticker.close))
 
 def logInitTioPatinhas():
-    logger = getLog()
-    logger.info("\t🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆\n")
-    logger.info("\t🦆\t\t\t   🦆\n")
-    logger.info("\t🦆   Running Tio Patinhas  🦆\n")
-    logger.info("\t🦆\t\t\t   🦆\n")
-    logger.info("\t🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆\n")
+    log("\t🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆\n")
+    log("\t🦆\t\t\t   🦆\n")
+    log("\t🦆   Running Tio Patinhas  🦆\n")
+    log("\t🦆\t\t\t   🦆\n")
+    log("\t🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆\n")
 
 def log(str: str):
     logger = getLog()
     logger.info(str)
+
+def logCounter(prefix: str, total: int, current: int):
+    sys.stdout.write("\t %s: %i/%i \r" % (prefix, current, total) )
+    if current <= total-1:
+        sys.stdout.flush()
+    else:
+        print("")
