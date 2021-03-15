@@ -31,6 +31,8 @@ class StrategyResultType(Enum):
 
 class StrategyData:
     ticker: ibTicker
+    averageVolume: float
+    volumeFirstMinute: float
     position: ibPosition
     order: Order
     totalCash: float
@@ -38,11 +40,15 @@ class StrategyData:
     def __init__(self, ticker: ibTicker,
                         position: ibPosition,
                         order: Order,
-                        totalCash: float):
+                        totalCash: float,
+                        averageVolume: float = None,
+                        volumeFirstMinute: float = None):
         self.ticker = ticker
         self.position = position
         self.order = order
         self.totalCash = totalCash
+        self.averageVolume = averageVolume
+        self.volumeFirstMinute = volumeFirstMinute
 
 class StrategyResult:
     ticker: ibTicker
