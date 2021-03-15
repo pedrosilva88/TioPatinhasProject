@@ -9,10 +9,10 @@ class StrategyOPG(Strategy):
     minGap: int = 3
     maxGap: int = 8
     maxLastGap: int = 9
-    gapProfitPercentage: float = 0.7
+    gapProfitPercentage: float = 0.75
     willingToLose: float = 0.02
     stopToLosePercentage: float = 0.1
-    maxToInvestPerStockPercentage: float = 0.2
+    maxToInvestPerStockPercentage: float = 0.9
     strategyHoldTimeout: datetime = datetime.combine(date.today(),time(17,30))
     runStrategyMaxTime: datetime = datetime.combine(date.today(),time(14,45))
     runStrategyStartTime: time = datetime.combine(date.today(),time(14,15))
@@ -32,6 +32,7 @@ class StrategyOPG(Strategy):
     askPrice: float = None
     bidPrice: float = None
     avgVolume: float = None
+    volumeFirstMinute: float = None
     datetime: datetime = None
 
     def run(self, strategyData: StrategyData):
@@ -67,6 +68,9 @@ class StrategyOPG(Strategy):
                     log("❗️ The GAP is becoming poor for this order!❗️")
                     return StrategyResult(strategyData.ticker, StrategyResultType.KeepOrder, self.strategyData.order)
             else:
+                # print("❗️ %s %s %.2f ❗️" % (self.strategyData.ticker.time, self.gapType, self.gapPrice))
+                # print("❗️The GAP is poor or don't exist. Do nothing! %s GapPercentage(%.2f) GapLastPercentage(%.2f)❗️" % (self.strategyData.ticker.contract.symbol, self.gapPercentage, self.gapLastPercentage))
+
                 log("❗️The GAP is poor or don't exist. Do nothing! %s GapPercentage(%.2f) GapLastPercentage(%.2f)❗️" % (self.strategyData.ticker.contract.symbol, self.gapPercentage, self.gapLastPercentage))
                 return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing)
     
@@ -78,8 +82,9 @@ class StrategyOPG(Strategy):
         self.lastPrice = self.strategyData.ticker.last
         self.askPrice = self.strategyData.ticker.ask
         self.bidPrice = self.strategyData.ticker.bid
-        self.avgVolume = self.strategyData.ticker.avVolume
         self.datetime = self.strategyData.ticker.time
+        self.avgVolume = self.strategyData.averageVolume
+        self.volumeFirstMinute = self.strategyData.volumeFirstMinute
 
     # Validations
 
@@ -119,11 +124,14 @@ class StrategyOPG(Strategy):
                 self.lastPrice > 0 and
                 self.askPrice > 0 and
                 self.bidPrice > 0 and
-                self.datetime)
+                self.datetime and
+                self.datetime.hour >= 14 and
+                self.datetime.minute > 30 and
+                self.volumeFirstMinute < (self.avgVolume+(self.avgVolume*2)))
 
     def isTimeForThisStartegyExpired(self):
-        datetime = self.datetime.replace(microsecond=0, tzinfo=None)
-        holdTimeout = self.strategyHoldTimeout.replace(microsecond=0, tzinfo=None)
+        datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
+        holdTimeout = self.strategyHoldTimeout.replace(microsecond=0, tzinfo=None).time()
         return datetime > holdTimeout
 
     def isGapValid(self):
@@ -149,7 +157,6 @@ class StrategyOPG(Strategy):
 
     def handlePosition(self):
         if self.isTimeForThisStartegyExpired():
-            # TODO: Validar se o Position Size é negativo quando estou a fazer short
             if self.strategyData.position.position > 0:
                 return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
             elif self.strategyData.position.position < 0:
