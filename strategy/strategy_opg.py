@@ -1,6 +1,5 @@
 from enum import Enum
 from datetime import *
-from helpers import log
 from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType
 from models import Order, OrderAction, OrderType
 
@@ -9,10 +8,12 @@ class StrategyOPG(Strategy):
     minGap: int = 3
     maxGap: int = 8
     maxLastGap: int = 9
-    gapProfitPercentage: float = 0.7
+    gapProfitPercentage: float = 0.75
     willingToLose: float = 0.02
     stopToLosePercentage: float = 0.1
-    maxToInvestPerStockPercentage: float = 0.2
+    maxToInvestPerStockPercentage: float = 0.9
+    averageVolumePercentage: float = 2 # This means 200% above
+    
     strategyHoldTimeout: datetime = datetime.combine(date.today(),time(17,30))
     runStrategyMaxTime: datetime = datetime.combine(date.today(),time(14,45))
     runStrategyStartTime: time = datetime.combine(date.today(),time(14,15))
@@ -32,6 +33,7 @@ class StrategyOPG(Strategy):
     askPrice: float = None
     bidPrice: float = None
     avgVolume: float = None
+    volumeFirstMinute: float = None
     datetime: datetime = None
 
     def run(self, strategyData: StrategyData):
@@ -78,8 +80,9 @@ class StrategyOPG(Strategy):
         self.lastPrice = self.strategyData.ticker.last
         self.askPrice = self.strategyData.ticker.ask
         self.bidPrice = self.strategyData.ticker.bid
-        self.avgVolume = self.strategyData.ticker.avVolume
         self.datetime = self.strategyData.ticker.time
+        self.avgVolume = self.strategyData.averageVolume
+        self.volumeFirstMinute = self.strategyData.volumeFirstMinute
 
     # Validations
 
@@ -104,13 +107,13 @@ class StrategyOPG(Strategy):
                 self.isDatetimeAfterExchangeStartTime())
 
     def isDatetimeInThePeriodToRunThisStrategy(self):
-        datetime = self.datetime.replace(microsecond=0, tzinfo=None)
-        maxDatetime = self.runStrategyMaxTime.replace(microsecond=0, tzinfo=None)
+        datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
+        maxDatetime = self.runStrategyMaxTime.replace(microsecond=0, tzinfo=None).time()
         return datetime <= maxDatetime
 
     def isDatetimeAfterExchangeStartTime(self):
-        datetime = self.datetime.replace(microsecond=0, tzinfo=None)
-        startTime = self.runStrategyStartTime.replace(microsecond=0)
+        datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
+        startTime = self.runStrategyStartTime.replace(microsecond=0).time()
         return datetime >= startTime
 
     def isStrategyDataValid(self):
@@ -119,11 +122,16 @@ class StrategyOPG(Strategy):
                 self.lastPrice > 0 and
                 self.askPrice > 0 and
                 self.bidPrice > 0 and
-                self.datetime)
+                self.datetime and
+                self.datetime.hour >= 14 and
+                self.datetime.minute > 30 and
+                self.volumeFirstMinute and
+                self.avgVolume and
+                self.volumeFirstMinute < (self.avgVolume+(self.avgVolume*self.averageVolumePercentage)))
 
     def isTimeForThisStartegyExpired(self):
-        datetime = self.datetime.replace(microsecond=0, tzinfo=None)
-        holdTimeout = self.strategyHoldTimeout.replace(microsecond=0, tzinfo=None)
+        datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
+        holdTimeout = self.strategyHoldTimeout.replace(microsecond=0, tzinfo=None).time()
         return datetime > holdTimeout
 
     def isGapValid(self):
@@ -149,7 +157,6 @@ class StrategyOPG(Strategy):
 
     def handlePosition(self):
         if self.isTimeForThisStartegyExpired():
-            # TODO: Validar se o Position Size é negativo quando estou a fazer short
             if self.strategyData.position.position > 0:
                 return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
             elif self.strategyData.position.position < 0:

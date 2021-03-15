@@ -55,6 +55,7 @@ class Island(IslandEvents):
                 await self.ib.accountSummaryAsync()
                 await self.ib.reqPositionsAsync()
                 await self.ib.reqAllOpenOrdersAsync()
+                await self.vault.getAverageVolumeOfStocks()
 
                 self.vault.getEraningsCalendarIfNecessary() # Isto aqui pode ser async. Preciso de estudar melhor
                 self.vault.updatePortfolio()

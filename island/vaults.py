@@ -2,12 +2,12 @@ from enum import Enum
 from datetime import datetime
 from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition
 from helpers import logExecutionTicker
-from models import Order, OrderAction
+from models import Order, OrderAction, StockInfo
 from scanner import Scanner
-from strategy import Strategy, StrategyOPG, StrategyData, StrategyResult, StrategyResultType
+from strategy import Strategy, StrategyOPG, StrategyData, StrategyResult, StrategyResultType, HistoricalData
 from portfolio import Portfolio
 from earnings_calendar import EarningsCalendar
-from helpers import log
+from helpers import log, logCounter
 
 class VaultType(Enum):
     OPG_US_RTL = 1
@@ -22,7 +22,8 @@ class Vault:
     strategy: Strategy
     portfolio: Portfolio
     earningsCalendar: EarningsCalendar
-    lastExecutions: dict()
+    historicalData: HistoricalData
+    stocksExtraInfo: [str, StockInfo]
 
     def __init__(self, type: VaultType, scanner: Scanner, strategy: Strategy, portfolio: Portfolio):
         self.type = type
@@ -30,7 +31,8 @@ class Vault:
         self.strategy = strategy
         self.portfolio = portfolio
         self.earningsCalendar = EarningsCalendar()
-        self.lastExecutions = {}
+        self.historicalData = HistoricalData()
+        self.stocksExtraInfo = {}
 
     # Strategy
 
@@ -40,13 +42,22 @@ class Vault:
     def executeTicker(self, ticker: ibTicker):
         #log("Volume(%.2f) - AVVolume(%.2f) - RTVolume(%.2f)" % (ticker.volume, ticker.avVolume, ticker.rtVolume))
         if self.shouldRunStrategy(ticker.contract, ticker.time):
+            self.updateVolumeInFirstMinuteBar(ticker)
             position = self.getPosition(ticker)
             order = self.getOrder(ticker)
+            averageVolume = None
+            volumeFirstMinute = None
+            if ticker.contract.symbol in self.stocksExtraInfo:
+                stockInfo = self.stocksExtraInfo[ticker.contract.symbol]
+                averageVolume = stockInfo.averageVolume
+                volumeFirstMinute = stockInfo.volumeFirstMinute
 
             data = StrategyData(ticker, 
                                 position, 
                                 order, 
-                                self.portfolio.totalCashBalance)
+                                self.portfolio.totalCashBalance,
+                                averageVolume,
+                                volumeFirstMinute)
 
             result = self.runStrategy(data)
             self.registerLastExecution(ticker.contract, ticker.time)
@@ -75,15 +86,51 @@ class Vault:
         return
 
     def registerLastExecution(self, contract: ibContract, datetime: datetime):
-        self.lastExecutions[contract.symbol] = datetime
+        if contract.symbol in self.stocksExtraInfo:
+            model = self.stocksExtraInfo[contract.symbol]
+            model.lastExecution = datetime
+        else:
+            self.stocksExtraInfo[contract.symbol] = StockInfo(symbol=contract.symbol, lastExecution=datetime)
     
     def shouldRunStrategy(self, contract: ibContract, newDatetime: datetime):
-        if not contract.symbol in self.lastExecutions:
+        if not contract.symbol in self.stocksExtraInfo:
             return True
         newDatetime = newDatetime.replace(microsecond=0, tzinfo=None)
-        datetime = self.lastExecutions[contract.symbol].replace(microsecond=0, tzinfo=None)
+        datetime = self.stocksExtraInfo[contract.symbol].lastExecution.replace(microsecond=0, tzinfo=None)
         return newDatetime > datetime
                 # and (newDatetime.second - datetime.second) >= 2 # Caso queira dar um intervalo de 2 segundos por Ticker event
+
+    # Volumes
+
+    async def getAverageVolumeOfStocks(self):
+        total = len(self.stocks)
+        current = 0
+        for stock in self.stocks:
+            current +=1
+            logCounter("Volumes", total, current)
+            averageVolume = await self.historicalData.getAverageVolume(self.ib, stock, 5)
+            if averageVolume:
+                if stock.symbol in self.stocksExtraInfo:
+                    model = self.stocksExtraInfo[stock.symbol]
+                    model.averageVolume = averageVolume
+                else:
+                    self.stocksExtraInfo[stock.symbol] = StockInfo(symbol=stock.symbol, averageVolume=averageVolume)
+
+    def updateVolumeInFirstMinuteBar(self, ticker: ibTicker):
+        model = None
+        stock = ticker.contract
+        if stock.symbol in self.stocksExtraInfo:
+            model = self.stocksExtraInfo[stock.symbol]
+            self.stocksExtraInfo[stock.symbol] = model        
+
+        if (ticker.time.hour == 14 and ticker.time.hour == 31 and
+            (not model or not model.volumeFirstMinute)):
+            if not model:
+                model = StockInfo(symbol=stock.symbol, volumeFirstMinute=ticker.volume)
+                self.stocksExtraInfo[stock.symbol] = model
+            if not model.volumeFirstMinute:
+                model.volumeFirstMinute = ticker.volume
+                self.stocksExtraInfo[stock.symbol] = model        
 
     # Earning Calendar
 
@@ -183,6 +230,7 @@ class Vault:
 
     def unsubscribeTicker(self, contract: ibContract):
         ## Além de fazer cancelmarketData também devia de limpar na list de stocks que tenho no scanner
+        log("👋 Unsubscribe Contract %s 👋" % contract.symbol) 
         self.ib.cancelMktData(contract)
         # self.ib.cancelRealTimeBars()
         return 
