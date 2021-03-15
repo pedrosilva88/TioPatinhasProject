@@ -40,7 +40,6 @@ class Vault:
         return self.strategy.run(data)
 
     def executeTicker(self, ticker: ibTicker):
-        #log("Volume(%.2f) - AVVolume(%.2f) - RTVolume(%.2f)" % (ticker.volume, ticker.avVolume, ticker.rtVolume))
         if self.shouldRunStrategy(ticker.contract, ticker.time):
             self.updateVolumeInFirstMinuteBar(ticker)
             position = self.getPosition(ticker)
@@ -95,10 +94,12 @@ class Vault:
     def shouldRunStrategy(self, contract: ibContract, newDatetime: datetime):
         if not contract.symbol in self.stocksExtraInfo:
             return True
-        newDatetime = newDatetime.replace(microsecond=0, tzinfo=None)
-        datetime = self.stocksExtraInfo[contract.symbol].lastExecution.replace(microsecond=0, tzinfo=None)
-        return newDatetime > datetime
-                # and (newDatetime.second - datetime.second) >= 2 # Caso queira dar um intervalo de 2 segundos por Ticker event
+        elif self.stocksExtraInfo[contract.symbol].lastExecution:
+            newDatetime = newDatetime.replace(microsecond=0, tzinfo=None)
+            datetime = self.stocksExtraInfo[contract.symbol].lastExecution.replace(microsecond=0, tzinfo=None)
+            return newDatetime > datetime
+        else:
+            return True
 
     # Volumes
 
@@ -120,10 +121,10 @@ class Vault:
         model = None
         stock = ticker.contract
         if stock.symbol in self.stocksExtraInfo:
-            model = self.stocksExtraInfo[stock.symbol]
-            self.stocksExtraInfo[stock.symbol] = model        
+            model = self.stocksExtraInfo[stock.symbol]  
 
-        if (ticker.time.hour == 14 and ticker.time.hour == 31 and
+        if (ticker.time.hour == 14 and ticker.time.minute == 31 and
+            ticker.volume > 0 and
             (not model or not model.volumeFirstMinute)):
             if not model:
                 model = StockInfo(symbol=stock.symbol, volumeFirstMinute=ticker.volume)

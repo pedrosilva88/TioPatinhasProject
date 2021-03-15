@@ -23,9 +23,9 @@ class Scanner:
                     stocks.append(ibStock(row[0], row[1], row[2]))
                 line_count += 1
         
-        if len(stocks) > 90:
-            self.stocksDownloaded = stocks[:90]
-            self.stocks = stocks[:90]
+        if len(stocks) > 80:
+            self.stocksDownloaded = stocks[:80]
+            self.stocks = stocks[:80]
         else:
             self.stocksDownloaded = stocks
             self.stocks = stocks

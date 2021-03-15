@@ -1,11 +1,12 @@
 from datetime import *
-from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData
+from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, BarDataList
 
 class HistoricalData:
 
     async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
         minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
-        return self.calculateAverageVolume(minute_bars)
+        value = self.calculateAverageVolume(minute_bars)
+        return value
 
     async def downloadHistoricDataFromIB(self, ib: IB, stock: ibContract, days: int = 5) -> [BarData]:
         nDays = days
@@ -23,9 +24,8 @@ class HistoricalData:
                                                     formatDate=1)
             startDate = startDate+timedelta(days=6)
             minute_bars += bars
-        
         return minute_bars
-
+    
     def calculateAverageVolume(self, datas: [BarData]):
         nBars = len(datas)
         if nBars > 0:

@@ -1,6 +1,5 @@
 from logging import *
 import sys
-from strategy import StrategyData, StrategyResult, StrategyResultType
 
 def createLog():
     logger = getLogger("Tio Patinhas")
@@ -24,9 +23,9 @@ def createLog():
 def getLog() -> Logger:
     return getLogger("Tio Patinhas")
 
-def logExecutionTicker(data: StrategyData, result: StrategyResult):
+def logExecutionTicker(data, result):
     logger = getLog()
-    if (result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell):
+    if (result.type.value == 2 or result.type.value == 3):
         logger.info("⭐️[%i/%i %i:%i:%i] Ticker %s: %s / LastBid(%.2f) LastAsk(%.2f) Open(%.2f) Close(%.2f) ⭐️" % (data.ticker.time.day, 
                                                                                                             data.ticker.time.month, 
                                                                                                             data.ticker.time.hour, 
