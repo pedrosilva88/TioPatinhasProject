@@ -10,17 +10,18 @@ class HistoricalData:
     async def downloadHistoricDataFromIB(self, ib: IB, stock: ibContract, days: int = 5) -> [BarData]:
         nDays = days
         today = datetime.now().replace(microsecond=0, tzinfo=None).date()
-        startDate = today-timedelta(days=nDays)
+        startDate = today-timedelta(days=nDays+1)
         
         minute_bars: [BarData] = []
         while startDate <= today:
-            bars: [BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime=startDate, 
+            endtime = startDate+timedelta(days=1)
+            bars: [BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime=endtime, 
                                                     durationStr='5 D', 
                                                     barSizeSetting='1 min', 
                                                     whatToShow='TRADES',
                                                     useRTH=True,
                                                     formatDate=1)
-            startDate = startDate+timedelta(days=5)
+            startDate = startDate+timedelta(days=6)
             minute_bars += bars
         
         return minute_bars
