@@ -29,27 +29,57 @@ class BackTestResultType(Enum):
     stopLoss = 3
     loss = 4
 
+    def emoji(self):
+        if self == BackTestResultType.takeProfit:
+            return "✅ ✅"
+        elif self == BackTestResultType.profit:
+            return "✅"
+        elif self == BackTestResultType.stopLoss:
+            return "❌ ❌"
+        elif self == BackTestResultType.loss:
+            return "❌"
+
 class BackTestResult():
     date: date
     symbol: str
     pnl: float
     action: str
     type: BackTestResultType
+    priceCreateTrade: float
+    priceCloseTrade: float
+    size: int
+    averageVolume: float
+    volumeFirstMinute: float
+    totalInvested: float
+    openPrice: float
+    ystdClosePrice: float
 
-    def __init__(self, symbol: str, date: date, pnl, action: str, type: BackTestResultType):
+    def __init__(self, symbol: str, date: date, pnl, action: str, 
+                type: BackTestResultType, priceCreateTrade: float, priceCloseTrade: float,
+                size: int, averageVolume: float, volumeFirstMinute: float, totalInvested: float,
+                openPrice: float, ystdClosePrice: float):
         self.symbol = symbol
         self.date = date
         self.pnl = pnl
         self.action = action
         self.type = type
+        self.priceCreateTrade = priceCreateTrade
+        self.priceCloseTrade = priceCloseTrade
+        self.size = size
+        self.averageVolume =  averageVolume
+        self.volumeFirstMinute =  volumeFirstMinute
+        self.totalInvested = totalInvested
+        self.openPrice = openPrice
+        self.ystdClosePrice = ystdClosePrice
 
 class BackTest():
     results: [str, [BackTestResult]]
+    trades: [str, [str]] = dict()
 
     def __init__(self):
         util.startLoop()
-        self.ib = IB()
-        self.ib.connect('127.0.0.1', 7497, clientId=16)
+        # self.ib = IB()
+        # self.ib.connect('127.0.0.1', 7497, clientId=16)
         self.strategy = StrategyOPG()
         self.results = dict()
 
@@ -57,7 +87,14 @@ class BackTest():
         scanner = Scanner()
         scanner.getOPGRetailers(path='../scanner/Data/CSV/US/OPG_Retails_SortFromBackTest.csv')
         stocks = scanner.stocks
-        # stocks = [Stock("VUZI","SMART","USD")]
+        # stocks = [Stock("VUZI","SMART","USD"),
+        #             Stock("HBP","SMART","USD"),
+        #             Stock("ASO","SMART","USD"),
+        #             Stock("BBQ","SMART","USD"),
+        #             Stock("BGI","SMART","USD"),
+        #             Stock("KXIN","SMART","USD"),
+        #             Stock("JILL","SMART","USD"),
+        #             Stock("WTRH","SMART","USD")]
         for stock in stocks:
             name = ("backtest/Data/CSV/%s.csv" % stock.symbol)
         
@@ -67,19 +104,46 @@ class BackTest():
             models = self.getModelsFromCSV(name)
             self.runStrategy(models)
         self.showReport()
+    
+    def saveReportResultInFile(self, data:[[]]):
+        name = "backtest/Data/CSV/Report/ResultsPnL.csv"
+        with open(name, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Date", "PnL", "Trades"])
+            for model in data:
+                writer.writerow(model)
+
+    def saveReportTradesInFile(self, data:[[]]):
+        name = "backtest/Data/CSV/Report/ResultsTrades.csv"
+        with open(name, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Date", "Symbol", "Result", "PnL", "Price CreateTrade", "Price CloseTrade", "Size", "Avg Volume",  "Volume 1st minute", "Total Invested", "Open Price", "YSTD Close Price", "Action"])
+            for model in data:
+                writer.writerow(model)
 
     def showReport(self):
         for key, array in self.results.items():
-            updatedArray = []
-            for item in self.deduplicate(array):
-                updatedArray.append(item)
-            self.results[key] = updatedArray
+            self.results[key] = array[:2]
 
+        for key, array in self.trades.items():
+            self.trades[key] = array[:2]
+
+        items = [[]]
         for key, array in self.results.items():
             total = 0
             for item in array:
                 total += item.pnl
-            print("%s: %.2f"% (key, total))
+            items.append([key, total, len(array)])
+            print("%s: %.2f€ %d" % (key, total, len(array)))
+
+        self.saveReportResultInFile(items)
+
+        items = [[]]
+        for key, array in self.trades.items():
+            for item in array:
+                items.append(item)
+
+        self.saveReportTradesInFile(items)
             
     def deduplicate(self, items):
         seen = set()
@@ -93,6 +157,27 @@ class BackTest():
             self.results[key].append(value)
         else:
             self.results[key] = [value]
+
+    def updateTrades(self, key: str, ticker: Ticker, result: BackTestResult):
+        resultArray = []
+        resultArray.append(key) # date
+        resultArray.append(ticker.contract.symbol) # symbol
+        resultArray.append(result.type.emoji()) # ✅ or ✅ ✅ or ❌  or ❌ ❌
+        resultArray.append(result.pnl) # PnL
+        resultArray.append(result.priceCreateTrade) # Price CreateTrade
+        resultArray.append(result.priceCloseTrade) # Price CloseTrade
+        resultArray.append(result.size) # Size
+        resultArray.append(result.averageVolume) # AverageVolume
+        resultArray.append(result.volumeFirstMinute) # VolumeFirstMinute
+        resultArray.append(result.totalInvested) # Total Invested
+        resultArray.append(result.openPrice) # Open Price
+        resultArray.append(result.ystdClosePrice) # YSTD Close Price
+        resultArray.append(result.action) # Action Long or Short
+        
+        if key in self.trades:
+            self.trades[key].append(resultArray)
+        else:
+            self.trades[key] = [resultArray]
 
     def runStrategy(self, models: [BackTestModel]):
         limitProfits = 0
@@ -129,9 +214,22 @@ class BackTest():
                     ganho = abs(tempOrder.takeProfitOrder.lmtPrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     totalWon += ganho
                     print(today)
-                    print("Success ✅ - %.2f FirstMinute(%d) Average(%d)\n" % (ganho, model.volumeInFirstMinuteBar, model.averageVolume))
-                    result = BackTestResult(ticker.contract.symbol, ticker.time, ganho, tempOrder.action.value, BackTestResultType.takeProfit)
+                    print("Success ✅ - %.2f FirstMinute(%d) Average(%d) Size(%.2f)\n" % (ganho, model.volumeInFirstMinuteBar, model.averageVolume, tempOrder.totalQuantity))
+                    result = BackTestResult(symbol=ticker.contract.symbol, 
+                                            date=ticker.time, 
+                                            pnl=(ganho), 
+                                            action=tempOrder.action.value, 
+                                            type=BackTestResultType.takeProfit,
+                                            priceCreateTrade= tempOrder.lmtPrice, 
+                                            priceCloseTrade= tempOrder.takeProfitOrder.lmtPrice,
+                                            size= tempOrder.totalQuantity, 
+                                            averageVolume= model.averageVolume, 
+                                            volumeFirstMinute= model.volumeInFirstMinuteBar, 
+                                            totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
+                                            openPrice= ticker.open, 
+                                            ystdClosePrice= ticker.close)
                     self.updateResults(key=("%s" % ticker.time.date()), value=result)
+                    self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
                     limitProfits += 1
                     dayTradingEnded = True
                     continue
@@ -140,9 +238,22 @@ class BackTest():
                     perda = abs(tempOrder.stopLossOrder.auxPrice*tempOrder.stopLossOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     totalLoss += perda
                     print(today)
-                    print("StopLoss ❌ - %.2f FirstMinute(%d) Average(%d)\n" % (perda, model.volumeInFirstMinuteBar, model.averageVolume))
-                    result = BackTestResult(ticker.contract.symbol, ticker.time, -perda, tempOrder.action.value, BackTestResultType.stopLoss)
+                    print("StopLoss ❌ - %.2f FirstMinute(%d) Average(%d) Size(%.2f)\n" % (perda, model.volumeInFirstMinuteBar, model.averageVolume, tempOrder.totalQuantity))
+                    result = BackTestResult(symbol=ticker.contract.symbol, 
+                                            date=ticker.time, 
+                                            pnl=(-perda), 
+                                            action=tempOrder.action.value, 
+                                            type=BackTestResultType.stopLoss,
+                                            priceCreateTrade= tempOrder.lmtPrice, 
+                                            priceCloseTrade= tempOrder.stopLossOrder.auxPrice,
+                                            size= tempOrder.totalQuantity, 
+                                            averageVolume= model.averageVolume, 
+                                            volumeFirstMinute= model.volumeInFirstMinuteBar, 
+                                            totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
+                                            openPrice= ticker.open, 
+                                            ystdClosePrice= ticker.close)
                     self.updateResults(key=("%s" % ticker.time.date()), value=result)
+                    self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
                     stopLosses += 1
                     dayTradingEnded = True
                     continue
@@ -185,18 +296,44 @@ class BackTest():
                     ganho = abs(ticker.last*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     profits += 1
                     totalWon += ganho
-                    result = BackTestResult(ticker.contract.symbol, ticker.time, ganho, tempOrder.action.value, BackTestResultType.profit)
+                    result = BackTestResult(symbol=ticker.contract.symbol, 
+                                            date=ticker.time, 
+                                            pnl=(ganho), 
+                                            action=tempOrder.action.value, 
+                                            type=BackTestResultType.profit,
+                                            priceCreateTrade= tempOrder.lmtPrice, 
+                                            priceCloseTrade= ticker.last,
+                                            size= tempOrder.totalQuantity, 
+                                            averageVolume= model.averageVolume, 
+                                            volumeFirstMinute= model.volumeInFirstMinuteBar, 
+                                            totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
+                                            openPrice= ticker.open, 
+                                            ystdClosePrice= ticker.close)
                     self.updateResults(key=("%s" % ticker.time.date()), value=result)
+                    self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
                     print(today)
-                    print("Success (not profit) ✅ - %.2f FirstMinute(%d) Average(%d)\n" % (ganho, model.volumeInFirstMinuteBar, model.averageVolume))
+                    print("Success (not profit) ✅ - %.2f FirstMinute(%d) Average(%d) Size(%.2f)\n" % (ganho, model.volumeInFirstMinuteBar, model.averageVolume, tempOrder.totalQuantity))
                 else:
                     perda = abs(ticker.last*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     losses += 1
                     totalLoss += perda
-                    result = BackTestResult(ticker.contract.symbol, ticker.time, -perda, tempOrder.action.value, BackTestResultType.loss)
+                    result = BackTestResult(symbol=ticker.contract.symbol, 
+                                            date=ticker.time, 
+                                            pnl=(-perda), 
+                                            action=tempOrder.action.value, 
+                                            type=BackTestResultType.loss,
+                                            priceCreateTrade= tempOrder.lmtPrice, 
+                                            priceCloseTrade= ticker.last,
+                                            size= tempOrder.totalQuantity, 
+                                            averageVolume= model.averageVolume, 
+                                            volumeFirstMinute= model.volumeInFirstMinuteBar, 
+                                            totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
+                                            openPrice= ticker.open, 
+                                            ystdClosePrice= ticker.close)
                     self.updateResults(key=("%s" % ticker.time.date()), value=result)
+                    self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
                     print(today)
-                    print("Loss ❌ - %.2f FirstMinute(%d) Average(%d)\n" % (perda, model.volumeInFirstMinuteBar, model.averageVolume))
+                    print("Loss ❌ - %.2f FirstMinute(%d) Average(%d) Size(%.2f)\n" % (perda, model.volumeInFirstMinuteBar, model.averageVolume, tempOrder.totalQuantity))
 
             elif result.type == StrategyResultType.KeepOrder:
                 order = result.order
@@ -221,7 +358,7 @@ class BackTest():
 
     def downloadHistoricDataFromIB(self, stock: Contract, days: int = 5) -> ([BarData], [BarData]):
         nDays = days
-        durationDays = ("%d D" % (nDays+1))
+        durationDays = ("%d D" % (nDays+1)) if nDays < 365 else "1 Y"
         today = datetime.now().replace(microsecond=0, tzinfo=None).date()
         startDate = today-timedelta(days=nDays+1)
         
@@ -372,7 +509,7 @@ class BackTest():
             else:
                 print("")
 
-            mBars, dBars = self.downloadHistoricDataFromIB(stock, 15)
+            mBars, dBars = self.downloadHistoricDataFromIB(stock, 365)
             # current = None
             # for bar in mBars:
             #     newDate = bar.date.replace(microsecond=0, tzinfo=None).date()
