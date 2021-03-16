@@ -15,9 +15,9 @@ class StrategyOPG(Strategy):
     maxToInvestPerStockPercentage: float = 0.5
     averageVolumePercentage: float = 1.2 # This means 120% above
     
-    strategyHoldTimeout: datetime = datetime.combine(date.today(),time(17,30))
-    runStrategyMaxTime: datetime = datetime.combine(date.today(),time(14,45))
-    runStrategyStartTime: time = datetime.combine(date.today(),time(14,15))
+    strategyHoldTimeout: datetime = datetime.combine(date.today(),time(16,30))
+    runStrategyMaxTime: datetime = datetime.combine(date.today(),time(13,45))
+    runStrategyStartTime: time = datetime.combine(date.today(),time(13,15))
 
     # Properties
     strategyData: StrategyData = None
