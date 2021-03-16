@@ -10,9 +10,9 @@ class StrategyOPG(Strategy):
     maxGap: int = 8
     maxLastGap: int = 9
     gapProfitPercentage: float = 0.75
-    willingToLose: float = 0.02
+    willingToLose: float = 0.05
     stopToLosePercentage: float = 0.1
-    maxToInvestPerStockPercentage: float = 0.9
+    maxToInvestPerStockPercentage: float = 0.5
     strategyHoldTimeout: datetime = datetime.combine(date.today(),time(17,30))
     runStrategyMaxTime: datetime = datetime.combine(date.today(),time(14,45))
     runStrategyStartTime: time = datetime.combine(date.today(),time(14,15))
@@ -127,7 +127,7 @@ class StrategyOPG(Strategy):
                 self.datetime and
                 self.datetime.hour >= 14 and
                 self.datetime.minute > 30 and
-                self.volumeFirstMinute < (self.avgVolume+(self.avgVolume*2)))
+                self.volumeFirstMinute < (self.avgVolume+(self.avgVolume*1.2)))
 
     def isTimeForThisStartegyExpired(self):
         datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
@@ -204,6 +204,7 @@ class StrategyOPG(Strategy):
         portfolioLoss = totalCash * self.willingToLose
         stopLossPriceRatio = price*self.stopToLosePercentage
 
+        #return int((totalCash*self.maxToInvestPerStockPercentage)/price)
         return int(min(portfolioLoss/stopLossPriceRatio, (totalCash*self.maxToInvestPerStockPercentage)/price))
 
     # Final Operations
