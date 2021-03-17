@@ -7,6 +7,11 @@ class CountryKey(Enum):
     UK = 2
     Japan = 3
 
+    @property
+    def code(self):
+        if self == CountryKey.USA: return "US"
+        if self == CountryKey.UK: return "UK"
+
 class CountryConfig():
     key: CountryKey
     timezone: timezone
@@ -25,4 +30,9 @@ def getConfigFor(key: CountryKey) -> CountryConfig:
                             timezone=timezone('America/New_York'),
                             startSetupData=datetime.combine(date.today(),time(9,15)),
                             exchangeOpenTime=datetime.combine(date.today(),time(9,30)))
+    if key == CountryKey.UK:
+        return CountryConfig(key=CountryKey.UK,
+                            timezone=timezone('Europe/London'),
+                            startSetupData=datetime.combine(date.today(),time(7,45)),
+                            exchangeOpenTime=datetime.combine(date.today(),time(8,0)))
     

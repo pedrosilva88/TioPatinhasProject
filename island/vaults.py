@@ -12,9 +12,11 @@ from helpers import log, utcToLocal, logCounter
 
 class VaultType(Enum):
     OPG_US_RTL = 1
+    OPG_UK_RTL = 2
     
     def __str__(self):
         if self == OPG_US_RTL: return "Opening Price Gap for US Retailers"
+        if self == OPG_UK_RTL: return "Opening Price Gap for UK Retailers"
 
 class Vault:
     type: VaultType
@@ -249,11 +251,13 @@ class Vault:
         #self.ib.reqHistoricalDataAsync(contract, '', '5 D', '1 min', "TRADES", True, 1, True)
         #self.ib.reqRealTimeBars(contract, 5, 'TRADES', True)
 
-def createOPGRetailVault():
+def createOPGRetailVault(key: CountryKey = CountryKey.USA):
     scanner = Scanner()
-    countryConfig = getConfigFor(key=CountryKey.USA)
-    scanner.getOPGRetailers()
+    countryConfig = getConfigFor(key=key)
+    path = ("scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv" % key.code)
+    scanner.getOPGRetailers(path=path)
     strategy = StrategyOPG()
-    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+    strategyConfig = getStrategyConfigFor(key=key, timezone=countryConfig.timezone)
     portfolio = Portfolio()
-    return Vault(VaultType.OPG_US_RTL, countryConfig, scanner, strategy, strategyConfig, portfolio)
+    vaultType = VaultType.OPG_UK_RTL if key == CountryKey.UK else VaultType.OPG_US_RTL
+    return Vault(vaultType, countryConfig, scanner, strategy, strategyConfig, portfolio)

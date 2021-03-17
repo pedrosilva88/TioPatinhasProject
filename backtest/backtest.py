@@ -84,14 +84,19 @@ class BackTest():
     results: [str, [BackTestResult]]
     trades: [str, [str]] = dict()
     cashAvailable = 2000
+    countryCode: str
+    countryConfig: CountryConfig
+    strategyConfig: StrategyConfig
 
-    def __init__(self):
+    def __init__(self, countryKey: CountryKey = CountryKey.USA):
         util.startLoop()
-        #self.ib = IB()
-        #self.ib.connect('127.0.0.1', 7497, clientId=16)
+        self.ib = IB()
+        self.ib.connect('127.0.0.1', 7497, clientId=16)
         self.strategy = StrategyOPG()
-        self.countryConfig = getConfigFor(key=CountryKey.USA)
-        self.strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=self.countryConfig.timezone)
+        self.countryCode = countryKey.code
+        self.countryConfig = getConfigFor(key=countryKey)
+        self.strategyConfig = getStrategyConfigFor(key=countryKey, timezone=self.countryConfig.timezone)
+
         self.results = dict()
         self.stockPerformance = dict()
 
@@ -109,8 +114,8 @@ class BackTest():
 
     def loadFiles(self):
         scanner = Scanner()
-        scanner.getOPGRetailers(path='../scanner/Data/CSV/US/OPG_Retails_SortFromBackTest.csv')
-        stocks = scanner.stocks[:90]
+        scanner.getOPGRetailers(path=('../scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv' % (self.countryCode)))
+        stocks = scanner.stocks
 
         total = len(stocks)
         current = 0
@@ -123,7 +128,7 @@ class BackTest():
             else:
                 print("")
 
-            name = ("backtest/Data/CSV/%s.csv" % stock.symbol)
+            name = ("backtest/Data/CSV/%s/%s.csv" % (self.countryCode, stock.symbol))
             if not os.path.isfile(name):
                 print("File not found ", name)
                 continue
@@ -135,7 +140,7 @@ class BackTest():
     # Reports
 
     def saveReportResultInFile(self, data:[[]]):
-        name = "backtest/Data/CSV/Report/ResultsPnL.csv"
+        name = ("backtest/Data/CSV/%s/Report/ResultsPnL.csv" % (self.countryCode))
         with open(name, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["Date", "PnL", "Trades"])
@@ -143,7 +148,7 @@ class BackTest():
                 writer.writerow(model)
 
     def saveReportTradesInFile(self, data:[[]]):
-        name = "backtest/Data/CSV/Report/ResultsTrades.csv"
+        name = ("backtest/Data/CSV/%s/Report/ResultsTrades.csv" % (self.countryCode))
         with open(name, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["Date", "Symbol", "Result", "PnL", "Price CreateTrade", "Price CloseTrade", "Size", "Avg Volume",  "Volume 1st minute", "Total Invested", "Open Price", "YSTD Close Price", "Action", "Cash"])
@@ -151,7 +156,7 @@ class BackTest():
                 writer.writerow(model)
 
     def saveReportPerformance(self, data):
-        name = "backtest/Data/CSV/Report/ResultsStockPerformance.csv"
+        name = ("backtest/Data/CSV/%s/Report/ResultsStockPerformance.csv" % (self.countryCode))
         with open(name, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["Symbol", "Exchange", "Currency", "OPGs Found", "Take Profit", "Profit", "StopLoss", "Loss", "Wins", "%"])
@@ -430,9 +435,8 @@ class BackTest():
 
     def downloadStocksToCSVFile(self):
         scanner = Scanner()
-        scanner.getOPGRetailers(path='../scanner/Data/CSV/US/OPG_Retails_SortFromBackTest.csv')
+        scanner.getOPGRetailers(path=('../scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv' % (self.countryCode)))
         stocks = scanner.stocks
-        # stocks = [Stock("AAPL", "SMART", "USD")]
         total = len(stocks)
         current = 0
         for stock in stocks:
@@ -444,12 +448,6 @@ class BackTest():
                 print("")
 
             mBars, dBars = self.downloadHistoricDataFromIB(stock, 365)
-            # current = None
-            # for bar in mBars:
-            #     newDate = bar.date.replace(microsecond=0, tzinfo=None).date()
-            #     if not current or current != newDate:
-            #         current = newDate
-            #         print(bar.date)
             models = self.createListOfBackTestModels(stock, mBars, dBars)
             self.saveDataInCSVFile(stock.symbol, models)
 
@@ -486,7 +484,7 @@ class BackTest():
     # Save
 
     def saveDataInCSVFile(self, filename: str, data: [BackTestModel]):
-        name = ("backtest/Data/CSV/%s.csv" % filename)
+        name = ("backtest/Data/CSV/%s/%s.csv" % (self.countryCode, filename))
         with open(name, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["Symbol", "Date", "Close", "Open", "Bid", "Ask", "Last", "Volume", "AvgVolume", "VolumeFirstMinute"])
@@ -607,9 +605,9 @@ class BackTest():
 
 if __name__ == '__main__':
     try:
-        backtest = BackTest()
+        backtest = BackTest(countryKey=CountryKey.USA)
         #backtest.downloadStocksToCSVFile()
-        #backtest.run()
-        backtest.runStockPerformance()
+        backtest.run()
+        #backtest.runStockPerformance()
     except (KeyboardInterrupt, SystemExit):
         None

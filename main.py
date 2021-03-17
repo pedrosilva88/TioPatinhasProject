@@ -22,7 +22,7 @@ if __name__ == '__main__':
     logInitTioPatinhas()
     try:
         island = Island()
-        vaultOPG = createOPGRetailVault()
+        vaultOPG = createOPGRetailVault(key=CountryKey.USA)
         island.start(vaultOPG)
     except (KeyboardInterrupt, SystemExit):
         island.stop()
