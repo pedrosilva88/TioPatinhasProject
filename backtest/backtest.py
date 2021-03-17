@@ -93,8 +93,21 @@ class BackTest():
         self.countryConfig = getConfigFor(key=CountryKey.USA)
         self.strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=self.countryConfig.timezone)
         self.results = dict()
+        self.stockPerformance = dict()
 
     def run(self):
+        models = self.loadFiles()
+        print("Run Strategy")
+        self.runStrategy(models)
+        self.showReport()
+
+    def runStockPerformance(self):
+        models = self.loadFiles()
+        print("Run Performance")
+        self.runStrategy(models=models, forPerformance=True)
+        self.showPerformanceReport()
+
+    def loadFiles(self):
         scanner = Scanner()
         scanner.getOPGRetailers(path='../scanner/Data/CSV/US/OPG_Retails_SortFromBackTest.csv')
         stocks = scanner.stocks[:90]
@@ -117,9 +130,7 @@ class BackTest():
             models += self.getModelsFromCSV(name)
         print("Sort all Ticks by date")
         models.sort(key=lambda x: x.ticker.time, reverse=False)
-        print("Run Strategy")
-        self.runStrategy(models)
-        self.showReport()
+        return models
 
     # Reports
 
@@ -139,6 +150,25 @@ class BackTest():
             for model in data:
                 writer.writerow(model)
 
+    def saveReportPerformance(self, data):
+        name = "backtest/Data/CSV/Report/ResultsStockPerformance.csv"
+        with open(name, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Symbol", "Exchange", "Currency", "OPGs Found", "Take Profit", "Profit", "StopLoss", "Loss", "Wins", "%"])
+            for key, item in data.items():
+                total = item[0]+item[1]+item[2]+item[3]
+                wins = item[0]+item[1]
+                writer.writerow([key,
+                                "SMART",
+                                "USD",
+                                total,
+                                item[0],
+                                item[1],
+                                item[2],
+                                item[3],
+                                wins,
+                                (wins/total)*100])
+
     def showReport(self):
         items = [[]]
         for key, array in self.results.items():
@@ -156,6 +186,9 @@ class BackTest():
                 items.append(item)
 
         self.saveReportTradesInFile(items)
+
+    def showPerformanceReport(self):
+        self.saveReportPerformance(self.stockPerformance)
 
     def updateResults(self, key: str, value: BackTestResult):
         if key in self.results:
@@ -185,14 +218,33 @@ class BackTest():
         else:
             self.trades[key] = [resultArray]
 
+    def updateStockPerformance(self, ticker: Ticker, type: BackTestResultType):
+        array = []
+        if ticker.contract.symbol in self.stockPerformance:
+            array = self.stockPerformance[ticker.contract.symbol]
+        else:
+            array = [0,0,0,0]
+
+        if type == BackTestResultType.takeProfit:
+            array[0] += 1
+        elif type == BackTestResultType.profit:
+            array[1] += 1
+        elif type == BackTestResultType.stopLoss:
+            array[2] += 1
+        elif type == BackTestResultType.loss:
+            array[3] += 1
+
+        self.stockPerformance[ticker.contract.symbol] = array
+
     # Run Strategy
     
-    def runStrategy(self, models: [BackTestModel]):
+    def runStrategy(self, models: [BackTestModel], forPerformance: bool = False):
         orders: [str, myOrder] = dict()
         tempOrders: [str, myOrder] = dict()
         positions: [str, Position] = dict()
         dayTradingStocksEnded: [str] = []
         currentDay: date = None
+        isForStockPerformance = forPerformance
 
         for model in models:
             ticker = model.ticker
@@ -232,9 +284,12 @@ class BackTest():
                                             openPrice= ticker.open, 
                                             ystdClosePrice= ticker.close,
                                             cash= self.cashAvailable)
-                    self.updateResults(key=("%s" % ticker.time.date()), value=result)
-                    self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
-                    self.cashAvailable += ganho
+                    if isForStockPerformance:
+                        self.updateStockPerformance(ticker=ticker, type=result.type)
+                    else:
+                        self.updateResults(key=("%s" % ticker.time.date()), value=result)
+                        self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
+                        self.cashAvailable += ganho
                     dayTradingStocksEnded.append(ticker.contract.symbol)
                     continue
                 elif ((tempOrder.action == OrderAction.Buy and tempOrder.stopLossOrder.auxPrice >= ticker.last) or
@@ -255,9 +310,12 @@ class BackTest():
                                             openPrice= ticker.open, 
                                             ystdClosePrice= ticker.close,
                                             cash= self.cashAvailable)
-                    self.updateResults(key=("%s" % ticker.time.date()), value=result)
-                    self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
-                    self.cashAvailable -= perda
+                    if isForStockPerformance:
+                        self.updateStockPerformance(ticker=ticker, type=result.type)
+                    else:
+                        self.updateResults(key=("%s" % ticker.time.date()), value=result)
+                        self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
+                        self.cashAvailable -= perda
                     dayTradingStocksEnded.append(ticker.contract.symbol)
                     continue
             elif ticker.contract.symbol in orders:
@@ -283,7 +341,7 @@ class BackTest():
                 totalInOrders = self.calculatePriceInOrders(orders)
                 balance = self.cashAvailable - totalInOrders - totalInPositions
                 totalOrderCost = result.order.lmtPrice*result.order.totalQuantity
-                if balance > totalOrderCost:
+                if balance > totalOrderCost or isForStockPerformance:
                     orders[ticker.contract.symbol] = result.order
                     print(result)
 
@@ -314,9 +372,12 @@ class BackTest():
                                                 openPrice= ticker.open, 
                                                 ystdClosePrice= ticker.close,
                                                 cash= self.cashAvailable)
-                        self.updateResults(key=("%s" % ticker.time.date()), value=result)
-                        self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
-                        self.cashAvailable += ganho
+                        if isForStockPerformance:
+                            self.updateStockPerformance(ticker=ticker, type=result.type)
+                        else:
+                            self.updateResults(key=("%s" % ticker.time.date()), value=result)
+                            self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
+                            self.cashAvailable += ganho
                         print("Success (not profit) ✅ - %.2f FirstMinute(%d) Average(%d) Size(%.2f)\n" % (ganho, model.volumeInFirstMinuteBar, model.averageVolume, tempOrder.totalQuantity))
                     else:
                         perda = abs(ticker.last*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
@@ -334,9 +395,12 @@ class BackTest():
                                                 openPrice= ticker.open, 
                                                 ystdClosePrice= ticker.close,
                                                 cash= self.cashAvailable)
-                        self.updateResults(key=("%s" % ticker.time.date()), value=result)
-                        self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
-                        self.cashAvailable -= perda
+                        if isForStockPerformance:
+                            self.updateStockPerformance(ticker=ticker, type=result.type)
+                        else:
+                            self.updateResults(key=("%s" % ticker.time.date()), value=result)
+                            self.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result)
+                            self.cashAvailable -= perda
                         print("Loss ❌ - %.2f FirstMinute(%d) Average(%d) Size(%.2f)\n" % (perda, model.volumeInFirstMinuteBar, model.averageVolume, tempOrder.totalQuantity))
 
             elif result.type == StrategyResultType.KeepOrder:
@@ -545,6 +609,7 @@ if __name__ == '__main__':
     try:
         backtest = BackTest()
         #backtest.downloadStocksToCSVFile()
-        backtest.run()
+        #backtest.run()
+        backtest.runStockPerformance()
     except (KeyboardInterrupt, SystemExit):
         None

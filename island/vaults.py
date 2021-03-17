@@ -53,8 +53,10 @@ class Vault:
             volumeFirstMinute = None
             if ticker.contract.symbol in self.stocksExtraInfo:
                 stockInfo = self.stocksExtraInfo[ticker.contract.symbol]
-                averageVolume = stockInfo.averageVolume
-                volumeFirstMinute = stockInfo.volumeFirstMinute
+                if stockInfo.averageVolume:
+                    averageVolume = stockInfo.averageVolume
+                if stockInfo.volumeFirstMinute:
+                    volumeFirstMinute = stockInfo.volumeFirstMinute
 
             data = StrategyData(ticker, 
                                 position, 
@@ -128,8 +130,9 @@ class Vault:
         if stock.symbol in self.stocksExtraInfo:
             model = self.stocksExtraInfo[stock.symbol]  
 
-        if (ticker.time.hour == 14 and ticker.time.minute == 31 and
-            ticker.volume > 0 and
+        if (ticker.time.hour == self.strategyConfig.startRunningStrategy.hour and 
+            ticker.time.minute == self.strategyConfig.startRunningStrategy.minute and
+            ticker.volume >= 0 and
             (not model or not model.volumeFirstMinute)):
             if not model:
                 model = StockInfo(symbol=stock.symbol, volumeFirstMinute=ticker.volume)

@@ -139,6 +139,10 @@ class StrategyOPG(Strategy):
                 self.lastPrice > 0 and
                 self.askPrice > 0 and
                 self.bidPrice > 0 and
+                self.volumeFirstMinute and
+                self.avgVolume and
+                self.volumeFirstMinute >= 0 and
+                self.avgVolume >= 0 and
                 self.isDatetimeValid() and
                 self.isVolumeValid())
 

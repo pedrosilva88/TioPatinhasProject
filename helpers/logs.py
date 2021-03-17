@@ -55,4 +55,3 @@ def logCounter(prefix: str, total: int, current: int):
         sys.stdout.flush()
     else:
         print("")
-        print("")
