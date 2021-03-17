@@ -42,7 +42,7 @@ class Portfolio:
                 self.exchangeUSDRate = float(account.value)
 
         self.calcOpenTradesValue()
-        currentDatetime = datetime.now().replace(microsecond=0, tzinfo=None)
+        currentDatetime = datetime.now().replace(microsecond=0)
         if (not self.totalCashBalanceLastUpdate or currentDatetime.date() != self.totalCashBalanceLastUpdate.date()):
             self.totalCashBalance = float(self.cashBalance)
             self.totalCashBalanceLastUpdate = currentDatetime

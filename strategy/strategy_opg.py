@@ -1,24 +1,28 @@
 from enum import Enum
 from datetime import *
-from helpers import log
-from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType
+from helpers import log, utcToLocal
+from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType, StrategyConfig
 from models import Order, OrderAction, OrderType
+from country_config import CountryConfig
 
 class StrategyOPG(Strategy):
-    # Constants
-    minGap: int = 3
-    maxGap: int = 8
-    maxLastGap: int = 9
-    gapProfitPercentage: float = 0.75
-    willingToLose: float = 0.05
-    stopToLosePercentage: float = 0.1
-    maxToInvestPerStockPercentage: float = 0.5
-    strategyHoldTimeout: datetime = datetime.combine(date.today(),time(17,30))
-    runStrategyMaxTime: datetime = datetime.combine(date.today(),time(14,45))
-    runStrategyStartTime: time = datetime.combine(date.today(),time(14,15))
-
     # Properties
+
     strategyData: StrategyData = None
+    strategyConfig: StrategyConfig = None
+    countryConfig: CountryConfig = None
+
+    minGap: int = None
+    maxGap: int = None
+    maxLastGap: int = None
+    gapProfitPercentage: float = None
+    willingToLose: float = None
+    stopToLosePercentage: float = None
+    maxToInvestPerStockPercentage: None
+    strategyMaxTime: datetime = None
+    strategyValidPeriod: datetime = None
+    runStrategyStartTime: datetime = None
+
     gapPrice: float= None
     gapPercentage: float = None
     gapType: OrderAction = None
@@ -35,8 +39,10 @@ class StrategyOPG(Strategy):
     volumeFirstMinute: float = None
     datetime: datetime = None
 
-    def run(self, strategyData: StrategyData):
+    def run(self, strategyData: StrategyData, strategyConfig: StrategyConfig, countryConfig: CountryConfig):
         self.strategyData = strategyData
+        self.strategyConfig = strategyConfig
+        self.countryConfig = countryConfig
         self.fetchInformation()
 
         result = self.validateStrategy()
@@ -77,14 +83,29 @@ class StrategyOPG(Strategy):
     # Constructor
 
     def fetchInformation(self):
+        # Ticker Data
         self.closePrice = self.strategyData.ticker.close
         self.openPrice = self.strategyData.ticker.open
         self.lastPrice = self.strategyData.ticker.last
         self.askPrice = self.strategyData.ticker.ask
         self.bidPrice = self.strategyData.ticker.bid
-        self.datetime = self.strategyData.ticker.time
+        self.datetime = utcToLocal(self.strategyData.ticker.time, self.countryConfig.timezone)
         self.avgVolume = self.strategyData.averageVolume
         self.volumeFirstMinute = self.strategyData.volumeFirstMinute
+
+        # Strategy Parameters
+        self.minGap = self.strategyConfig.minGap
+        self.maxGap = self.strategyConfig.maxGap
+        self.maxLastGap = self.strategyConfig.maxLastGap
+        self.gapProfitPercentage = self.strategyConfig.gapProfitPercentage
+        self.willingToLose = self.strategyConfig.willingToLose
+        self.stopToLosePercentage = self.strategyConfig.stopToLosePercentage
+        self.maxToInvestPerStockPercentage = self.strategyConfig.maxToInvestPerStockPercentage
+        self.averageVolumePercentage = self.strategyConfig.averageVolumePercentage
+
+        self.strategyMaxTime = self.strategyConfig.strategyMaxTime
+        self.strategyValidPeriod = self.strategyConfig.strategyValidPeriod
+        self.runStrategyStartTime = self.strategyConfig.startRunningStrategy
 
     # Validations
 
@@ -98,25 +119,19 @@ class StrategyOPG(Strategy):
         if not self.datetimeIsValidForStrategy():
             return StrategyResult(self.strategyData.ticker, StrategyResultType.StrategyDateWindowExpired)
 
-        elif not self.isStrategyDataValid():
+        elif (not self.isConfigsValid() or not self.isStrategyDataValid()):
             return StrategyResult(self.strategyData.ticker, StrategyResultType.IgnoreEvent)
 
         return None
 
     def datetimeIsValidForStrategy(self):
         return (self.datetime and
-                self.isDatetimeInThePeriodToRunThisStrategy() and
-                self.isDatetimeAfterExchangeStartTime())
+                self.isDatetimeInThePeriodToRunThisStrategy())
 
     def isDatetimeInThePeriodToRunThisStrategy(self):
-        datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
-        maxDatetime = self.runStrategyMaxTime.replace(microsecond=0, tzinfo=None).time()
-        return datetime <= maxDatetime
-
-    def isDatetimeAfterExchangeStartTime(self):
-        datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
-        startTime = self.runStrategyStartTime.replace(microsecond=0).time()
-        return datetime >= startTime
+        datetime = self.datetime.replace(microsecond=0).time()
+        validPeriod = self.strategyValidPeriod.replace(microsecond=0).time()
+        return datetime <= validPeriod
 
     def isStrategyDataValid(self):
         return (self.closePrice > 0 and
@@ -124,15 +139,35 @@ class StrategyOPG(Strategy):
                 self.lastPrice > 0 and
                 self.askPrice > 0 and
                 self.bidPrice > 0 and
-                self.datetime and
-                self.datetime.hour >= 14 and
-                self.datetime.minute > 30 and
-                self.volumeFirstMinute < (self.avgVolume+(self.avgVolume*1.2)))
+                self.isDatetimeValid() and
+                self.isVolumeValid())
+
+    def isDatetimeValid(self):
+        return (self.datetime and
+                ((self.datetime.hour > self.runStrategyStartTime.hour) 
+                or
+                (self.datetime.hour == self.runStrategyStartTime.hour and 
+                self.datetime.minute >= self.runStrategyStartTime.minute)))
+
+    def isVolumeValid(self):
+        return self.volumeFirstMinute < (self.avgVolume+(self.avgVolume*self.averageVolumePercentage))
+
+    def isConfigsValid(self):
+        return (self.minGap > 0 and
+                self.maxGap > 0 and
+                self.maxLastGap > 0 and
+                self.gapProfitPercentage > 0 and
+                self.willingToLose > 0 and
+                self.stopToLosePercentage > 0 and
+                self.maxToInvestPerStockPercentage > 0 and
+                self.strategyMaxTime and
+                self.strategyValidPeriod and
+                self.runStrategyStartTime)
 
     def isTimeForThisStartegyExpired(self):
-        datetime = self.datetime.replace(microsecond=0, tzinfo=None).time()
-        holdTimeout = self.strategyHoldTimeout.replace(microsecond=0, tzinfo=None).time()
-        return datetime > holdTimeout
+        datetime = self.datetime.replace(microsecond=0).time()
+        maxTime = self.strategyMaxTime.replace(microsecond=0).time()
+        return datetime > maxTime
 
     def isGapValid(self):
         return (self.gapType and self.gapPrice and self.gapPercentage and 
@@ -204,7 +239,6 @@ class StrategyOPG(Strategy):
         portfolioLoss = totalCash * self.willingToLose
         stopLossPriceRatio = price*self.stopToLosePercentage
 
-        #return int((totalCash*self.maxToInvestPerStockPercentage)/price)
         return int(min(portfolioLoss/stopLossPriceRatio, (totalCash*self.maxToInvestPerStockPercentage)/price))
 
     # Final Operations

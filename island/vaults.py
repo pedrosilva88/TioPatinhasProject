@@ -4,10 +4,11 @@ from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as i
 from helpers import logExecutionTicker
 from models import Order, OrderAction
 from scanner import Scanner
-from strategy import Strategy, StrategyOPG, StrategyData, StrategyResult, StrategyResultType
+from strategy import Strategy, StrategyOPG, StrategyData, StrategyResult, StrategyResultType, StrategyConfig, getStrategyConfigFor
+from country_config import *
 from portfolio import Portfolio
 from earnings_calendar import EarningsCalendar
-from helpers import log
+from helpers import log, utcToLocal
 
 class VaultType(Enum):
     OPG_US_RTL = 1
@@ -18,16 +19,20 @@ class VaultType(Enum):
 class Vault:
     type: VaultType
     ib: IB
+    countryConfig: CountryConfig
+    strategyConfig: StrategyConfig
     scanner: Scanner
     strategy: Strategy
     portfolio: Portfolio
     earningsCalendar: EarningsCalendar
     lastExecutions: dict()
 
-    def __init__(self, type: VaultType, scanner: Scanner, strategy: Strategy, portfolio: Portfolio):
+    def __init__(self, type: VaultType, countryConfig: CountryConfig, scanner: Scanner, strategy: Strategy, strategyConfig: StrategyConfig, portfolio: Portfolio):
         self.type = type
+        self.countryConfig = countryConfig
         self.scanner = scanner
         self.strategy = strategy
+        self.strategyConfig = strategyConfig
         self.portfolio = portfolio
         self.earningsCalendar = EarningsCalendar()
         self.lastExecutions = {}
@@ -35,7 +40,7 @@ class Vault:
     # Strategy
 
     def runStrategy(self, data: StrategyData):
-        return self.strategy.run(data)
+        return self.strategy.run(data, self.strategyConfig, self.countryConfig)
 
     def executeTicker(self, ticker: ibTicker):
         #log("Volume(%.2f) - AVVolume(%.2f) - RTVolume(%.2f)" % (ticker.volume, ticker.avVolume, ticker.rtVolume))
@@ -75,13 +80,13 @@ class Vault:
         return
 
     def registerLastExecution(self, contract: ibContract, datetime: datetime):
-        self.lastExecutions[contract.symbol] = datetime
+        self.lastExecutions[contract.symbol] = utcToLocal(datetime, self.countryConfig.timezone)
     
     def shouldRunStrategy(self, contract: ibContract, newDatetime: datetime):
         if not contract.symbol in self.lastExecutions:
             return True
-        newDatetime = newDatetime.replace(microsecond=0, tzinfo=None)
-        datetime = self.lastExecutions[contract.symbol].replace(microsecond=0, tzinfo=None)
+        newDatetime = utcToLocal(newDatetime.replace(microsecond=0), self.countryConfig.timezone)
+        datetime = self.lastExecutions[contract.symbol].replace(microsecond=0)
         return newDatetime > datetime
                 # and (newDatetime.second - datetime.second) >= 2 # Caso queira dar um intervalo de 2 segundos por Ticker event
 
@@ -194,7 +199,9 @@ class Vault:
 
 def createOPGRetailVault():
     scanner = Scanner()
+    countryConfig = getConfigFor(key=CountryKey.USA)
     scanner.getOPGRetailers()
     strategy = StrategyOPG()
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
     portfolio = Portfolio()
-    return Vault(VaultType.OPG_US_RTL, scanner, strategy, portfolio)
+    return Vault(VaultType.OPG_US_RTL, countryConfig, scanner, strategy, strategyConfig, portfolio)

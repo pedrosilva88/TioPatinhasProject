@@ -1,7 +1,9 @@
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, date, time
 from models import Order
 from ib_insync import Ticker as ibTicker, Position as ibPosition
+from country_config import CountryKey, CountryConfig
+from pytz import timezone
 
 class StrategyResultType(Enum):
     def __str__(self):
@@ -64,3 +66,45 @@ class StrategyResult:
         self.type = type
         self.order = order
         self.position = position
+
+class StrategyConfig():
+    startRunningStrategy: datetime
+    strategyValidPeriod: datetime
+    strategyMaxTime: datetime
+    minGap: int
+    maxGap: int
+    maxLastGap: int = 9
+    gapProfitPercentage: float
+    willingToLose: float
+    stopToLosePercentage: float
+    maxToInvestPerStockPercentage: float
+    averageVolumePercentage: float #= 1.2 # This means 120% above
+
+    def __init__(self, startRunningStrategy: datetime, strategyValidPeriod: datetime, strategyMaxTime: datetime,
+                        minGap: int, maxGap: int, maxLastGap: int, gapProfitPercentage: float,
+                        willingToLose: float, stopToLosePercentage: float, 
+                        maxToInvestPerStockPercentage: float, averageVolumePercentage: float):
+        self.startRunningStrategy = startRunningStrategy
+        self.strategyValidPeriod = strategyValidPeriod
+        self.strategyMaxTime = strategyMaxTime
+        self.minGap = minGap
+        self.maxGap = maxGap
+        self.maxLastGap = maxLastGap
+        self.gapProfitPercentage = gapProfitPercentage
+        self.willingToLose = willingToLose
+        self.stopToLosePercentage = stopToLosePercentage
+        self.maxToInvestPerStockPercentage = maxToInvestPerStockPercentage
+        self.averageVolumePercentage = averageVolumePercentage
+
+def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
+    if key == CountryKey.USA:
+        return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(9,31)), is_dst=None), 
+                                strategyValidPeriod=timezone.localize(datetime.combine(date.today(),time(9,45)), is_dst=None),
+                                strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(12,30)), is_dst=None), 
+                                minGap= 3, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
+                                willingToLose= 0.05, 
+                                stopToLosePercentage= 0.1, 
+                                maxToInvestPerStockPercentage= 0.5, 
+                                averageVolumePercentage= 1.2)
+    else:
+        return None
