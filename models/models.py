@@ -2,6 +2,18 @@ from enum import Enum
 from datetime import datetime
 from ib_insync import IB, Contract as ibContract, Order as ibOrder, LimitOrder as ibLimitOrder, MarketOrder as ibMarketOrder, StopOrder as ibStopOrder
 
+class StockInfo:
+    symbol: str
+    lastExecution: datetime
+    averageVolume: float
+    volumeFirstMinute: float
+
+    def __init__(self, symbol: str, lastExecution: datetime = None, averageVolume: float = None, volumeFirstMinute: float = None):
+        self.symbol = symbol
+        self.lastExecution = lastExecution
+        self.averageVolume = averageVolume
+        self.volumeFirstMinute = volumeFirstMinute
+
 class OrderAction(Enum):
     Buy = "BUY"
     Sell = "SELL"

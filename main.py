@@ -17,10 +17,9 @@ from helpers import logInitTioPatinhas, createLog
 from island import *
 
 if __name__ == '__main__':
-    logInitTioPatinhas()
     asyncio.get_event_loop().set_debug(True)
     createLog()
-    #util.logToFile("logs/tioPatinhas.log",logging.DEBUG)
+    logInitTioPatinhas()
     try:
         island = Island()
         vaultOPG = createOPGRetailVault()

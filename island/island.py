@@ -26,7 +26,7 @@ class Island(IslandEvents):
         self.vault = None
         self._runner = None
         self.waiter = None
-        self._logger = logging.getLogger('TioPatinhas.Island')
+        self._logger = logging.getLogger('Tio Patinhas')
 
     def __post_init__(self):
         if not self.ib:
@@ -55,6 +55,7 @@ class Island(IslandEvents):
                 await self.ib.accountSummaryAsync()
                 await self.ib.reqPositionsAsync()
                 await self.ib.reqAllOpenOrdersAsync()
+                await self.vault.getAverageVolumeOfStocks()
 
                 self.vault.getEraningsCalendarIfNecessary() # Isto aqui pode ser async. Preciso de estudar melhor
                 self.vault.updatePortfolio()
