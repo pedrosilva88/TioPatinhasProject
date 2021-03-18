@@ -83,15 +83,15 @@ class BackTestResult():
 class BackTest():
     results: [str, [BackTestResult]]
     trades: [str, [str]] = dict()
-    cashAvailable = 2000
+    cashAvailable = 5000
     countryCode: str
     countryConfig: CountryConfig
     strategyConfig: StrategyConfig
 
     def __init__(self, countryKey: CountryKey = CountryKey.USA):
         util.startLoop()
-        self.ib = IB()
-        self.ib.connect('127.0.0.1', 7497, clientId=16)
+        # self.ib = IB()
+        # self.ib.connect('127.0.0.1', 7497, clientId=16)
         self.strategy = StrategyOPG()
         self.countryCode = countryKey.code
         self.countryConfig = getConfigFor(key=countryKey)

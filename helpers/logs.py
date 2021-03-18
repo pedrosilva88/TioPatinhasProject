@@ -13,7 +13,7 @@ def createLog():
     f_handler.setLevel(DEBUG)
 
     # Create formatters and add it to handlers
-    f_format = Formatter('%(message)s')
+    f_format = Formatter('[%(asctime)s] -> %(message)s', "%H:%M:%S")
     f_handler.setFormatter(f_format)
 
     # Add handlers to the logger

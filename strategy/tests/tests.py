@@ -2,11 +2,14 @@ from datetime import *
 from strategy import *
 from ib_insync import Ticker as ibTicker, Contract as ibContract, Stock as ibStock, Position as ibPosition
 from models import Order, OrderAction
-from strategy import StrategyData, StrategyResult, StrategyResultType
+from strategy import StrategyData, StrategyResult, StrategyResultType, getStrategyConfigFor, StrategyConfig
+from country_config import getConfigFor, CountryKey
+from helpers import utcToLocal
 
-def dummyTicker(datetime: datetime = datetime.combine(date.today(),time(14,30)), close=21, open=22.27, last=22.30, ask=22.34, bid=22.29, avVolume=10):
+def dummyTicker(datetime: datetime = datetime.combine(date.today(),time(9,31)), close=21, open=22.27, last=22.30, ask=22.34, bid=22.29, avVolume=1):
     contract = ibStock("DummyStock", "SMART", "USD")
-    datetime = datetime.replace(microsecond=0)
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    datetime = datetime.replace(microsecond=0, tzinfo=countryConfig.timezone)
     return ibTicker(contract=contract, time=datetime, close=close, open=open, last=last, ask=ask, bid=bid, avVolume=avVolume)
 
 def dummyPosition(position: int=10, avgCost: float=5):
@@ -16,16 +19,18 @@ def dummyPosition(position: int=10, avgCost: float=5):
 def TestStrategyDataToShortWithAOpenPriceHigherThanLastPrice():
     print("Running Test to Short - OpenPrice < LastPrice")
     ticker = dummyTicker()
-    data = StrategyData(ticker, None, None, 2000)
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+    data = StrategyData(ticker, None, None, 2000, 1, 1)
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.Sell and
         result.order.action == OrderAction.Sell and
-        result.order.totalQuantity == 17 and
+        result.order.totalQuantity == 35 and
         result.order.lmtPrice == 22.34 and
-        result.order.takeProfitOrder.lmtPrice == 21.39 and
-        result.order.stopLossOrder.auxPrice == 23.46):
+        result.order.takeProfitOrder.lmtPrice == 21.33 and
+        result.order.stopLossOrder.auxPrice == 24.57):
         printTestSuccess()
     else:
         printTestFailure()
@@ -33,17 +38,19 @@ def TestStrategyDataToShortWithAOpenPriceHigherThanLastPrice():
 def TestStrategyDataToShortWithAOpenPriceLowerThanLastPrice():
     print("Running Test to Short - OpenPrice > LastPrice")
     ticker = dummyTicker(open=22.27, ask=22.20, bid=22.16)
-    data = StrategyData(ticker, None, None, 2000)
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+    data = StrategyData(ticker, None, None, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.Sell and
         result.order.action == OrderAction.Sell and
-        result.order.totalQuantity == 18 and
+        result.order.totalQuantity == 36 and
         result.order.lmtPrice == 22.2 and
-        result.order.takeProfitOrder.lmtPrice == 21.33 and
-        result.order.stopLossOrder.auxPrice == 23.31):
+        result.order.takeProfitOrder.lmtPrice == 21.26 and
+        result.order.stopLossOrder.auxPrice == 24.42):
         printTestSuccess()
     else:
         printTestFailure()
@@ -51,17 +58,19 @@ def TestStrategyDataToShortWithAOpenPriceLowerThanLastPrice():
 def TestStrategyDataToLongWithAOpenPriceHigherThanLastPrice():
     print("Running Test to Long - OpenPrice > LastPrice")
     ticker = dummyTicker(close=30.74, open=28.45, last=29.20, ask=29.24, bid=29.20)
-    data = StrategyData(ticker, None, None, 2000)
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+    data = StrategyData(ticker, None, None, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.Buy and
         result.order.action == OrderAction.Buy and
-        result.order.totalQuantity == 13 and
+        result.order.totalQuantity == 27 and
         result.order.lmtPrice == 29.2 and
-        result.order.takeProfitOrder.lmtPrice == 29.93 and
-        result.order.stopLossOrder.auxPrice == 27.74):
+        result.order.takeProfitOrder.lmtPrice == 30.04 and
+        result.order.stopLossOrder.auxPrice == 26.28):
         printTestSuccess()
     else:
         printTestFailure()
@@ -69,29 +78,33 @@ def TestStrategyDataToLongWithAOpenPriceHigherThanLastPrice():
 def TestStrategyDataToLongWithAOpenPriceLowerThanLastPrice():
     print("Running Test to Long - OpenPrice < LastPrice")
     ticker = dummyTicker(close=30.74, open=28.45, last=28.30, ask=28.60, bid=28.30)
-    data = StrategyData(ticker, None, None, 2000)
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+    data = StrategyData(ticker, None, None, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.Buy and
         result.order.action == OrderAction.Buy and
-        result.order.totalQuantity == 14 and
+        result.order.totalQuantity == 28 and
         result.order.lmtPrice == 28.3 and
-        result.order.takeProfitOrder.lmtPrice == 29.78 and
-        result.order.stopLossOrder.auxPrice == 26.89):
+        result.order.takeProfitOrder.lmtPrice == 29.88 and
+        result.order.stopLossOrder.auxPrice == 25.47):
         printTestSuccess()
     else:
         printTestFailure()
 
 def TestStrategyDataTooLateToRunThisStrategy():
     print("Running Test - Too late to run - (9:45)")
-    dt = datetime.combine(date.today(),time(14,46))
+    dt = datetime.combine(date.today(),time(9,46))
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
     ticker = dummyTicker(datetime=dt)
-    data = StrategyData(ticker, None, None, 2000)
+    data = StrategyData(ticker, None, None, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.StrategyDateWindowExpired and
         result.order == None):
@@ -100,15 +113,17 @@ def TestStrategyDataTooLateToRunThisStrategy():
         printTestFailure()
 
 def TestStrategyDataForLongPositionForTimeout():
-    print("Running Test - Long position - Time expired - (12:30)")
+    print("Running Test - Long position - Time expired - (14:35)")
 
-    dt = datetime.combine(date.today(),time(17,35))
+    dt = datetime.combine(date.today(),time(14,35))
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
     ticker = dummyTicker(datetime=dt)
     position = dummyPosition()
-    data = StrategyData(ticker, position, None, 2000)
+    data = StrategyData(ticker, position, None, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.PositionExpired_Sell and
         result.order == None):
@@ -117,15 +132,17 @@ def TestStrategyDataForLongPositionForTimeout():
         printTestFailure()
 
 def TestStrategyDataForShortPositionForTimeout():
-    print("Running Test - Short position - Time expired - (12:30)")
+    print("Running Test - Short position - Time expired - (14:30)")
 
-    dt = datetime.combine(date.today(),time(17,35))
+    dt = datetime.combine(date.today(),time(14,35))
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
     ticker = dummyTicker(datetime=dt)
     position = dummyPosition(position=-10)
-    data = StrategyData(ticker, position, None, 2000)
+    data = StrategyData(ticker, position, None, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.PositionExpired_Buy and
         result.order == None):
@@ -135,13 +152,15 @@ def TestStrategyDataForShortPositionForTimeout():
 
 def TestStrategyDataForShortPositionDoNothing():
     print("Running Test - Short position - Nothing to do")
-    dt = datetime.combine(date.today(),time(16,35))
+    dt = datetime.combine(date.today(),time(11,35))
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
     ticker = dummyTicker(datetime=dt)
     position = dummyPosition(position=-10)
-    data = StrategyData(ticker, position, None, 2000)
+    data = StrategyData(ticker, position, None, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.KeepPosition and
         result.order == None):
@@ -151,12 +170,14 @@ def TestStrategyDataForShortPositionDoNothing():
 
 def TestStrategyDataDateWindowExpiredWithoutPosition():
     print("Running Test - Date Window Expired - Nothing to do")
-    dt = datetime.combine(date.today(),time(14,55))
+    dt = datetime.combine(date.today(),time(9,55))
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
     ticker = dummyTicker(datetime=dt)
-    data = StrategyData(ticker, None, None, 2000)
+    data = StrategyData(ticker, None, None, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.StrategyDateWindowExpired and
         result.order == None):
@@ -166,13 +187,17 @@ def TestStrategyDataDateWindowExpiredWithoutPosition():
 
 def TestStrategyDataWithDateWindowExpiredWithOrder():
     print("Running Test - Short order - Strategy time expired")
-    dt = datetime.combine(date.today(),time(17,35))
-    order = Order(OrderAction.Buy, OrderType.MarketOrder, -17, 2)
+    dt = datetime.combine(date.today(),time(14,1))
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+    takeProfitOrder = Order(OrderAction.Buy, OrderType.LimitOrder, -17, 2.1)
+    stopLossOrder = Order(OrderAction.Buy, OrderType.StopOrder, -17, 2.1)
+    order = Order(OrderAction.Buy, OrderType.LimitOrder, -17, 2, 1, takeProfitOrder, stopLossOrder)
     ticker = dummyTicker(datetime=dt)
-    data = StrategyData(ticker, None, order, 2000)
+    data = StrategyData(ticker, None, order, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.StrategyDateWindowExpiredCancelOrder and
         not result.order == None):
@@ -182,36 +207,38 @@ def TestStrategyDataWithDateWindowExpiredWithOrder():
 
 def TestStrategyDataWithOrderNeedsToBeUpdated():
     print("Running Test - Receive Ticker to create Long Order - then - Ticker with a higher bid")
-    dt = datetime.combine(date.today(),time(14,30,5))
+    dt = datetime.combine(date.today(),time(9,31,5))
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
     ticker = dummyTicker(datetime=dt, close=5.3, open=5, last=5.1, ask=5.2, bid=5.1)
-    data = StrategyData(ticker, None, None, 2000)
+    data = StrategyData(ticker, None, None, 2000, 1, 1)
 
     strategy = StrategyOPG()
-    result = strategy.run(data)
+    result = strategy.run(data, strategyConfig, countryConfig)
     isStepValid_1 = False
 
     if (result.type == StrategyResultType.Buy and 
         result.order and
         result.order.action == OrderAction.Buy and
-        result.order.totalQuantity == 78 and
+        result.order.totalQuantity == 156 and
         result.order.lmtPrice == 5.1 and
-        result.order.takeProfitOrder.lmtPrice == 5.20 and
-        result.order.stopLossOrder.auxPrice == 4.84):
+        result.order.takeProfitOrder.lmtPrice == 5.21 and
+        result.order.stopLossOrder.auxPrice == 4.59):
         isStepValid_1 = True
 
-    dt = datetime.combine(date.today(),time(14,30,8))
+    dt = datetime.combine(date.today(),time(9,30,8))
     order = result.order
     ticker = dummyTicker(datetime=dt, close=5.3, open=5, last=5.1, ask=5.2, bid=5.14)
-    data = StrategyData(ticker, None, order, 2000)
-    result = strategy.run(data)
+    data = StrategyData(ticker, None, order, 2000, 1, 1)
+    result = strategy.run(data, strategyConfig, countryConfig)
 
     if (result.type == StrategyResultType.KeepOrder and 
         result.order and
         result.order.action == OrderAction.Buy and
-        result.order.totalQuantity == 77 and
+        result.order.totalQuantity == 155 and
         result.order.lmtPrice == 5.14 and
-        result.order.takeProfitOrder.lmtPrice == 5.2 and
-        result.order.stopLossOrder.auxPrice == 4.88 and
+        result.order.takeProfitOrder.lmtPrice == 5.21 and
+        result.order.stopLossOrder.auxPrice == 4.63 and
         isStepValid_1):
         printTestSuccess()
     else:
