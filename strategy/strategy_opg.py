@@ -120,7 +120,7 @@ class StrategyOPG(Strategy):
             return StrategyResult(self.strategyData.ticker, StrategyResultType.StrategyDateWindowExpired)
 
         elif (not self.isConfigsValid() or not self.isStrategyDataValid()):
-            log("🙅‍♂️ Invalid data for %s: isConfigsValid(%s) isStrategyDataValid(%s) 🙅‍♂️" ,(ticker.contract.symbol, self.isConfigsValid(), self.isStrategyDataValid()))
+            log("🙅‍♂️ Invalid data for %s: isConfigsValid(%s) isStrategyDataValid(%s) 🙅‍♂️" % (self.strategyData.ticker.contract.symbol, self.isConfigsValid(), self.isStrategyDataValid()))
             return StrategyResult(self.strategyData.ticker, StrategyResultType.IgnoreEvent)
 
         return None
