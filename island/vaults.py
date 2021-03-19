@@ -58,7 +58,7 @@ class Vault:
                 if stockInfo.averageVolume:
                     averageVolume = stockInfo.averageVolume
                 if stockInfo.volumeFirstMinute:
-                    log("🧶 🧶 Sending Volume First minute for %s: %.2f 🧶 🧶" ,(ticker.contract.symbol, ticker.volume))
+                    log("🧶 🧶 Sending Volume First minute for %s: %.2f 🧶 🧶" % (ticker.contract.symbol, ticker.volume))
                     volumeFirstMinute = stockInfo.volumeFirstMinute
 
             data = StrategyData(ticker, 
@@ -138,7 +138,7 @@ class Vault:
             time.minute == self.strategyConfig.startRunningStrategy.minute and
             ticker.volume >= 0 and
             (not model or not model.volumeFirstMinute)):
-            log("🧶 Volume first minute for %s: %.2f 🧶" ,(ticker.contract.symbol, ticker.volume))
+            log("🧶 Volume first minute for %s: %.2f 🧶" % (ticker.contract.symbol, ticker.volume))
             if not model:
                 model = StockInfo(symbol=stock.symbol, volumeFirstMinute=ticker.volume)
                 self.stocksExtraInfo[stock.symbol] = model
