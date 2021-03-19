@@ -56,9 +56,10 @@ class Vault:
             if ticker.contract.symbol in self.stocksExtraInfo:
                 stockInfo = self.stocksExtraInfo[ticker.contract.symbol]
                 if stockInfo.averageVolume:
+                    log("🧶 🕯 Sending Avg Volume for %s: %.2f 🕯 🧶" % (ticker.contract.symbol, stockInfo.averageVolume))
                     averageVolume = stockInfo.averageVolume
                 if stockInfo.volumeFirstMinute:
-                    log("🧶 🧶 Sending Volume First minute for %s: %.2f 🧶 🧶" % (ticker.contract.symbol, ticker.volume))
+                    log("🧶 🧶 Sending Volume First minute for %s: %.2f 🧶 🧶" % (ticker.contract.symbol, stockInfo.volumeFirstMinute))
                     volumeFirstMinute = stockInfo.volumeFirstMinute
 
             data = StrategyData(ticker, 
@@ -121,11 +122,14 @@ class Vault:
             logCounter("Volumes", total, current)
             averageVolume = await self.historicalData.getAverageVolume(self.ib, stock, 5)
             if averageVolume:
+                log("🧶 Volume for %s: %.2f 🧶" % (stock.symbol, averageVolume))
                 if stock.symbol in self.stocksExtraInfo:
                     model = self.stocksExtraInfo[stock.symbol]
                     model.averageVolume = averageVolume
                 else:
                     self.stocksExtraInfo[stock.symbol] = StockInfo(symbol=stock.symbol, averageVolume=averageVolume)
+            else:
+                log("🚨 Error getting AVG Volume for %s: 🚨" % (stock.symbol))
 
     def updateVolumeInFirstMinuteBar(self, ticker: ibTicker):
         model = None
