@@ -135,6 +135,9 @@ class StrategyOPG(Strategy):
         return datetime <= validPeriod
 
     def isStrategyDataValid(self):
+        if ((self.volumeFirstMinute is not None) and
+            (self.avgVolume is not None)):
+            log("😏 Data for %s: AVGVolume(%.2f) MinuteVolume(%.2f) IsDateTimeValid(%s) 😏" % (self.strategyData.ticker.contract.symbol, self.avgVolume, self.volumeFirstMinute, self.isDatetimeValid()))
         return ((self.volumeFirstMinute is not None) and
                 (self.avgVolume is not None) and
                 self.volumeFirstMinute >= 0 and
@@ -148,7 +151,7 @@ class StrategyOPG(Strategy):
                 self.bidPrice > 0)
 
     def isDatetimeValid(self):
-        return (self.datetime and
+        return ((self.datetime is not None) and
                 ((self.datetime.hour > self.runStrategyStartTime.hour) 
                 or
                 (self.datetime.hour == self.runStrategyStartTime.hour and 
