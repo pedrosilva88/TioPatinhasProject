@@ -57,6 +57,9 @@ class StrategyOPG(Strategy):
         self.gapLastPrice = self.closePrice - lastPrice if self.gapType == OrderAction.Buy else lastPrice - self.closePrice
         self.gapLastPercentage = self.gapLastPrice/self.closePrice*100
 
+        if (self.gapPercentage is not None) and (self.gapLastPercentage is not None) and (self.openPrice is not None) and (self.closePrice is not None) and (lastPrice is not None) and (self.gapType is not None):
+            log("💍 Strategy for %s: Open(%.2f) Close(%.2f) lastPrice(%.2f) Gap(%.2f) GapLast(%.2f) GapType(%s) 💍" % (self.strategyData.ticker.contract.symbol, self.openPrice, self.closePrice, lastPrice, self.gapPercentage, self.gapLastPercentage, self.gapType))
+
         if self.isGapValid():
             if self.strategyData.order:
                 self.updateCurrentOrder()
