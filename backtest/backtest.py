@@ -83,15 +83,15 @@ class BackTestResult():
 class BackTest():
     results: [str, [BackTestResult]]
     trades: [str, [str]] = dict()
-    cashAvailable = 5000
+    cashAvailable = 2000
     countryCode: str
     countryConfig: CountryConfig
     strategyConfig: StrategyConfig
 
     def __init__(self, countryKey: CountryKey = CountryKey.USA):
         util.startLoop()
-        # self.ib = IB()
-        # self.ib.connect('127.0.0.1', 7497, clientId=16)
+        #self.ib = IB()
+        #self.ib.connect('127.0.0.1', 7497, clientId=16)
         self.strategy = StrategyOPG()
         self.countryCode = countryKey.code
         self.countryConfig = getConfigFor(key=countryKey)
@@ -116,6 +116,7 @@ class BackTest():
         scanner = Scanner()
         scanner.getOPGRetailers(path=('../scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv' % (self.countryCode)))
         stocks = scanner.stocks
+        #stocks = [Stock("WTRH","SMART","USD"), Stock("HBP","SMART","USD"), Stock("VUZI","SMART","USD"), Stock("ASO","SMART","USD")]
 
         total = len(stocks)
         current = 0
@@ -271,8 +272,8 @@ class BackTest():
                 ticker.contract.symbol in tempOrders):
                 tempOrder = tempOrders[ticker.contract.symbol]
                 position = positions[ticker.contract.symbol]
-                if ((tempOrder.action == OrderAction.Buy and tempOrder.takeProfitOrder.lmtPrice <= ticker.last) or
-                    (tempOrder.action == OrderAction.Sell and tempOrder.takeProfitOrder.lmtPrice >= ticker.last)):
+                if ((tempOrder.action == OrderAction.Buy and (tempOrder.takeProfitOrder.lmtPrice < ticker.ask)) or # or ticker.last == tempOrder.takeProfitOrder.lmtPrice
+                    (tempOrder.action == OrderAction.Sell and (tempOrder.takeProfitOrder.lmtPrice > ticker.bid))): # or ticker.last == tempOrder.takeProfitOrder.lmtPrice
                     ganho = abs(tempOrder.takeProfitOrder.lmtPrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     print("Success ✅ - %.2f FirstMinute(%d) Average(%d) Size(%.2f)\n" % (ganho, model.volumeInFirstMinuteBar, model.averageVolume, tempOrder.totalQuantity))
                     result = BackTestResult(symbol=ticker.contract.symbol, 
@@ -297,8 +298,8 @@ class BackTest():
                         self.cashAvailable += ganho
                     dayTradingStocksEnded.append(ticker.contract.symbol)
                     continue
-                elif ((tempOrder.action == OrderAction.Buy and tempOrder.stopLossOrder.auxPrice >= ticker.last) or
-                    (tempOrder.action == OrderAction.Sell and tempOrder.stopLossOrder.auxPrice <= ticker.last)):
+                elif ((tempOrder.action == OrderAction.Buy and ticker.ask <= tempOrder.stopLossOrder.auxPrice) or
+                    (tempOrder.action == OrderAction.Sell and ticker.bid >= tempOrder.stopLossOrder.auxPrice )):
                     perda = abs(tempOrder.stopLossOrder.auxPrice*tempOrder.stopLossOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     print("StopLoss ❌ - %.2f FirstMinute(%d) Average(%d) Size(%.2f)\n" % (perda, model.volumeInFirstMinuteBar, model.averageVolume, tempOrder.totalQuantity))
                     result = BackTestResult(symbol=ticker.contract.symbol, 
@@ -325,8 +326,8 @@ class BackTest():
                     continue
             elif ticker.contract.symbol in orders:
                 order = orders[ticker.contract.symbol]
-                if ((order.action == OrderAction.Buy and order.lmtPrice >= ticker.last) or
-                    (order.action == OrderAction.Sell and order.lmtPrice <= ticker.last)):
+                if ((order.action == OrderAction.Buy and (order.lmtPrice > ticker.bid)) or  # or ticker.last == order.lmtPrice
+                    (order.action == OrderAction.Sell and (order.lmtPrice < ticker.ask))):  # or ticker.last == order.lmtPrice
                     tempOrders[ticker.contract.symbol] = order
                     del orders[ticker.contract.symbol]
                     positions[ticker.contract.symbol] = Position(account="",contract=stock, position=order.totalQuantity, avgCost=order.lmtPrice)
@@ -360,16 +361,17 @@ class BackTest():
                     ticker.contract.symbol in tempOrders):
                     tempOrder = tempOrders[ticker.contract.symbol]
                     position = positions[ticker.contract.symbol]
-                    if ((tempOrder.action == OrderAction.Buy and tempOrder.lmtPrice < ticker.last) or
-                        (tempOrder.action == OrderAction.Sell and tempOrder.lmtPrice > ticker.last)):
-                        ganho = abs(ticker.last*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
+                    if ((tempOrder.action == OrderAction.Buy and (tempOrder.lmtPrice > ticker.ask)) or  # or ticker.last == tempOrder.lmtPrice
+                        (tempOrder.action == OrderAction.Sell and (tempOrder.lmtPrice > ticker.bid))): # or ticker.last == tempOrder.lmtPrice
+                        closePrice = ticker.last
+                        ganho = abs(closePrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                         result = BackTestResult(symbol=ticker.contract.symbol, 
                                                 date=ticker.time, 
                                                 pnl=(ganho), 
                                                 action=tempOrder.action.value, 
                                                 type=BackTestResultType.profit,
                                                 priceCreateTrade= tempOrder.lmtPrice, 
-                                                priceCloseTrade= ticker.last,
+                                                priceCloseTrade= closePrice,
                                                 size= tempOrder.totalQuantity, 
                                                 averageVolume= model.averageVolume, 
                                                 volumeFirstMinute= model.volumeInFirstMinuteBar, 
@@ -385,14 +387,15 @@ class BackTest():
                             self.cashAvailable += ganho
                         print("Success (not profit) ✅ - %.2f FirstMinute(%d) Average(%d) Size(%.2f)\n" % (ganho, model.volumeInFirstMinuteBar, model.averageVolume, tempOrder.totalQuantity))
                     else:
-                        perda = abs(ticker.last*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
+                        closePrice = ticker.last
+                        perda = abs(closePrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                         result = BackTestResult(symbol=ticker.contract.symbol, 
                                                 date=ticker.time, 
                                                 pnl=(-perda), 
                                                 action=tempOrder.action.value, 
                                                 type=BackTestResultType.loss,
                                                 priceCreateTrade= tempOrder.lmtPrice, 
-                                                priceCloseTrade= ticker.last,
+                                                priceCloseTrade= closePrice,
                                                 size= tempOrder.totalQuantity, 
                                                 averageVolume= model.averageVolume, 
                                                 volumeFirstMinute= model.volumeInFirstMinuteBar, 
@@ -453,7 +456,7 @@ class BackTest():
 
     def downloadHistoricDataFromIB(self, stock: Contract, days: int = 5) -> ([BarData], [BarData]):
         nDays = days
-        durationDays = ("%d D" % (nDays+1)) if nDays < 365 else "1 Y"
+        durationDays = ("%d D" % (nDays+10)) if nDays < 365 else "1 Y"
         today = datetime.now().replace(microsecond=0, tzinfo=None).date()
         startDate = today-timedelta(days=nDays+1)
         
@@ -534,9 +537,9 @@ class BackTest():
                             time=mBar.date, 
                             close=barYstdClose, 
                             open=barTodayOpen,
-                            bid=mBar.average, 
-                            ask=mBar.average, 
-                            last=mBar.average,
+                            bid=mBar.low, 
+                            ask=mBar.high, 
+                            last=mBar.close,
                             volume=mBar.volume)
             model = BackTestModel(ticker, averageVolume, lastVolumeFirstMinute)
             models.append(model)
@@ -595,12 +598,14 @@ class BackTest():
             return 0
 
     def getVolumeInFirstMinute(self, data: [BarData], date: date):
-        target = datetime.combine(date.date(), time(14,30)).replace(microsecond=0,tzinfo=None)
-        filterData = list(filter(lambda x: x.date.replace(microsecond=0, tzinfo=None) == target, data))
-
+        target = datetime.combine(date, time(9,30))
+        newTarget = self.countryConfig.timezone.localize(target, is_dst=None)
+        filterData = list(filter(lambda x: newTarget == utcToLocal(x.date.replace(second=0, microsecond=0), self.countryConfig.timezone), data))
         if len(filterData) >= 1:
-            bar = filterData.pop()        
-            return bar.volume
+            total = 0
+            for item in filterData:
+                total += item.volume      
+            return total
         else: return None
 
 if __name__ == '__main__':
