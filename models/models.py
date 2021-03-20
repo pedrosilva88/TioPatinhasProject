@@ -22,6 +22,10 @@ class OrderAction(Enum):
     def reverse(self):
         return OrderAction.Sell if self == OrderAction.Buy else OrderAction.Buy
 
+    @property
+    def code(self):
+        return "Long" if self == OrderAction.Buy else "Short"
+
 class OrderType(Enum):
     LimitOrder = "LMT"
     MarketOrder = "MKT"

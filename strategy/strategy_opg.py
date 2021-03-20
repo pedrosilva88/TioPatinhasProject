@@ -59,6 +59,8 @@ class StrategyOPG(Strategy):
 
         if (self.gapPercentage is not None) and (self.gapLastPercentage is not None) and (self.openPrice is not None) and (self.closePrice is not None) and (lastPrice is not None) and (self.gapType is not None):
             log("💍 Strategy for %s: Open(%.2f) Close(%.2f) lastPrice(%.2f) Gap(%.2f) GapLast(%.2f) GapType(%s) 💍" % (self.strategyData.ticker.contract.symbol, self.openPrice, self.closePrice, lastPrice, self.gapPercentage, self.gapLastPercentage, self.gapType))
+        else:
+            log("💍 Invalid Gap for %s 💍" % (self.strategyData.ticker.contract.symbol))
 
         if self.isGapValid():
             if self.strategyData.order:
