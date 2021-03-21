@@ -19,14 +19,56 @@ class BackTestModel():
     ticker: Ticker
     averageVolume: float
     volumeInFirstMinuteBar: float
+    openPrice: float
+    close: float
+    bid: float
+    ask: float
+    last: float
+    volume: float
+    symbol: str
+    dateString: str
 
-    def __init__(self, ticker: Ticker, avgVolume: float, volumeFirstMinuteBar: float):
-        self.ticker = ticker
+    def __init__(self, openPrice: float,
+                        close: float,
+                        bid: float,
+                        ask: float,
+                        last: float,
+                        volume: float,
+                        symbol: str,
+                        dateString: str, avgVolume: float, volumeFirstMinuteBar: float):
+        self.openPrice = openPrice
+        self.close = close
+        self.bid = bid
+        self.ask = ask
+        self.last = last
+        self.volume = volume
+        self.symbol = symbol
+        self.dateString = dateString
         self.averageVolume = avgVolume if avgVolume else 0
         self.volumeInFirstMinuteBar = volumeFirstMinuteBar if volumeFirstMinuteBar else 0
 
     def __str__(self):
-        return ("%s - %s" % (self.ticker.time,self.ticker.contract.symbol))
+        return ("%s - %s" % (self.dateString, self.symbol))
+
+    def ticker(self, countryConfig):
+        formatDate = "%Y-%m-%d %H:%M:%S"
+        stock = Stock(self.symbol, "SMART", "USD")
+        customDate = self.dateString
+        if ":00+" in self.dateString:
+            customDate = self.dateString.split(":00+")[0]+":00"
+        elif ":00-" in self.dateString:
+            customDate = self.dateString.split(":00-")[0]+":00"
+
+        newTime = utcToLocal(datetime.strptime(customDate, formatDate), countryConfig)
+        return Ticker(contract=stock, 
+                            time=newTime, 
+                            close=self.close, 
+                            open=self.openPrice,
+                            bid=self.bid, 
+                            ask=self.ask, 
+                            last=self.last,
+                            volume=self.volume)
+
 
 class BackTestResultType(Enum):
     takeProfit = 1
@@ -92,6 +134,7 @@ class BackTest():
         util.startLoop()
         #self.ib = IB()
         #self.ib.connect('127.0.0.1', 7497, clientId=16)
+        #self.ib.reqMarketDataType(3)
         self.strategy = StrategyOPG()
         self.countryCode = countryKey.code
         self.countryConfig = getConfigFor(key=countryKey)
@@ -116,7 +159,7 @@ class BackTest():
         scanner = Scanner()
         scanner.getOPGRetailers(path=('../scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv' % (self.countryCode)))
         stocks = scanner.stocks
-        #stocks = [Stock("WTRH","SMART","USD"), Stock("HBP","SMART","USD"), Stock("VUZI","SMART","USD"), Stock("ASO","SMART","USD")]
+        #stocks = [Stock("LMPX","SMART","USD"), Stock("HBP","SMART","USD"), Stock("VUZI","SMART","USD"), Stock("ASO","SMART","USD")]
 
         total = len(stocks)
         current = 0
@@ -135,7 +178,7 @@ class BackTest():
                 continue
             models += self.getModelsFromCSV(name)
         print("Sort all Ticks by date")
-        models.sort(key=lambda x: x.ticker.time, reverse=False)
+        models.sort(key=lambda x: x.dateString, reverse=False)
         return models
 
     # Reports
@@ -269,8 +312,8 @@ class BackTest():
         isForStockPerformance = forPerformance
 
         for model in models:
-            ticker = model.ticker
-            stock = model.ticker.contract
+            ticker = model.ticker(self.countryConfig.timezone)
+            stock = ticker.contract
             today = utcToLocal(ticker.time.replace(microsecond=0), self.countryConfig.timezone).date()
             position = None
             order = None
@@ -508,16 +551,17 @@ class BackTest():
             writer = csv.writer(file)
             writer.writerow(["Symbol", "Date", "Close", "Open", "Bid", "Ask", "Last", "Volume", "AvgVolume", "VolumeFirstMinute"])
             for model in data:
+                ticker = model.ticker(self.countryConfig.timezone)
                 volumeMinute = None if not model.volumeInFirstMinuteBar else round(model.volumeInFirstMinuteBar, 2)
                 averageVolume = None if not model.averageVolume else round(model.averageVolume, 2)
-                openPrice = 0 if not model.ticker.open else round(model.ticker.open, 2)
-                close = 0 if not model.ticker.close else round(model.ticker.close, 2)
-                bid = 0 if not model.ticker.bid else round(model.ticker.bid, 2)
-                ask = 0 if not model.ticker.ask else round(model.ticker.ask, 2)
-                last = 0 if not model.ticker.last else round(model.ticker.last, 2)
-                volume = None if not model.ticker.volume else round(model.ticker.volume, 2)
-                writer.writerow([model.ticker.contract.symbol, 
-                                model.ticker.time, 
+                openPrice = 0 if not ticker.open else round(ticker.open, 2)
+                close = 0 if not ticker.close else round(ticker.close, 2)
+                bid = 0 if not ticker.bid else round(ticker.bid, 2)
+                ask = 0 if not ticker.ask else round(ticker.ask, 2)
+                last = 0 if not ticker.last else round(ticker.last, 2)
+                volume = None if not ticker.volume else round(ticker.volume, 2)
+                writer.writerow([ticker.contract.symbol, 
+                                ticker.time, 
                                 close, 
                                 openPrice, 
                                 bid, 
@@ -549,15 +593,7 @@ class BackTest():
                     barTodayOpen = None
                     barYstdClose = None
                 lastDay = mBar.date.replace(microsecond=0, tzinfo=None)
-            ticker = Ticker(contract=stock, 
-                            time=mBar.date, 
-                            close=barYstdClose, 
-                            open=barTodayOpen,
-                            bid=mBar.low, 
-                            ask=mBar.high, 
-                            last=mBar.close,
-                            volume=mBar.volume)
-            model = BackTestModel(ticker, averageVolume, lastVolumeFirstMinute)
+            model = BackTestModel(barTodayOpen, barYstdClose, mBar.low, mBar.high, mBar.close, mBar.volume, stock.symbol, mBar.date.strftime("%Y-%m-%d %H:%M:%S"), averageVolume, lastVolumeFirstMinute)
             models.append(model)
         return models
     
@@ -569,7 +605,6 @@ class BackTest():
             line_count = 0
             for row in csv_reader:
                 if line_count > 0:
-                    stock = Stock(row[0], "SMART", "USD")
                     volumeMinute = None if not row[9] else float(row[9])
                     averageVolume = None if not row[8] else float(row[8])
                     openPrice = 0 if not row[3] else float(row[3])
@@ -578,15 +613,7 @@ class BackTest():
                     ask = 0 if not row[5] else float(row[5])
                     last = 0 if not row[6] else float(row[6])
                     volume = 0 if not row[7] else float(row[7])
-                    ticker = Ticker(contract=stock, 
-                            time=utcToLocal(datetime.strptime(row[1], formatDate), self.countryConfig.timezone), 
-                            close=close, 
-                            open=openPrice,
-                            bid=bid, 
-                            ask=ask, 
-                            last=last,
-                            volume=volume)
-                    models.append(BackTestModel(ticker, averageVolume, volumeMinute))
+                    models.append(BackTestModel(openPrice, close, bid, ask, last, volume, row[0], row[1], averageVolume, volumeMinute))
                 line_count += 1
         return models
 
