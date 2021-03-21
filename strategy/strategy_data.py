@@ -103,16 +103,16 @@ def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
                                 strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(14,0)), is_dst=None), 
                                 minGap= 3, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
                                 willingToLose= 0.04, 
-                                stopToLosePercentage= 0.1, 
+                                stopToLosePercentage= 0.08, 
                                 maxToInvestPerStockPercentage= 0.5, 
                                 averageVolumePercentage= 1.2)
     if key == CountryKey.UK:
         return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(8,1)), is_dst=None), 
                                 strategyValidPeriod=timezone.localize(datetime.combine(date.today(),time(8,15)), is_dst=None),
-                                strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(12,0)), is_dst=None), 
+                                strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(13,0)), is_dst=None), 
                                 minGap= 3, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
                                 willingToLose= 0.04, 
-                                stopToLosePercentage= 0.1, 
+                                stopToLosePercentage= 0.08, 
                                 maxToInvestPerStockPercentage= 0.5, 
                                 averageVolumePercentage= 1.2)
     else:
