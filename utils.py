@@ -22,7 +22,8 @@ def runStrategyTests():
     TestStrategyDataWithDateWindowExpiredWithOrder()
     print ("\n------------------------------------\n")
     TestStrategyDataWithOrderNeedsToBeUpdated()
-
+    print ("\n------------------------------------\n")
+    TestStrategyDataForSizeLowerThan2Shares()
     print ("\n")
     
 if __name__ == '__main__':

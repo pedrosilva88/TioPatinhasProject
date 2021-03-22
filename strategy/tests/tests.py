@@ -27,10 +27,10 @@ def TestStrategyDataToShortWithAOpenPriceHigherThanLastPrice():
 
     if (result.type == StrategyResultType.Sell and
         result.order.action == OrderAction.Sell and
-        result.order.totalQuantity == 35 and
+        result.order.totalQuantity == 44 and
         result.order.lmtPrice == 22.34 and
         result.order.takeProfitOrder.lmtPrice == 21.33 and
-        result.order.stopLossOrder.auxPrice == 24.57):
+        result.order.stopLossOrder.auxPrice == 24.13):
         printTestSuccess()
     else:
         printTestFailure()
@@ -47,10 +47,10 @@ def TestStrategyDataToShortWithAOpenPriceLowerThanLastPrice():
 
     if (result.type == StrategyResultType.Sell and
         result.order.action == OrderAction.Sell and
-        result.order.totalQuantity == 36 and
+        result.order.totalQuantity == 45 and
         result.order.lmtPrice == 22.2 and
         result.order.takeProfitOrder.lmtPrice == 21.26 and
-        result.order.stopLossOrder.auxPrice == 24.42):
+        result.order.stopLossOrder.auxPrice == 23.98):
         printTestSuccess()
     else:
         printTestFailure()
@@ -67,10 +67,10 @@ def TestStrategyDataToLongWithAOpenPriceHigherThanLastPrice():
 
     if (result.type == StrategyResultType.Buy and
         result.order.action == OrderAction.Buy and
-        result.order.totalQuantity == 27 and
+        result.order.totalQuantity == 34 and
         result.order.lmtPrice == 29.2 and
         result.order.takeProfitOrder.lmtPrice == 30.04 and
-        result.order.stopLossOrder.auxPrice == 26.28):
+        result.order.stopLossOrder.auxPrice == 26.86):
         printTestSuccess()
     else:
         printTestFailure()
@@ -87,10 +87,10 @@ def TestStrategyDataToLongWithAOpenPriceLowerThanLastPrice():
 
     if (result.type == StrategyResultType.Buy and
         result.order.action == OrderAction.Buy and
-        result.order.totalQuantity == 28 and
+        result.order.totalQuantity == 35 and
         result.order.lmtPrice == 28.3 and
         result.order.takeProfitOrder.lmtPrice == 29.88 and
-        result.order.stopLossOrder.auxPrice == 25.47):
+        result.order.stopLossOrder.auxPrice == 26.04):
         printTestSuccess()
     else:
         printTestFailure()
@@ -220,10 +220,10 @@ def TestStrategyDataWithOrderNeedsToBeUpdated():
     if (result.type == StrategyResultType.Buy and 
         result.order and
         result.order.action == OrderAction.Buy and
-        result.order.totalQuantity == 156 and
+        result.order.totalQuantity == 196 and
         result.order.lmtPrice == 5.1 and
         result.order.takeProfitOrder.lmtPrice == 5.21 and
-        result.order.stopLossOrder.auxPrice == 4.59):
+        result.order.stopLossOrder.auxPrice == 4.69):
         isStepValid_1 = True
 
     dt = datetime.combine(date.today(),time(9,30,8))
@@ -235,14 +235,119 @@ def TestStrategyDataWithOrderNeedsToBeUpdated():
     if (result.type == StrategyResultType.KeepOrder and 
         result.order and
         result.order.action == OrderAction.Buy and
-        result.order.totalQuantity == 155 and
+        result.order.totalQuantity == 194 and
         result.order.lmtPrice == 5.14 and
         result.order.takeProfitOrder.lmtPrice == 5.21 and
-        result.order.stopLossOrder.auxPrice == 4.63 and
+        result.order.stopLossOrder.auxPrice == 4.73 and
         isStepValid_1):
         printTestSuccess()
     else:
         printTestFailure()
+
+def TestStrategyDataForSizeLowerThan2Shares():
+    #print("Running Test to Short - OpenPrice > LastPrice")
+    ticker = dummyTicker(close=2221, open=2110.27, last=2110.27, ask=2110.27, bid=2110.27, avVolume=1)
+    countryConfig = getConfigFor(key=CountryKey.USA)
+    strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+    data = StrategyData(ticker, None, None, 2000, 1, 1)
+
+    strategy = StrategyOPG()
+    result = strategy.run(data, strategyConfig, countryConfig)
+
+    if (result.type == StrategyResultType.Buy and
+        result.order.action == OrderAction.Buy and
+        result.order.totalQuantity == 0 and
+        result.order.lmtPrice == 2110.27 and
+        result.order.takeProfitOrder.lmtPrice == 2189.18 and
+        result.order.stopLossOrder.auxPrice == 1941.45):
+        printTestSuccess()
+    else:
+        printTestFailure()
+
+# def TestStrategyDataForSome():
+#     #print("Running Test to Short - OpenPrice > LastPrice")
+#     ticker = dummyTicker(close=2221, open=None, last=2110.27, ask=2110.27, bid=2110.27, avVolume=1)
+#     countryConfig = getConfigFor(key=CountryKey.USA)
+#     strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+#     data = StrategyData(ticker, None, None, 2000, 1, 1)
+
+#     strategy = StrategyOPG()
+#     result = strategy.run(data, strategyConfig, countryConfig)
+
+#     print(result)
+#     if (result.type == StrategyResultType.Buy and
+#         result.order.action == OrderAction.Buy and
+#         result.order.totalQuantity == 0 and
+#         result.order.lmtPrice == 2110.27 and
+#         result.order.takeProfitOrder.lmtPrice == 2189.18 and
+#         result.order.stopLossOrder.auxPrice == 1941.45):
+#         printTestSuccess()
+#     else:
+#         printTestFailure()
+
+# def TestStrategyDataForSome2():
+#     #print("Running Test to Short - OpenPrice > LastPrice")
+#     ticker = dummyTicker(close=None, open=2110.27, last=2110.27, ask=2110.27, bid=2110.27, avVolume=1)
+#     countryConfig = getConfigFor(key=CountryKey.USA)
+#     strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+#     data = StrategyData(ticker, None, None, 2000, 1, 1)
+
+#     strategy = StrategyOPG()
+#     result = strategy.run(data, strategyConfig, countryConfig)
+
+#     print(result)
+#     if (result.type == StrategyResultType.Buy and
+#         result.order.action == OrderAction.Buy and
+#         result.order.totalQuantity == 0 and
+#         result.order.lmtPrice == 2110.27 and
+#         result.order.takeProfitOrder.lmtPrice == 2189.18 and
+#         result.order.stopLossOrder.auxPrice == 1941.45):
+#         printTestSuccess()
+#     else:
+#         printTestFailure()
+
+# def TestStrategyDataForSome3():
+#     #print("Running Test to Short - OpenPrice > LastPrice")
+#     ticker = dummyTicker(close=2221, open=2110.27, last=None, ask=2110.27, bid=2110.27, avVolume=1)
+#     countryConfig = getConfigFor(key=CountryKey.USA)
+#     strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+#     data = StrategyData(ticker, None, None, 2000, 1, 1)
+
+#     strategy = StrategyOPG()
+#     result = strategy.run(data, strategyConfig, countryConfig)
+
+#     print(result)
+#     if (result.type == StrategyResultType.Buy and
+#         result.order.action == OrderAction.Buy and
+#         result.order.totalQuantity == 0 and
+#         result.order.lmtPrice == 2110.27 and
+#         result.order.takeProfitOrder.lmtPrice == 2189.18 and
+#         result.order.stopLossOrder.auxPrice == 1941.45):
+#         printTestSuccess()
+#     else:
+#         printTestFailure()
+
+
+# def TestStrategyDataForSome4():
+#     #print("Running Test to Short - OpenPrice > LastPrice")
+#     ticker = dummyTicker(close=2221, open=2110.27, last=2110.27, ask=None, bid=2110.27, avVolume=1)
+#     countryConfig = getConfigFor(key=CountryKey.USA)
+#     strategyConfig = getStrategyConfigFor(key=CountryKey.USA, timezone=countryConfig.timezone)
+#     data = StrategyData(ticker, None, None, 2000, 1, 1)
+
+#     strategy = StrategyOPG()
+#     result = strategy.run(data, strategyConfig, countryConfig)
+
+#     print(result)
+#     if (result.type == StrategyResultType.Buy and
+#         result.order.action == OrderAction.Buy and
+#         result.order.totalQuantity == 0 and
+#         result.order.lmtPrice == 2110.27 and
+#         result.order.takeProfitOrder.lmtPrice == 2189.18 and
+#         result.order.stopLossOrder.auxPrice == 1941.45):
+#         printTestSuccess()
+#     else:
+#         printTestFailure()
 
 def printTestSuccess():
     print ("Test Succeeded ✅")

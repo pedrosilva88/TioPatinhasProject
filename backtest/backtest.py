@@ -52,7 +52,7 @@ class BackTestModel():
 
     def ticker(self, countryConfig):
         formatDate = "%Y-%m-%d %H:%M:%S"
-        stock = Stock(self.symbol, "SMART", "USD")
+        stock = Stock(self.symbol, "SMART", "GBP")
         customDate = self.dateString
         if ":00+" in self.dateString:
             customDate = self.dateString.split(":00+")[0]+":00"
@@ -134,7 +134,6 @@ class BackTest():
         util.startLoop()
         #self.ib = IB()
         #self.ib.connect('127.0.0.1', 7497, clientId=16)
-        #self.ib.reqMarketDataType(3)
         self.strategy = StrategyOPG()
         self.countryCode = countryKey.code
         self.countryConfig = getConfigFor(key=countryKey)
@@ -159,7 +158,7 @@ class BackTest():
         scanner = Scanner()
         scanner.getOPGRetailers(path=('../scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv' % (self.countryCode)))
         stocks = scanner.stocks
-        #stocks = [Stock("LMPX","SMART","USD"), Stock("HBP","SMART","USD"), Stock("VUZI","SMART","USD"), Stock("ASO","SMART","USD")]
+        #stocks = [Stock("DGE","SMART","GBP"), Stock("HBP","SMART","GBP"), Stock("VUZI","SMART","GBP"), Stock("ASO","SMART","GBP")]
 
         total = len(stocks)
         current = 0
@@ -212,7 +211,7 @@ class BackTest():
                 wins = item[0]+item[1]
                 writer.writerow([key,
                                 "SMART",
-                                "USD",
+                                "GBP",
                                 total,
                                 item[0],
                                 item[1],
@@ -225,7 +224,7 @@ class BackTest():
             for item in stocks:
                 writer.writerow([item.symbol,
                                 "SMART",
-                                "USD",
+                                "GBP",
                                 0,
                                 0,
                                 0,
@@ -392,7 +391,7 @@ class BackTest():
                     positions[ticker.contract.symbol] = Position(account="",contract=stock, position=order.totalQuantity, avgCost=order.lmtPrice)
                     position = positions[ticker.contract.symbol]
                     order = None
-                
+            
             data = StrategyData(ticker, 
                                 position, 
                                 order, 
@@ -406,7 +405,7 @@ class BackTest():
                 totalInOrders = self.calculatePriceInOrders(orders)
                 balance = self.cashAvailable - totalInOrders - totalInPositions
                 totalOrderCost = result.order.lmtPrice*result.order.totalQuantity
-                if balance > totalOrderCost or isForStockPerformance:
+                if (balance > totalOrderCost and result.order.totalQuantity > 0) or isForStockPerformance:
                     orders[ticker.contract.symbol] = result.order
                     print(result)
 
@@ -653,9 +652,9 @@ class BackTest():
 
 if __name__ == '__main__':
     try:
-        backtest = BackTest(countryKey=CountryKey.USA)
+        backtest = BackTest(countryKey=CountryKey.UK)
         #backtest.downloadStocksToCSVFile()
-        backtest.run()
-        #backtest.runStockPerformance()
+        #backtest.run()
+        backtest.runStockPerformance()
     except (KeyboardInterrupt, SystemExit):
         None

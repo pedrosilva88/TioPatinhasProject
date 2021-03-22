@@ -143,17 +143,15 @@ class StrategyOPG(Strategy):
         if ((self.volumeFirstMinute is not None) and
             (self.avgVolume is not None)):
             log("😏 Data for %s: AVGVolume(%.2f) MinuteVolume(%.2f) IsDateTimeValid(%s) 😏" % (self.strategyData.ticker.contract.symbol, self.avgVolume, self.volumeFirstMinute, self.isDatetimeValid()))
-        return ((self.volumeFirstMinute is not None) and
-                (self.avgVolume is not None) and
-                self.volumeFirstMinute >= 0 and
-                self.avgVolume >= 0 and
+        return ((self.volumeFirstMinute is not None) and self.volumeFirstMinute >= 0 and
+                (self.avgVolume is not None) and self.avgVolume >= 0 and
                 self.isDatetimeValid() and
-                self.isVolumeValid() and 
-                self.closePrice > 0 and
-                self.openPrice > 0 and
-                self.lastPrice > 0 and
-                self.askPrice > 0 and
-                self.bidPrice > 0)
+                self.isVolumeValid() and
+                (self.closePrice is not None) and self.closePrice > 0 and
+                (self.openPrice is not None) and self.openPrice > 0 and
+                (self.lastPrice is not None) and self.lastPrice > 0 and
+                (self.askPrice is not None) and self.askPrice > 0 and
+                (self.bidPrice is not None) and self.bidPrice > 0)
 
     def isDatetimeValid(self):
         return ((self.datetime is not None) and
