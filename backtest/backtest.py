@@ -52,14 +52,14 @@ class BackTestModel():
 
     def ticker(self, countryConfig):
         formatDate = "%Y-%m-%d %H:%M:%S"
-        stock = Stock(self.symbol, "SMART", "GBP")
+        stock = Stock(self.symbol, "SMART", countryConfig.currency)
         customDate = self.dateString
         if ":00+" in self.dateString:
             customDate = self.dateString.split(":00+")[0]+":00"
         elif ":00-" in self.dateString:
             customDate = self.dateString.split(":00-")[0]+":00"
 
-        newTime = utcToLocal(datetime.strptime(customDate, formatDate), countryConfig)
+        newTime = utcToLocal(datetime.strptime(customDate, formatDate), countryConfig.timezone)
         return Ticker(contract=stock, 
                             time=newTime, 
                             close=self.close, 
@@ -158,7 +158,7 @@ class BackTest():
         scanner = Scanner()
         scanner.getOPGRetailers(path=('../scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv' % (self.countryCode)))
         stocks = scanner.stocks
-        #stocks = [Stock("DGE","SMART","GBP"), Stock("HBP","SMART","GBP"), Stock("VUZI","SMART","GBP"), Stock("ASO","SMART","GBP")]
+        #stocks = [Stock("DGE","SMART",self.countryConfig.currency), Stock("HBP","SMART",self.countryConfig.currency), Stock("VUZI","SMART",self.countryConfig.currency), Stock("ASO","SMART",self.countryConfig.currency)]
 
         total = len(stocks)
         current = 0
@@ -211,7 +211,7 @@ class BackTest():
                 wins = item[0]+item[1]
                 writer.writerow([key,
                                 "SMART",
-                                "GBP",
+                                self.countryConfig.currency,
                                 total,
                                 item[0],
                                 item[1],
@@ -224,7 +224,7 @@ class BackTest():
             for item in stocks:
                 writer.writerow([item.symbol,
                                 "SMART",
-                                "GBP",
+                                self.countryConfig.currency,
                                 0,
                                 0,
                                 0,
@@ -311,7 +311,7 @@ class BackTest():
         isForStockPerformance = forPerformance
 
         for model in models:
-            ticker = model.ticker(self.countryConfig.timezone)
+            ticker = model.ticker(self.countryConfig)
             stock = ticker.contract
             today = utcToLocal(ticker.time.replace(microsecond=0), self.countryConfig.timezone).date()
             position = None
@@ -550,7 +550,7 @@ class BackTest():
             writer = csv.writer(file)
             writer.writerow(["Symbol", "Date", "Close", "Open", "Bid", "Ask", "Last", "Volume", "AvgVolume", "VolumeFirstMinute"])
             for model in data:
-                ticker = model.ticker(self.countryConfig.timezone)
+                ticker = model.ticker(self.countryConfig)
                 volumeMinute = None if not model.volumeInFirstMinuteBar else round(model.volumeInFirstMinuteBar, 2)
                 averageVolume = None if not model.averageVolume else round(model.averageVolume, 2)
                 openPrice = 0 if not ticker.open else round(ticker.open, 2)
