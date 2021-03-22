@@ -77,7 +77,11 @@ class Vault:
     def handleStrategyResult(self, result: StrategyResult, contract: ibContract):
         if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and
             self.canCreateOrder(contract, result.order)):
-            return self.createOrder(contract, result.order)
+            if result.order.totalQuantity > 1:
+                return self.createOrder(contract, result.order)
+            else:
+                log("❗️ (%s) Order Size is lower then 2 Shares❗️", result.ticker.contract.symbol)
+                return None
 
         elif (result.type == StrategyResultType.StrategyDateWindowExpired or result.type == StrategyResultType.DoNothing):
             return self.unsubscribeTicker(contract)

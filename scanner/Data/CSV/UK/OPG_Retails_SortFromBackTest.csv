@@ -1,122 +1,121 @@
-Financial Instrument,Exchange,Currency,Sector,Industry,Category,Last,Volume ($),Volume/Min,Average Volume ($),Average Volume,Last ($),Bid,Ask
-TSCO,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Retail,228.7,145220260,2896.218,,,3.17,,
-MRW,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Retail,180.25,163815336,4546.23,,,2.5,,
-GSK,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Drugs,1296.2,395849240,1059.642,,,17.98,,
-GFS,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Security Services,244.3,25904890,85.9188,,,3.39,,
-MKS,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Retail,155.15,24885870,834.342,,,2.15,,
-SBRY,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Retail,244.8,62505164,1795.644,,,3.4,,
-MARS,SMART,GBP,"Consumer, Non-cyclical",Beverages,Brewery,92.8,4115017,506.2998,,,1.29,,
-ULVR,SMART,GBP,"Consumer, Non-cyclical",Cosmetics/Personal Care,Cosmetics&Toiletries,3952,604468746,941.016,,,54.82,,
-BATS,SMART,GBP,"Consumer, Non-cyclical",Agriculture,Tobacco,2792.5,320639805,455.9208,,,38.73,,
-
-CTEC,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Products,Medical Products,193.4,23996319,999.732,,,2.68,,
-AVCT,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Products,Diagnostic Equipment,270,98194,0,,,3.75,265,270
-RTO,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Building-Maint&Service,488,74059285,552.1812,,,6.77,,
-GNC,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Misc/Diversified,156,13804587,482.649,,,2.16,,
-DGE,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Wine/Spirits,2996,313800641,589.971,106332436,2558792,41.56,,
-BAB,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Building-Maint&Service,250,24870077,436.9044,,,3.47,,
-REL,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,1784.5,238982977,646.212,,,24.75,,
-DDDD,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Therapeutics,133.5,3017151,0,,,1.85,,
-AZN,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Drugs,7110,415086327,199.2042,,,98.62,,
-PFD,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Misc/Diversified,98.5,9149797,512.022,,,1.37,,
-GDR,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,122,28765,0,,,1.69,122,125
-IWG,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,358.6,14946919,246.018,,,4.97,,
-HAS,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Human Resources,156.1,10609981,799.824,,,2.17,,
-IMB,SMART,GBP,"Consumer, Non-cyclical",Agriculture,Tobacco,1458,116846134,212.7018,,,20.22,,
-SSPG,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Retail,332.4,14962058,172.4382,,,4.61,,
-EXPN,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Serv-Finance,2425,144338577,225.1872,,,33.64,,
-SN.,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Products,Medical Products,1354,104027112,520.7052,,,18.78,,
-INDV,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Drugs,123.7,5504236,401.6466,,,1.72,,
-OCDO,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Retail,2022,110061777,487.5432,,,28.05,,
-RB.,SMART,GBP,"Consumer, Non-cyclical",Household Products/Wares,Soap&Cleaning Prepar,6314,259711856,113.892,,,87.58,,
-TATE,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Misc/Diversified,746.8,39985117,463.4742,,,10.36,,
-HYVE,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,124.3,1140160,0,,,1.72,,
-APH,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Drugs,84.6,674508,0,,,1.17,,
-VEC,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Drugs,115.2,3787570,301.4502,,,1.6,,
-QQ.,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Consulting Services,333.4,10726354,174.5004,,,4.62,,
-ABF,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Misc/Diversified,2414,70206586,188.5098,,,33.48,,
-BVC,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,98.8,316451,0,,,1.37,,
-RWS,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,611,1781244,0,,,8.47,,
-XPS,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Human Resources,124.5,25044,0,,,1.73,124.5,127.5
-AHT,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Rental Auto/Equipment,4286,100297348,143.9484,,,59.45,,
-NCYT,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Products,Medical Products,755,1970743,0,,,10.47,,
-CCR,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Wine/Spirits,282.5,4851994,158.832,,,3.92,,
-AGK,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,882.5,17409367,100.7982,,,12.24,,
-UDG,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,Medical Labs&Testing Srv,770,9660333,0,,,10.68,,
-BVIC,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Non-alcoholic,814.5,22100663,127.4868,,,11.3,,
-JSG,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,153.2,508027,0,,,2.12,,
-PAGE,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Human Resources,482.6,5031844,0,,,6.69,,
-DLAR,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Printing-Commercial,193.4,2774463,68.748,,,2.68,,
-CLG,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Divers Oper/Commer Serv,562,2910519,77.6124,,,7.8,,
-NTG,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Rental Auto/Equipment,310,3850655,0,,,4.3,,
-CCH,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Non-alcoholic,2278,29515714,0,,,31.6,,
-MDC,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,Medical-Hospitals,303.2,3625116,72.5334,,,4.21,,
-STCK,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Wine/Spirits,274.5,2554199,69.4272,,,3.81,,
-ABC,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,1495,5133465,0,,,20.74,,
-HIK,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Drugs,2212,24521221,0,12577840,409951,30.68,,
-RPS,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Consulting Services,89.5,250681,0,,,1.24,,
-KGH,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Consulting Services,C440.00,,,,385788,C6.10,,
-DVO,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Misc/Diversified,195,361251,0,,,2.7,,
-MCB,SMART,GBP,"Consumer, Non-cyclical",Household Products/Wares,Soap&Cleaning Prepar,86.6,195263,0,,,1.2,,
-TRB,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Consulting Services,105,391,0,,,1.46,,
-PZC,SMART,GBP,"Consumer, Non-cyclical",Cosmetics/Personal Care,Cosmetics&Toiletries,258,3648098,189.1992,,,3.58,,
-SPI,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,Medical Labs&Testing Srv,165,2702411,155.1822,,,2.29,,
-CLIN,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Drug Delivery Systems,C753.00,,,,302254,C10.44,,
-GRG,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Retail,C2092.00,,,,301487,C29.02,,
-FEVR,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Non-alcoholic,C2225.00,,,,298727,C30.86,,
-PRTC,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,392.5,19658847,381.4554,1570261,288432,5.44,,
-AMS,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Products,Medical Products,237.5,965987,0,,,3.29,,
-RENE,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,126.5,8741,0,,,1.75,120,127
-ITRK,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,5414,44824039,0,19755970,263082,75.09,,
-TRD,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Consulting Services,145,6033,0,,,2.01,135,148
-SVS,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Consulting Services,1123,7843993,0,3530778,226674,15.58,,
-MXCT,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,900,21259,5.87295,2803400,224571,12.48,880,900
-RST,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,350,232998,214.4388,,,4.85,345,360
-STHR,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Human Resources,381,409833,0,,,5.28,,
-DPH,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Veterinary Products,3452,15174661,0,9799918,204674,47.88,,
-DWF,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,82,72452,0,,,1.14,82,84
-JET,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Retail,6864,28370371,0,18842493,197912,95.21,,
-CVSG,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Veterinary Diagnostics,1805,5024539,0,4896304,195570,25.04,,
-OXB,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,940,4465418,0,2282084,175031,13.04,,
-BAKK,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Canned,107.8,109305,0,,,1.5,,
-SBI,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,Medical Labs&Testing Srv,180,1383,0,,,2.5,175,180
-IDHC,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,Medical Labs&Testing Srv,1.05,333513,0,,,1.05,,
-VINO,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Wine/Spirits,227,,0,,,3.15,225,230
-CWK,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Meat Products,3488,24789405,0,6833572,141248,48.38,,
-MER,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Building-Maint&Service,183,525127,0,,,2.54,180.5,182.5
-GPH,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Whsing&Harbor Trans Serv,117,163835,0,,,1.62,,
-HFG,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Wholesale/Distrib,1030,26851613,216.141,1845645,129188,14.29,,
-GNS,SMART,GBP,"Consumer, Non-cyclical",Agriculture,Agricultural Operations,4946,14355382,0,7891059,115025,68.6,,
-SLN,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,564,156771,0,,,7.82,,
-IXI,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Drugs,107,16269,0,,,1.48,107,110
-ERM,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Serv-Finance,941,3952211,0,,,13.05,,
-ERGO,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Drugs,1260,42223,0,1599800,91539,17.48,1200,1260
-MGP,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,MRI/Medical Diag Imaging,150,192863,0,,,2.08,151,155.5
-BAG,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Non-alcoholic,469.5,640606,0,,,6.51,,
-IHC,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Whsle Drug Dist,127,,0,,,1.76,123,127
-UPR,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Whsle Drug Dist,209,8114,0,,,2.9,215,225
-HCM,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,416,55560,0,,,5.77,410,412
-WIL,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Consulting Services,200,787,0,,,2.77,192,200
-GATC,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Human Resources,154,41080,77.838,,,2.14,152,159
-CTH,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,Medical-Hospitals,546,105222,0,,,7.57,,
-DTY,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Funeral Serv&Rel Items,628,2394067,0,,,8.71,,
-HOTC,SMART,GBP,"Consumer, Non-cyclical",Food,Food-Confectionery,406,18684,0,,,5.63,390,400
-MRL,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,700,58983,0,,,9.71,694,706
-TSTL,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,Medical-Hospitals,612,5466,0,,,8.49,602,620
-CARR,SMART,GBP,"Consumer, Non-cyclical",Agriculture,Agricultural Operations,130,5748,0,,,1.8,,
-ONC,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Drugs,200,55,0,,,2.77,182,185
-DXRX,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,MRI/Medical Diag Imaging,110,30,0,,,1.53,111,115
-ABDP,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Research&Development,2060,11257,0,,,28.57,2020,2060
-FOUR,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Printing-Commercial,2255,1851830,0,,,31.28,,
-AFM,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Consulting Services,252,3,0,,,3.5,252,264
-RE.B,SMART,GBP,"Consumer, Non-cyclical",Agriculture,Agricultural Operations,83.5,127399,166.9956,,,1.16,80.5,84
-YNGA,SMART,GBP,"Consumer, Non-cyclical",Beverages,Brewery,1435,117592,0,,,19.9,1430,1465
-FSTA,SMART,GBP,"Consumer, Non-cyclical",Beverages,Brewery,858,81377,0,,,11.9,,
-RWA,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Human Resources,588,358993,0,,,8.16,574,584
-NICL,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Non-alcoholic,1250,26475,0,,,17.34,,
-MPE,SMART,GBP,"Consumer, Non-cyclical",Agriculture,Agricultural Operations,615,28004,0,,,8.53,,
-VP.,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Rental Auto/Equipment,840,5021,0,,,11.65,,
-AEP,SMART,GBP,"Consumer, Non-cyclical",Agriculture,Agricultural Operations,612,28139,0,,,8.49,,
-BVXP,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,4200,3903,0,,,58.26,4200,4400
-CPP,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Commercial Services,500,5894,0,,,6.94,,
-CAM,SMART,GBP,"Consumer, Non-cyclical",Agriculture,Agricultural Operations,7000,24273,0,,,97.09,,
+Symbol,Exchange,Currency,OPGs Found,Take Profit,Profit,StopLoss,Loss,Wins,%
+VEC,SMART,GBP,4,3,1,0,0,4,100
+OCDO,SMART,GBP,3,1,2,0,0,3,100
+CTEC,SMART,GBP,3,1,2,0,0,3,100
+ULVR,SMART,GBP,2,1,1,0,0,2,100
+RWS,SMART,GBP,2,1,1,0,0,2,100
+ABC,SMART,GBP,2,1,1,0,0,2,100
+REL,SMART,GBP,1,1,0,0,0,1,100
+GSK,SMART,GBP,1,0,1,0,0,1,100
+SBRY,SMART,GBP,1,0,1,0,0,1,100
+PFD,SMART,GBP,6,4,1,1,0,5,83.33333333
+RTO,SMART,GBP,5,4,0,0,1,4,80
+NCYT,SMART,GBP,8,4,2,0,2,6,75
+JSG,SMART,GBP,11,8,0,1,2,8,72.72727273
+HYVE,SMART,GBP,19,13,0,5,1,13,68.42105263
+DDDD,SMART,GBP,21,14,0,3,4,14,66.66666667
+MKS,SMART,GBP,6,3,1,0,2,4,66.66666667
+AZN,SMART,GBP,3,2,0,0,1,2,66.66666667
+BATS,SMART,GBP,3,0,2,0,1,2,66.66666667
+MARS,SMART,GBP,16,10,0,6,0,10,62.5
+SN.,SMART,GBP,6,3,0,0,3,3,50
+ABF,SMART,GBP,4,2,0,0,2,2,50
+IMB,SMART,GBP,4,1,1,0,2,2,50
+APH,SMART,GBP,2,1,0,0,1,1,50
+QQ.,SMART,GBP,2,1,0,0,1,1,50
+DGE,SMART,GBP,2,1,0,0,1,1,50
+TSCO,SMART,GBP,2,0,1,0,1,1,50
+GFS,SMART,GBP,7,1,2,0,4,3,42.85714286
+BVC,SMART,GBP,17,6,1,2,8,7,41.17647059
+XPS,SMART,GBP,9,3,0,0,6,3,33.33333333
+IWG,SMART,GBP,6,2,0,2,2,2,33.33333333
+EXPN,SMART,GBP,3,0,1,1,1,1,33.33333333
+AHT,SMART,GBP,7,1,1,0,5,2,28.57142857
+HAS,SMART,GBP,7,1,1,0,5,2,28.57142857
+SSPG,SMART,GBP,9,2,0,3,4,2,22.22222222
+AVCT,SMART,GBP,5,0,0,0,5,0,0
+GNC,SMART,GBP,2,0,0,0,2,0,0
+BAB,SMART,GBP,1,0,0,0,1,0,0
+CCR,SMART,GBP,1,0,0,0,1,0,0
+TATE,SMART,GBP,1,0,0,0,1,0,0
+MRW,SMART,GBP,0,0,0,0,0,0,0
+GDR,SMART,GBP,0,0,0,0,0,0,0
+INDV,SMART,GBP,0,0,0,0,0,0,0
+RB.,SMART,GBP,0,0,0,0,0,0,0
+AGK,SMART,GBP,0,0,0,0,0,0,0
+UDG,SMART,GBP,0,0,0,0,0,0,0
+BVIC,SMART,GBP,0,0,0,0,0,0,0
+PAGE,SMART,GBP,0,0,0,0,0,0,0
+DLAR,SMART,GBP,0,0,0,0,0,0,0
+CLG,SMART,GBP,0,0,0,0,0,0,0
+NTG,SMART,GBP,0,0,0,0,0,0,0
+CCH,SMART,GBP,0,0,0,0,0,0,0
+MDC,SMART,GBP,0,0,0,0,0,0,0
+STCK,SMART,GBP,0,0,0,0,0,0,0
+HIK,SMART,GBP,0,0,0,0,0,0,0
+RPS,SMART,GBP,0,0,0,0,0,0,0
+KGH,SMART,GBP,0,0,0,0,0,0,0
+DVO,SMART,GBP,0,0,0,0,0,0,0
+MCB,SMART,GBP,0,0,0,0,0,0,0
+TRB,SMART,GBP,0,0,0,0,0,0,0
+PZC,SMART,GBP,0,0,0,0,0,0,0
+SPI,SMART,GBP,0,0,0,0,0,0,0
+CLIN,SMART,GBP,0,0,0,0,0,0,0
+GRG,SMART,GBP,0,0,0,0,0,0,0
+FEVR,SMART,GBP,0,0,0,0,0,0,0
+PRTC,SMART,GBP,0,0,0,0,0,0,0
+AMS,SMART,GBP,0,0,0,0,0,0,0
+RENE,SMART,GBP,0,0,0,0,0,0,0
+ITRK,SMART,GBP,0,0,0,0,0,0,0
+TRD,SMART,GBP,0,0,0,0,0,0,0
+SVS,SMART,GBP,0,0,0,0,0,0,0
+MXCT,SMART,GBP,0,0,0,0,0,0,0
+RST,SMART,GBP,0,0,0,0,0,0,0
+STHR,SMART,GBP,0,0,0,0,0,0,0
+DPH,SMART,GBP,0,0,0,0,0,0,0
+DWF,SMART,GBP,0,0,0,0,0,0,0
+JET,SMART,GBP,0,0,0,0,0,0,0
+CVSG,SMART,GBP,0,0,0,0,0,0,0
+OXB,SMART,GBP,0,0,0,0,0,0,0
+BAKK,SMART,GBP,0,0,0,0,0,0,0
+SBI,SMART,GBP,0,0,0,0,0,0,0
+IDHC,SMART,GBP,0,0,0,0,0,0,0
+VINO,SMART,GBP,0,0,0,0,0,0,0
+CWK,SMART,GBP,0,0,0,0,0,0,0
+MER,SMART,GBP,0,0,0,0,0,0,0
+GPH,SMART,GBP,0,0,0,0,0,0,0
+HFG,SMART,GBP,0,0,0,0,0,0,0
+GNS,SMART,GBP,0,0,0,0,0,0,0
+SLN,SMART,GBP,0,0,0,0,0,0,0
+IXI,SMART,GBP,0,0,0,0,0,0,0
+ERM,SMART,GBP,0,0,0,0,0,0,0
+ERGO,SMART,GBP,0,0,0,0,0,0,0
+MGP,SMART,GBP,0,0,0,0,0,0,0
+BAG,SMART,GBP,0,0,0,0,0,0,0
+IHC,SMART,GBP,0,0,0,0,0,0,0
+UPR,SMART,GBP,0,0,0,0,0,0,0
+HCM,SMART,GBP,0,0,0,0,0,0,0
+WIL,SMART,GBP,0,0,0,0,0,0,0
+GATC,SMART,GBP,0,0,0,0,0,0,0
+CTH,SMART,GBP,0,0,0,0,0,0,0
+DTY,SMART,GBP,0,0,0,0,0,0,0
+HOTC,SMART,GBP,0,0,0,0,0,0,0
+MRL,SMART,GBP,0,0,0,0,0,0,0
+TSTL,SMART,GBP,0,0,0,0,0,0,0
+CARR,SMART,GBP,0,0,0,0,0,0,0
+ONC,SMART,GBP,0,0,0,0,0,0,0
+DXRX,SMART,GBP,0,0,0,0,0,0,0
+ABDP,SMART,GBP,0,0,0,0,0,0,0
+FOUR,SMART,GBP,0,0,0,0,0,0,0
+AFM,SMART,GBP,0,0,0,0,0,0,0
+RE.B,SMART,GBP,0,0,0,0,0,0,0
+YNGA,SMART,GBP,0,0,0,0,0,0,0
+FSTA,SMART,GBP,0,0,0,0,0,0,0
+RWA,SMART,GBP,0,0,0,0,0,0,0
+NICL,SMART,GBP,0,0,0,0,0,0,0
+MPE,SMART,GBP,0,0,0,0,0,0,0
+VP.,SMART,GBP,0,0,0,0,0,0,0
+AEP,SMART,GBP,0,0,0,0,0,0,0
+BVXP,SMART,GBP,0,0,0,0,0,0,0
+CPP,SMART,GBP,0,0,0,0,0,0,0
+CAM,SMART,GBP,0,0,0,0,0,0,0
