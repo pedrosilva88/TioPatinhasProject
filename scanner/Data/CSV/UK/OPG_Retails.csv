@@ -95,6 +95,8 @@ BAG,SMART,GBP,"Consumer, Non-cyclical",Beverages,Beverages-Non-alcoholic,469.5,6
 IHC,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Whsle Drug Dist,127,,0,,,1.76,123,127
 UPR,SMART,GBP,"Consumer, Non-cyclical",Pharmaceuticals,Medical-Whsle Drug Dist,209,8114,0,,,2.9,215,225
 HCM,SMART,GBP,"Consumer, Non-cyclical",Biotechnology,Medical-Biomedical/Gene,416,55560,0,,,5.77,410,412
+
+
 WIL,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Consulting Services,200,787,0,,,2.77,192,200
 GATC,SMART,GBP,"Consumer, Non-cyclical",Commercial Services,Human Resources,154,41080,77.838,,,2.14,152,159
 CTH,SMART,GBP,"Consumer, Non-cyclical",Healthcare-Services,Medical-Hospitals,546,105222,0,,,7.57,,

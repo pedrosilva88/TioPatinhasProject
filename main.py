@@ -7,7 +7,7 @@ version="0.1"
 description="A Python client library for the Interactive Brokers integration"
 long_description = long_description
 long_description_content_type="text/markdown"
-packages=['vault, strategie, order, screener']
+packages=['vault, strategy, order, scanner']
 zip_safe=False
 '''
 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     logInitTioPatinhas()
     try:
         island = Island()
-        vaultOPG = createOPGRetailVault(key=CountryKey.USA)
+        vaultOPG = createOPGRetailVault(key=CountryKey.UK)
         island.start(vaultOPG)
     except (KeyboardInterrupt, SystemExit):
         island.stop()
