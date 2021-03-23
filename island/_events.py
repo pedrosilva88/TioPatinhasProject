@@ -10,7 +10,7 @@ class IslandEvents:
         #self.vault.updatePortfolio()
 
     def onBarUpdate(self, bars, hasNewBar):
-        print("🕯 %s: %s 🕯" % (bars.contract.symbol, bars[-1]))
+        self.vault.updateVolumeInFirstMinuteBar(bars)
 
     def onOpenOrderEvent(self, trade):
         self.vault.updatePortfolio()

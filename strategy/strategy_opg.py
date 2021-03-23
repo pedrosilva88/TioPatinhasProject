@@ -128,6 +128,10 @@ class StrategyOPG(Strategy):
             log("🙅‍♂️ Invalid data for %s: isConfigsValid(%s) isStrategyDataValid(%s) 🙅‍♂️" % (self.strategyData.ticker.contract.symbol, self.isConfigsValid(), self.isStrategyDataValid()))
             return StrategyResult(self.strategyData.ticker, StrategyResultType.IgnoreEvent)
 
+        elif (not self.isVolumeValid()):
+            log("❗️ Invalid Volume for %s: AVGVolume(%.2f) VolumeMinute(%.2f) unsubscribing...❗️" % (self.strategyData.ticker.contract.symbol, self.avgVolume, self.volumeFirstMinute))
+            return StrategyResult(self.strategyData.ticker, StrategyResultType.DoNothing)
+
         return None
 
     def datetimeIsValidForStrategy(self):
@@ -146,7 +150,6 @@ class StrategyOPG(Strategy):
         return ((self.volumeFirstMinute is not None) and self.volumeFirstMinute >= 0 and
                 (self.avgVolume is not None) and self.avgVolume >= 0 and
                 self.isDatetimeValid() and
-                self.isVolumeValid() and
                 (self.closePrice is not None) and self.closePrice > 0 and
                 (self.openPrice is not None) and self.openPrice > 0 and
                 (self.lastPrice is not None) and self.lastPrice > 0 and

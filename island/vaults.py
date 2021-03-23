@@ -1,6 +1,6 @@
 from enum import Enum
 from datetime import datetime
-from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition
+from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData
 from helpers import logExecutionTicker
 from models import Order, OrderAction, StockInfo
 from scanner import Scanner
@@ -48,7 +48,6 @@ class Vault:
 
     def executeTicker(self, ticker: ibTicker):
         if self.shouldRunStrategy(ticker.contract, ticker.time):
-            self.updateVolumeInFirstMinuteBar(ticker)
             position = self.getPosition(ticker)
             order = self.getOrder(ticker)
             averageVolume = None
@@ -135,24 +134,35 @@ class Vault:
             else:
                 log("🚨 Error getting AVG Volume for %s: 🚨" % (stock.symbol))
 
-    def updateVolumeInFirstMinuteBar(self, ticker: ibTicker):
+    def updateVolumeInFirstMinuteBar(self, bars: [BarData]):
         model = None
-        stock = ticker.contract
+        stock = bars.contract
+        barDatetime = bars[-1].time
         if stock.symbol in self.stocksExtraInfo:
             model = self.stocksExtraInfo[stock.symbol]  
 
-        time = utcToLocal(ticker.time, self.countryConfig.timezone)
+        time = utcToLocal(barDatetime, self.countryConfig.timezone)
         if (time.hour == self.strategyConfig.startRunningStrategy.hour and 
-            time.minute == self.strategyConfig.startRunningStrategy.minute and
-            ticker.volume >= 0 and
-            (not model or not model.volumeFirstMinute)):
-            log("🧶 Volume first minute for %s: %.2f 🧶" % (ticker.contract.symbol, ticker.volume))
-            if not model:
-                model = StockInfo(symbol=stock.symbol, volumeFirstMinute=ticker.volume)
-                self.stocksExtraInfo[stock.symbol] = model
-            if not model.volumeFirstMinute:
-                model.volumeFirstMinute = ticker.volume
-                self.stocksExtraInfo[stock.symbol] = model        
+            time.minute >= self.strategyConfig.startRunningStrategy.minute and
+            ((model is None) or (model.volumeFirstMinute is None))):
+            volume = -1
+            hasMatch = False
+            for bar in bars:
+                dataTime = utcToLocal(bar.time, self.countryConfig.timezone)
+                if (dataTime.time().hour == self.strategyConfig.startRunningStrategy.hour and
+                    dataTime.time().minute == self.strategyConfig.startRunningStrategy.minute-1):
+                    if not hasMatch:
+                        hasMatch = True
+                        volume = 0
+                    volume += bar.volume
+            if volume >= 0:
+                log("🧶 Volume first minute for %s: %.2f 🧶" % (stock.symbol, volume))
+                if not model:
+                    model = StockInfo(symbol=stock.symbol, volumeFirstMinute=volume)
+                    self.stocksExtraInfo[stock.symbol] = model
+                if not model.volumeFirstMinute:
+                    model.volumeFirstMinute = volume
+                    self.stocksExtraInfo[stock.symbol] = model        
 
     # Earning Calendar
 
@@ -254,13 +264,20 @@ class Vault:
         ## Além de fazer cancelmarketData também devia de limpar na list de stocks que tenho no scanner
         log("👋 Unsubscribe Contract %s 👋" % contract.symbol) 
         self.ib.cancelMktData(contract)
-        # self.ib.cancelRealTimeBars()
+        if contract.symbol in self.stocksExtraInfo:
+            model = self.stocksExtraInfo[contract.symbol]  
+            self.ib.cancelRealTimeBars(model.realTimeBarList)
         return 
 
     def subscribeTicker(self, contract: ibContract):
         self.ib.reqMktData(contract)
-        #self.ib.reqHistoricalDataAsync(contract, '', '5 D', '1 min', "TRADES", True, 1, True)
-        #self.ib.reqRealTimeBars(contract, 5, 'TRADES', True)
+        model = None
+        if contract.symbol in self.stocksExtraInfo:
+            model = self.stocksExtraInfo[contract.symbol]  
+        else:
+            model = StockInfo(contract.symbol)
+            self.stocksExtraInfo[contract.symbol] = model
+        model.realTimeBarList = self.ib.reqRealTimeBars(contract, 5, 'TRADES', True)
 
 def createOPGRetailVault(key: CountryKey = CountryKey.USA):
     scanner = Scanner()
