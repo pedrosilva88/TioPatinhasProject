@@ -654,7 +654,7 @@ if __name__ == '__main__':
     try:
         backtest = BackTest(countryKey=CountryKey.UK)
         #backtest.downloadStocksToCSVFile()
-        #backtest.run()
-        backtest.runStockPerformance()
+        backtest.run()
+        #backtest.runStockPerformance()
     except (KeyboardInterrupt, SystemExit):
         None
