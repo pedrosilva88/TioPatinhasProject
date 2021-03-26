@@ -652,7 +652,7 @@ class BackTest():
 
 if __name__ == '__main__':
     try:
-        backtest = BackTest(countryKey=CountryKey.UK)
+        backtest = BackTest(countryKey=CountryKey.USA)
         #backtest.downloadStocksToCSVFile()
         backtest.run()
         #backtest.runStockPerformance()
