@@ -10,11 +10,14 @@ class IslandEvents:
         #self.vault.updatePortfolio()
 
     def onBarUpdate(self, bars, hasNewBar):
-        self.vault.updateVolumeInFirstMinuteBar(bars)
+        self.vault.updateVolumeInFirstMinuteBar(bars, bars[-1].time)
 
     def onOpenOrderEvent(self, trade):
         self.vault.updatePortfolio()
 
+    def onCancelOrderEvent(self, trade):
+        self.vault.updatePortfolio()
+      
     def onAccountSummaryEvent(self, accountValue: AccountValue):
         self.vault.updatePortfolio()
 
@@ -30,7 +33,7 @@ class IslandEvents:
             self.waiter.set_exception(Warning(f'Error {errorCode}'))
         else:
             log("🚨 %s 🚨" % errorString)
-            self._logger.debug(errorString)
+        self.vault.updatePortfolio()
 
     def onTimeout(self, idlePeriod):
         log("⏰ onTimeoutEvent ⏰")
@@ -49,6 +52,7 @@ class IslandEvents:
         ib.pendingTickersEvent += self.onPendingTickersEvent
         ib.accountSummaryEvent += self.onAccountSummaryEvent
         ib.openOrderEvent += self.onOpenOrderEvent
+        ib.cancelOrderEvent += self.onCancelOrderEvent
         ib.updateEvent += self.onUpdateEvent
         ib.barUpdateEvent += self.onBarUpdate
 
@@ -59,5 +63,6 @@ class IslandEvents:
         ib.pendingTickersEvent -= self.onPendingTickersEvent
         ib.accountSummaryEvent -= self.onAccountSummaryEvent
         ib.openOrderEvent -= self.onOpenOrderEvent
+        ib.cancelOrderEvent -= self.onCancelOrderEvent 
         ib.updateEvent -= self.onUpdateEvent
         ib.barUpdateEvent -= self.onBarUpdate

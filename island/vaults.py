@@ -48,16 +48,20 @@ class Vault:
 
     def executeTicker(self, ticker: ibTicker):
         if self.shouldRunStrategy(ticker.contract, ticker.time):
+            if ticker.contract.symbol in self.stocksExtraInfo:
+                model = self.stocksExtraInfo[ticker.contract.symbol]
+                self.updateVolumeInFirstMinuteBar(model.realTimeBarList, ticker.time)
+
             position = self.getPosition(ticker)
             order = self.getOrder(ticker)
             averageVolume = None
             volumeFirstMinute = None
             if ticker.contract.symbol in self.stocksExtraInfo:
                 stockInfo = self.stocksExtraInfo[ticker.contract.symbol]
-                if stockInfo.averageVolume:
+                if (stockInfo.averageVolume is not None):
                     log("🧶 🕯 Sending Avg Volume for %s: %.2f 🕯 🧶" % (ticker.contract.symbol, stockInfo.averageVolume))
                     averageVolume = stockInfo.averageVolume
-                if stockInfo.volumeFirstMinute:
+                if (stockInfo.volumeFirstMinute is not None):
                     log("🧶 🧶 Sending Volume First minute for %s: %.2f 🧶 🧶" % (ticker.contract.symbol, stockInfo.volumeFirstMinute))
                     volumeFirstMinute = stockInfo.volumeFirstMinute
 
@@ -79,7 +83,7 @@ class Vault:
             if result.order.totalQuantity > 1:
                 return self.createOrder(contract, result.order)
             else:
-                log("❗️ (%s) Order Size is lower then 2 Shares❗️", result.ticker.contract.symbol)
+                log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
                 return None
 
         elif (result.type == StrategyResultType.StrategyDateWindowExpired or result.type == StrategyResultType.DoNothing):
@@ -134,10 +138,10 @@ class Vault:
             else:
                 log("🚨 Error getting AVG Volume for %s: 🚨" % (stock.symbol))
 
-    def updateVolumeInFirstMinuteBar(self, bars: [BarData]):
+    def updateVolumeInFirstMinuteBar(self, bars: [BarData], time: datetime):
         model = None
         stock = bars.contract
-        barDatetime = bars[-1].time
+        barDatetime = time
         if stock.symbol in self.stocksExtraInfo:
             model = self.stocksExtraInfo[stock.symbol]  
 
@@ -145,24 +149,20 @@ class Vault:
         if (time.hour == self.strategyConfig.startRunningStrategy.hour and 
             time.minute >= self.strategyConfig.startRunningStrategy.minute and
             ((model is None) or (model.volumeFirstMinute is None))):
-            volume = -1
-            hasMatch = False
+            volume = 0
             for bar in bars:
                 dataTime = utcToLocal(bar.time, self.countryConfig.timezone)
                 if (dataTime.time().hour == self.strategyConfig.startRunningStrategy.hour and
                     dataTime.time().minute == self.strategyConfig.startRunningStrategy.minute-1):
-                    if not hasMatch:
-                        hasMatch = True
-                        volume = 0
                     volume += bar.volume
             if volume >= 0:
                 log("🧶 Volume first minute for %s: %.2f 🧶" % (stock.symbol, volume))
-                if not model:
+                if (model is None):
                     model = StockInfo(symbol=stock.symbol, volumeFirstMinute=volume)
                     self.stocksExtraInfo[stock.symbol] = model
-                if not model.volumeFirstMinute:
+                if (model.volumeFirstMinute is None):
                     model.volumeFirstMinute = volume
-                    self.stocksExtraInfo[stock.symbol] = model        
+                    self.stocksExtraInfo[stock.symbol] = model
 
     # Earning Calendar
 
