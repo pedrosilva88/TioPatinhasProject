@@ -23,8 +23,8 @@ class Scanner:
                     stocks.append(ibStock(row[0], row[1], row[2]))
                 line_count += 1
         
-        self.stocksDownloaded = stocks[:61]
-        self.stocks = stocks[:61]
+        self.stocksDownloaded = stocks[:83]
+        self.stocks = stocks[:83]
 
     def getTicker(self, symbol: str):
         ticker = [d for d in self.stocks if d.symbol == symbol].pop()
