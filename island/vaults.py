@@ -1,3 +1,4 @@
+import asyncio
 from enum import Enum
 from datetime import datetime
 from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData
@@ -10,16 +11,7 @@ from portfolio import Portfolio
 from earnings_calendar import EarningsCalendar
 from helpers import log, utcToLocal, logCounter
 
-class VaultType(Enum):
-    OPG_US_RTL = 1
-    OPG_UK_RTL = 2
-    
-    def __str__(self):
-        if self == OPG_US_RTL: return "Opening Price Gap for US Retailers"
-        if self == OPG_UK_RTL: return "Opening Price Gap for UK Retailers"
-
 class Vault:
-    type: VaultType
     ib: IB
     countryConfig: CountryConfig
     strategyConfig: StrategyConfig
@@ -30,16 +22,68 @@ class Vault:
     historicalData: HistoricalData
     stocksExtraInfo: [str, StockInfo]
 
-    def __init__(self, type: VaultType, countryConfig: CountryConfig, scanner: Scanner, strategy: Strategy, strategyConfig: StrategyConfig, portfolio: Portfolio):
-        self.type = type
-        self.countryConfig = countryConfig
-        self.scanner = scanner
-        self.strategy = strategy
-        self.strategyConfig = strategyConfig
-        self.portfolio = portfolio
+    def __init__(self):
+        self.setupVault()
         self.earningsCalendar = EarningsCalendar()
         self.historicalData = HistoricalData()
+
+    # Setup
+
+    def setupVault(self):
+        self.countryConfig = getCurrentMarketConfig()
+        log("🏃‍♂️ Setup Vault for %s 🏃‍♂️"% self.countryConfig.key.code)
+        key = self.countryConfig.key
+        path = ("scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv" % key.code)
+
+        self.scanner = Scanner()
+        self.scanner.getOPGRetailers(path=path, nItems=3)
+        self.strategy = StrategyOPG()
+        self.strategyConfig = getStrategyConfigFor(key=key, timezone=self.countryConfig.timezone)
+        self.portfolio = Portfolio()
         self.stocksExtraInfo = {}
+
+    async def resetVault(self):
+        for stock in self.stocks:
+            self.unsubscribeTicker(stock)
+        self.setupVault()
+        await self.runMarket()
+
+    async def runMarket(self):
+        await self.runMarketAt(self.countryConfig.startSetupData)
+
+        await self.ib.accountSummaryAsync()
+        await self.ib.reqPositionsAsync()
+        await self.ib.reqAllOpenOrdersAsync()
+        await self.getAverageVolumeOfStocks()
+        self.getEraningsCalendarIfNecessary() # Isto aqui pode ser async. Preciso de estudar melhor
+        self.updatePortfolio()
+        self.subscribeTickers()
+
+        await self.closeMarketAt(self.countryConfig.closeMarket)
+        
+    async def runMarketAt(self, time: datetime):
+        marketTime = time.astimezone(timezone('UTC'))
+        nowTime = datetime.now().astimezone(timezone('UTC'))
+        difference = (marketTime - nowTime)
+        if difference.total_seconds() < 0:
+            print("😉 See you Tomorrow 😉")
+            marketTime = datetime(year=marketTime.year, 
+                                    month=marketTime.month, day=marketTime.day+1, 
+                                    hour=marketTime.hour, minute=marketTime.minute,
+                                    tzinfo=marketTime.tzinfo)
+            difference = (marketTime - nowTime)
+        if difference.total_seconds() > 900: # Maior do que 15 minutos
+            log("🕐 Run Market for %s at %d/%d %d:%d 🕐" % (self.countryConfig.key.code, marketTime.month, marketTime.day, marketTime.hour, marketTime.minute))
+            await asyncio.sleep(difference.total_seconds())
+        log("🕐 Run Market for %s now 🕐" % self.countryConfig.key.code)
+            
+    async def closeMarketAt(self, time: datetime):
+        marketTime = time.astimezone(timezone('UTC'))
+        nowTime = datetime.now().astimezone(timezone('UTC'))
+        log("🕐 Closing Market for %s scheduled to %d:%d 🕐" % (self.countryConfig.key.code, marketTime.hour, marketTime.minute))
+        difference = (marketTime - nowTime)
+        await asyncio.sleep(difference.total_seconds())
+        await self.resetVault()
 
     # Strategy
 
@@ -250,9 +294,6 @@ class Vault:
     def stocks(self):
         return self.scanner.stocks
 
-    def getTicker(self, symbol: str):
-        return self.scanner.getTicker(symbol)
-
     def subscribeTickers(self):
         contracts = [stock for stock in self.stocks]
         for contract in contracts:
@@ -261,12 +302,13 @@ class Vault:
     # IB
 
     def unsubscribeTicker(self, contract: ibContract):
-        ## Além de fazer cancelmarketData também devia de limpar na list de stocks que tenho no scanner
         log("👋 Unsubscribe Contract %s 👋" % contract.symbol) 
         self.ib.cancelMktData(contract)
         if contract.symbol in self.stocksExtraInfo:
-            model = self.stocksExtraInfo[contract.symbol]  
-            self.ib.cancelRealTimeBars(model.realTimeBarList)
+            model = self.stocksExtraInfo[contract.symbol]
+            if (model.realTimeBarList is not None):
+                self.ib.cancelRealTimeBars(model.realTimeBarList)
+        self.scanner.removeTicker(contract.symbol)
         return 
 
     def subscribeTicker(self, contract: ibContract):
@@ -279,13 +321,5 @@ class Vault:
             self.stocksExtraInfo[contract.symbol] = model
         model.realTimeBarList = self.ib.reqRealTimeBars(contract, 5, 'TRADES', True)
 
-def createOPGRetailVault(key: CountryKey = CountryKey.USA):
-    scanner = Scanner()
-    countryConfig = getConfigFor(key=key)
-    path = ("scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv" % key.code)
-    scanner.getOPGRetailers(path=path)
-    strategy = StrategyOPG()
-    strategyConfig = getStrategyConfigFor(key=key, timezone=countryConfig.timezone)
-    portfolio = Portfolio()
-    vaultType = VaultType.OPG_UK_RTL if key == CountryKey.UK else VaultType.OPG_US_RTL
-    return Vault(vaultType, countryConfig, scanner, strategy, strategyConfig, portfolio)
+def createOPGRetailVault():
+    return Vault()

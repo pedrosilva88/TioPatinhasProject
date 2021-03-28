@@ -10,19 +10,21 @@ long_description_content_type="text/markdown"
 packages=['vault, strategy, order, scanner']
 zip_safe=False
 '''
-
+import sys
 import asyncio
 import logging
 from helpers import logInitTioPatinhas, createLog
 from island import *
+from country_config import *
 
 if __name__ == '__main__':
     asyncio.get_event_loop().set_debug(True)
     createLog()
     logInitTioPatinhas()
     try:
-        island = Island()
-        vaultOPG = createOPGRetailVault(key=CountryKey.USA)
+        path = sys.argv[1]
+        island = Island(configPath=path)
+        vaultOPG = createOPGRetailVault()
         island.start(vaultOPG)
     except (KeyboardInterrupt, SystemExit):
         island.stop()
