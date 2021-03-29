@@ -7,7 +7,7 @@ from ib_insync import IB, IBC
 from .vaults import Vault
 from ._events import *
 from helpers import log
-
+    
 class Island(IslandEvents):
     controller: IBC
     ib: IB
@@ -22,6 +22,7 @@ class Island(IslandEvents):
     account: str = ''
 
     vault: Vault
+    marketWaiter: asyncio.Future
 
     def __init__(self, configPath: str):
         self.ib = IB()
@@ -29,6 +30,7 @@ class Island(IslandEvents):
         self.vault = None
         self._runner = None
         self.waiter = None
+        self.marketWaiter = None
         self._logger = logging.getLogger('Tio Patinhas')
 
     def __post_init__(self):
@@ -65,7 +67,7 @@ class Island(IslandEvents):
                     self.readonly, self.account)
 
                 self.ib.setTimeout(self.appTimeout)
-                self.subscribeEvents(self.ib)
+                self.subscribeSystemEvents(self.ib)
 
                 while self._runner:
                     self.waiter = asyncio.Future()
@@ -85,6 +87,7 @@ class Island(IslandEvents):
                 self._logger.debug("Finishing")
                 log("🥺 Finishing 🥺")
                 self.unsubscribeEvents(self.ib)
+                await self.controller.terminateAsync()
 
                 if self._runner:
                     await asyncio.sleep(self.retryDelay)

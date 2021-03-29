@@ -24,7 +24,7 @@ if __name__ == '__main__':
     try:
         path = sys.argv[1]
         island = Island(configPath=path)
-        vaultOPG = createOPGRetailVault()
+        vaultOPG = Vault(island)
         island.start(vaultOPG)
     except (KeyboardInterrupt, SystemExit):
         island.stop()

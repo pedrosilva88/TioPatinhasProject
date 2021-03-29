@@ -10,7 +10,7 @@ class Scanner:
         self.tickersDownloaded = []
         self.tickers = []
 
-    def getOPGRetailers(self, path: str):
+    def getOPGRetailers(self, path: str, nItems: int):
         modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
         datapath = os.path.join(modpath, path)
         stocks = []
@@ -23,9 +23,9 @@ class Scanner:
                     stocks.append(ibStock(row[0], row[1], row[2]))
                 line_count += 1
         
-        self.stocksDownloaded = stocks[:83]
-        self.stocks = stocks[:83]
+        self.stocksDownloaded = stocks[:nItems]
+        self.stocks = stocks[:nItems]
 
-    def getTicker(self, symbol: str):
+    def removeTicker(self, symbol: str):
         ticker = [d for d in self.stocks if d.symbol == symbol].pop()
-        return ticker
+        self.stocks.remove(ticker)

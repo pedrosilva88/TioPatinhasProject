@@ -1,5 +1,6 @@
 import asyncio
 from enum import Enum
+from typing import Protocol
 from datetime import datetime
 from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData
 from helpers import logExecutionTicker
@@ -10,6 +11,15 @@ from country_config import *
 from portfolio import Portfolio
 from earnings_calendar import EarningsCalendar
 from helpers import log, utcToLocal, logCounter
+
+class IslandProtocol(Protocol):
+    marketWaiter: asyncio.Future
+
+    def subscribeStrategyEvents(self, ib: IB):
+        """Subscribe Events"""
+
+    def unsubscribeStrategyEvents(self, ib: IB):
+        """Subscribe Events"""
 
 class Vault:
     ib: IB
@@ -22,21 +32,24 @@ class Vault:
     historicalData: HistoricalData
     stocksExtraInfo: [str, StockInfo]
 
-    def __init__(self):
+    delegate: IslandProtocol
+
+    def __init__(self, delegate: IslandProtocol):
         self.setupVault()
         self.earningsCalendar = EarningsCalendar()
         self.historicalData = HistoricalData()
+        self.delegate = delegate
 
     # Setup
 
     def setupVault(self):
         self.countryConfig = getCurrentMarketConfig()
-        log("🏃‍♂️ Setup Vault for %s 🏃‍♂️"% self.countryConfig.key.code)
+        log("🏃‍ Setup Vault for %s 🏃‍"% self.countryConfig.key.code)
         key = self.countryConfig.key
         path = ("scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv" % key.code)
 
         self.scanner = Scanner()
-        self.scanner.getOPGRetailers(path=path, nItems=3)
+        self.scanner.getOPGRetailers(path=path, nItems=self.countryConfig.nItems)
         self.strategy = StrategyOPG()
         self.strategyConfig = getStrategyConfigFor(key=key, timezone=self.countryConfig.timezone)
         self.portfolio = Portfolio()
@@ -45,6 +58,7 @@ class Vault:
     async def resetVault(self):
         for stock in self.stocks:
             self.unsubscribeTicker(stock)
+        self.delegate.unsubscribeStrategyEvents(self.ib)
         self.setupVault()
         await self.runMarket()
 
@@ -57,8 +71,9 @@ class Vault:
         await self.getAverageVolumeOfStocks()
         self.getEraningsCalendarIfNecessary() # Isto aqui pode ser async. Preciso de estudar melhor
         self.updatePortfolio()
-        self.subscribeTickers()
 
+        self.delegate.subscribeStrategyEvents(self.ib)
+        self.subscribeTickers()
         await self.closeMarketAt(self.countryConfig.closeMarket)
         
     async def runMarketAt(self, time: datetime):
@@ -73,8 +88,12 @@ class Vault:
                                     tzinfo=marketTime.tzinfo)
             difference = (marketTime - nowTime)
         if difference.total_seconds() > 900: # Maior do que 15 minutos
-            log("🕐 Run Market for %s at %d/%d %d:%d 🕐" % (self.countryConfig.key.code, marketTime.month, marketTime.day, marketTime.hour, marketTime.minute))
-            await asyncio.sleep(difference.total_seconds())
+            localTime = marketTime.astimezone(timezone('Europe/Lisbon'))
+            log("🕐 Run Market for %s at %d/%d %d:%d 🕐" % (self.countryConfig.key.code, localTime.month, localTime.day, localTime.hour, localTime.minute))
+            coro = asyncio.sleep(difference.total_seconds())
+            self.delegate.marketWaiter = asyncio.ensure_future(coro)
+            await asyncio.wait([self.delegate.marketWaiter])
+            self.delegate.marketWaiter = None
         log("🕐 Run Market for %s now 🕐" % self.countryConfig.key.code)
             
     async def closeMarketAt(self, time: datetime):
@@ -82,7 +101,10 @@ class Vault:
         nowTime = datetime.now().astimezone(timezone('UTC'))
         log("🕐 Closing Market for %s scheduled to %d:%d 🕐" % (self.countryConfig.key.code, marketTime.hour, marketTime.minute))
         difference = (marketTime - nowTime)
-        await asyncio.sleep(difference.total_seconds())
+        coro = asyncio.sleep(difference.total_seconds())
+        self.delegate.marketWaiter = asyncio.ensure_future(coro)
+        await asyncio.wait([self.delegate.marketWaiter])
+        self.delegate.marketWaiter = None
         await self.resetVault()
 
     # Strategy
@@ -244,7 +266,7 @@ class Vault:
         profit = None
         stopLoss = None
 
-        if profitOrder:
+        if profitOrder is not None:
             profit = Order(orderId=profitOrder.orderId, 
                             action=profitOrder.action, 
                             type=profitOrder.orderType,
@@ -252,7 +274,7 @@ class Vault:
                             price=profitOrder.lmtPrice,
                             parentId=mainOrder.parentId)
 
-        if stopLossOrder:
+        if stopLossOrder is not None:
             stopLoss = Order(orderId=stopLossOrder.orderId, 
                             action=stopLossOrder.action, 
                             type=stopLossOrder.orderType,
