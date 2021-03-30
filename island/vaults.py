@@ -56,6 +56,7 @@ class Vault:
         self.stocksExtraInfo = {}
 
     async def resetVault(self):
+        log("🤖 Reset Vault 🤖")
         for stock in self.stocks:
             self.unsubscribeTicker(stock)
         self.delegate.unsubscribeStrategyEvents(self.ib)
@@ -87,9 +88,10 @@ class Vault:
                                     hour=marketTime.hour, minute=marketTime.minute,
                                     tzinfo=marketTime.tzinfo)
             difference = (marketTime - nowTime)
+            self.countryConfig = updateMarketConfigForNextDay(self.countryConfig)
         if difference.total_seconds() > 900: # Maior do que 15 minutos
             localTime = marketTime.astimezone(timezone('Europe/Lisbon'))
-            log("🕐 Run Market for %s at %d/%d %d:%d 🕐" % (self.countryConfig.key.code, localTime.month, localTime.day, localTime.hour, localTime.minute))
+            log("🕐 Run Market for %s at %d/%d %d:%d 🕐" % (self.countryConfig.key.code, localTime.day, localTime.month, localTime.hour, localTime.minute))
             coro = asyncio.sleep(difference.total_seconds())
             self.delegate.marketWaiter = asyncio.ensure_future(coro)
             await asyncio.wait([self.delegate.marketWaiter])
@@ -99,7 +101,8 @@ class Vault:
     async def closeMarketAt(self, time: datetime):
         marketTime = time.astimezone(timezone('UTC'))
         nowTime = datetime.now().astimezone(timezone('UTC'))
-        log("🕐 Closing Market for %s scheduled to %d:%d 🕐" % (self.countryConfig.key.code, marketTime.hour, marketTime.minute))
+        localMarketTime = marketTime.astimezone(timezone('Europe/Lisbon'))
+        log("🕐 Closing Market for %s scheduled to %d/%d %d:%d 🕐" % (self.countryConfig.key.code, localMarketTime.day, localMarketTime.month, localMarketTime.hour, localMarketTime.minute))
         difference = (marketTime - nowTime)
         coro = asyncio.sleep(difference.total_seconds())
         self.delegate.marketWaiter = asyncio.ensure_future(coro)

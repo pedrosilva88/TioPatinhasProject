@@ -73,3 +73,12 @@ def getCurrentMarketConfig() -> CountryConfig:
             break
 
     return currentMarket
+
+def updateMarketConfigForNextDay(previousConfig: CountryConfig) -> CountryConfig:
+    return CountryConfig(key=previousConfig.key,
+                            timezone=previousConfig.timezone,
+                            currency=previousConfig.currency,
+                            startSetupData=datetime.combine(date.today()+datetime.timedelta(days= 1),previousConfig.startSetupData.time),
+                            exchangeOpenTime=datetime.combine(date.today()+datetime.timedelta(days= 1),previousConfig.exchangeOpenTime.time),
+                            closeMarket=datetime.combine(date.today()+datetime.timedelta(days= 1),previousConfig.closeMarket.time),
+                            nItems=previousConfig.nItems)
