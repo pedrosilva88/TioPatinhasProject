@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import *
-from helpers import log, utcToLocal
-from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType, StrategyConfig
+from helpers import log, utcToLocal, round_down
+from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType, StrategyConfig, ContractDetails
 from models import Order, OrderAction, OrderType
 from country_config import CountryConfig
 
@@ -38,6 +38,7 @@ class StrategyOPG(Strategy):
     avgVolume: float = None
     volumeFirstMinute: float = None
     datetime: datetime = None
+    contractDetails: ContractDetails = None
 
     def run(self, strategyData: StrategyData, strategyConfig: StrategyConfig, countryConfig: CountryConfig):
         self.strategyData = strategyData
@@ -97,6 +98,7 @@ class StrategyOPG(Strategy):
         self.datetime = utcToLocal(self.strategyData.ticker.time, self.countryConfig.timezone)
         self.avgVolume = self.strategyData.averageVolume
         self.volumeFirstMinute = self.strategyData.volumeFirstMinute
+        self.contractDetails = self.strategyData.contractDetails
 
         # Strategy Parameters
         self.minGap = self.strategyConfig.minGap
@@ -258,6 +260,7 @@ class StrategyOPG(Strategy):
     # Final Operations
 
     def createOrder(self):
+        minTick = self.contractDetails.minTick
         action = self.gapType
         price = self.getOrderPrice()
         profitTarget = self.calculatePnl()
@@ -266,11 +269,12 @@ class StrategyOPG(Strategy):
 
         log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
-        profitOrder = Order(action.reverse, OrderType.LimitOrder, size, profitTarget)
-        stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, stopLossPrice)
+        profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(round_down(profitTarget, minTick), 2))
+        stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, round(round_down(stopLossPrice, minTick), 2))
         return Order(action=action, type=OrderType.LimitOrder, totalQuantity=size, price=price, takeProfitOrder=profitOrder, stopLossOrder=stopLossOrder)
 
     def updateCurrentOrder(self):
+        minTick = self.contractDetails.minTick
         price = self.getOrderPrice()
         profitTarget = self.calculatePnl()
         stopLossPrice = self.getStopLossPrice()
@@ -278,11 +282,11 @@ class StrategyOPG(Strategy):
 
         log("\t⭐️ [Upadte] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
-        self.strategyData.order.lmtPrice = round(price,2)
+        self.strategyData.order.lmtPrice = round(price, 2)
         self.strategyData.order.totalQuantity = int(size)
 
-        self.strategyData.order.takeProfitOrder.lmtPrice = round(profitTarget, 2)
+        self.strategyData.order.takeProfitOrder.lmtPrice = round(round_down(profitTarget, minTick), 2)
         self.strategyData.order.takeProfitOrder.totalQuantity = int(size)
 
-        self.strategyData.order.stopLossOrder.auxPrice = round(stopLossPrice, 2)
+        self.strategyData.order.stopLossOrder.auxPrice = round(round_down(stopLossPrice, minTick), 2)
         self.strategyData.order.stopLossOrder.totalQuantity = int(size)

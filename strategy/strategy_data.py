@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import datetime, date, time
 from models import Order
-from ib_insync import Ticker as ibTicker, Position as ibPosition
+from ib_insync import Ticker as ibTicker, Position as ibPosition, ContractDetails
 from country_config import CountryKey, CountryConfig
 from pytz import timezone
 
@@ -33,6 +33,7 @@ class StrategyResultType(Enum):
 
 class StrategyData:
     ticker: ibTicker
+    contractDetails: ContractDetails
     averageVolume: float
     volumeFirstMinute: float
     position: ibPosition
@@ -44,13 +45,15 @@ class StrategyData:
                         order: Order,
                         totalCash: float,
                         averageVolume: float = None,
-                        volumeFirstMinute: float = None):
+                        volumeFirstMinute: float = None,
+                        contractDetails: ContractDetails = None):
         self.ticker = ticker
         self.position = position
         self.order = order
         self.totalCash = totalCash
         self.averageVolume = averageVolume
         self.volumeFirstMinute = volumeFirstMinute
+        self.contractDetails = contractDetails
 
 class StrategyResult:
     ticker: ibTicker

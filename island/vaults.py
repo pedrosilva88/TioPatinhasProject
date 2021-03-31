@@ -69,7 +69,7 @@ class Vault:
         await self.ib.accountSummaryAsync()
         await self.ib.reqPositionsAsync()
         await self.ib.reqAllOpenOrdersAsync()
-        await self.getAverageVolumeOfStocks()
+        await self.getDataFromStocks()
         self.getEraningsCalendarIfNecessary() # Isto aqui pode ser async. Preciso de estudar melhor
         self.updatePortfolio()
 
@@ -83,10 +83,7 @@ class Vault:
         difference = (marketTime - nowTime)
         if difference.total_seconds() < 0:
             print("😉 See you Tomorrow 😉")
-            marketTime = datetime(year=marketTime.year, 
-                                    month=marketTime.month, day=marketTime.day+1, 
-                                    hour=marketTime.hour, minute=marketTime.minute,
-                                    tzinfo=marketTime.tzinfo)
+            marketTime += timedelta(days=1)
             difference = (marketTime - nowTime)
             self.countryConfig = updateMarketConfigForNextDay(self.countryConfig)
         if difference.total_seconds() > 900: # Maior do que 15 minutos
@@ -125,8 +122,10 @@ class Vault:
             order = self.getOrder(ticker)
             averageVolume = None
             volumeFirstMinute = None
+            contractDetails = None
             if ticker.contract.symbol in self.stocksExtraInfo:
                 stockInfo = self.stocksExtraInfo[ticker.contract.symbol]
+                contractDetails = stockInfo.contractDetails
                 if (stockInfo.averageVolume is not None):
                     log("🧶 🕯 Sending Avg Volume for %s: %.2f 🕯 🧶" % (ticker.contract.symbol, stockInfo.averageVolume))
                     averageVolume = stockInfo.averageVolume
@@ -139,7 +138,8 @@ class Vault:
                                 order, 
                                 self.portfolio.totalCashBalance,
                                 averageVolume,
-                                volumeFirstMinute)
+                                volumeFirstMinute,
+                                contractDetails)
 
             result = self.runStrategy(data)
             self.registerLastExecution(ticker.contract, ticker.time)
@@ -188,24 +188,36 @@ class Vault:
         else:
             return True
 
-    # Volumes
+    # Get extra data from stocks - Volume & Contract Details
 
-    async def getAverageVolumeOfStocks(self):
+    async def getDataFromStocks(self):
         total = len(self.stocks)
         current = 0
         for stock in self.stocks:
             current +=1
-            logCounter("Volumes", total, current)
-            averageVolume = await self.historicalData.getAverageVolume(self.ib, stock, 5)
-            if averageVolume:
-                log("🧶 Volume for %s: %.2f 🧶" % (stock.symbol, averageVolume))
-                if stock.symbol in self.stocksExtraInfo:
-                    model = self.stocksExtraInfo[stock.symbol]
-                    model.averageVolume = averageVolume
-                else:
-                    self.stocksExtraInfo[stock.symbol] = StockInfo(symbol=stock.symbol, averageVolume=averageVolume)
-            else:
-                log("🚨 Error getting AVG Volume for %s: 🚨" % (stock.symbol))
+            logCounter("Volumes & Contract Details", total, current)
+            if stock.symbol not in self.stocksExtraInfo:
+                self.stocksExtraInfo[stock.symbol] = StockInfo(symbol=stock.symbol)
+            model = self.stocksExtraInfo[stock.symbol]
+            await self.getAverageVolumeOfStock(stock, model)
+            await self.getContractDetailsOfStock(stock, model)
+
+    async def getAverageVolumeOfStock(self, stock: ibContract, model: StockInfo):
+        averageVolume = await self.historicalData.getAverageVolume(self.ib, stock, 5)
+        if averageVolume is not None:
+            log("🧶 Volume for %s: %.2f 🧶" % (stock.symbol, averageVolume))
+            model.averageVolume = averageVolume
+        else:
+            log("🚨 Error getting AVG Volume for %s: 🚨" % (stock.symbol))
+
+    async def getContractDetailsOfStock(self, stock: ibContract, model: StockInfo):
+        contractDetails = await self.historicalData.getContractDetails(self.ib, stock)
+        if (len(contractDetails)> 0 and (contractDetails[0] is not None)):
+            details = contractDetails[0]
+            log("🧶 Contract Details for %s: MinTick(%.2f) 🧶" % (stock.symbol, details.minTick))
+            model.contractDetails = contractDetails[0]
+        else:
+            log("🚨 Error getting Contract Details for %s: 🚨" % (stock.symbol))
 
     def updateVolumeInFirstMinuteBar(self, bars: [BarData], time: datetime):
         model = None

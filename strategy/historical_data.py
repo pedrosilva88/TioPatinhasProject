@@ -1,5 +1,5 @@
 from datetime import *
-from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, BarDataList
+from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, BarDataList, ContractDetails
 
 class HistoricalData:
 
@@ -25,6 +25,9 @@ class HistoricalData:
             startDate = startDate+timedelta(days=6)
             minute_bars += bars
         return minute_bars
+
+    async def getContractDetails(self, ib: IB, stock: ibContract) -> ContractDetails:
+        return await ib.reqContractDetailsAsync(stock)
     
     def calculateAverageVolume(self, datas: [BarData]):
         nBars = len(datas)
