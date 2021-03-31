@@ -1,6 +1,6 @@
 from enum import Enum
 from pytz import timezone
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 
 class CountryKey(Enum):
     USA = 1
@@ -46,7 +46,7 @@ def getConfigFor(key: CountryKey) -> CountryConfig:
         return CountryConfig(key=CountryKey.UK,
                             timezone=timezone('Europe/London'),
                             currency="GBP",
-                            startSetupData=datetime.combine(date.today(),time(7,30)),
+                            startSetupData=datetime.combine(date.today(),time(7,0)),
                             exchangeOpenTime=datetime.combine(date.today(),time(8,0)),
                             closeMarket=datetime.combine(date.today(),time(13,10)),
                             nItems= 61)
@@ -75,10 +75,11 @@ def getCurrentMarketConfig() -> CountryConfig:
     return currentMarket
 
 def updateMarketConfigForNextDay(previousConfig: CountryConfig) -> CountryConfig:
+    nextday = date.today()+timedelta(days= 1)
     return CountryConfig(key=previousConfig.key,
                             timezone=previousConfig.timezone,
                             currency=previousConfig.currency,
-                            startSetupData=datetime.combine(date.today()+datetime.timedelta(days= 1),previousConfig.startSetupData.time),
-                            exchangeOpenTime=datetime.combine(date.today()+datetime.timedelta(days= 1),previousConfig.exchangeOpenTime.time),
-                            closeMarket=datetime.combine(date.today()+datetime.timedelta(days= 1),previousConfig.closeMarket.time),
+                            startSetupData=datetime.combine(nextday,previousConfig.startSetupData.time()),
+                            exchangeOpenTime=datetime.combine(nextday,previousConfig.exchangeOpenTime.time()),
+                            closeMarket=datetime.combine(nextday,previousConfig.closeMarket.time()),
                             nItems=previousConfig.nItems)

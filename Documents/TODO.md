@@ -1,17 +1,8 @@
-
-- Bugs
-       - GTIM - Nesta Stock aconteceu que bateu num OPG para short entao criou uma order. Entretanto o valor desceu tanto que já ultrapasou o profit que eu criei pa essa order. Se essa não for executado e o valor já for muito baixo também deveria cancelar essa order.
-
-- Look to `Volume` and `News`
-       * Tenho que perceber se o `volume` é muito a cima do habitual
-       * Tenho que perceber se houve anuncio de `Earnings` ou `Dividens`
+- Look to `News`
        * Olhar para noticias e perceber se têm um ranking. E apartir disso tomar decisoesse faz sentido apostar ou não.
 
 - Calcular `comissions`
        * Preciso saber quanto uma order me vai custar, antes de a executar. Isto porque pode não compensar executar essa order.
-
-- Usar o `cancelMktData` para deixar de escutar uma derterminada stock
-       * Isto aqui tem de ser mais inteligente. Se mudar de dia tenho que restar a lista de stocks.
 
 - Create Order Issue
        * Neste momento o createOrder só permite criar `LimitOrder`. Era interessante poder criar pelo menos `MarketOrder`.
@@ -21,14 +12,7 @@
        * Nem que seja para já o `BYX`
        * Ver a aula do Mohsen onde explica as `ECN` e as suas `Fees`
 
-- Stock(ticker, `SMART`, `USD`)
-       * Perceber como posso ter a currency dinamica
-       * Se tiver a criar uma `Stock USA` tem de ser `USD` se for uma `Stock UK` tem que ser `POUND`
-
 - Multi Country
-       * Implementar lógica para conseguir correr em vários países diferentes horas. Podia começar por UK e USA.
-       * Devo ter uma logica de timeout para o script "descansar" e acordar quando for necessario. Exemplo: UK começa às 8:00 e o script teria que estar atento até ao 12:30h, depois poderia estar em standby até às 14:30h que é a hora que a exchange de USA abre.
-
        * UK:
               - Arranque do Script: 07:45
               - Abre: 8:00
