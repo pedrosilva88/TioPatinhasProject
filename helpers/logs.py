@@ -1,15 +1,30 @@
 from logging import *
-import sys
+from datetime import *
+import sys, os
+
+def mkdir(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
 
 def createLog():
     logger = getLogger("Tio Patinhas")
     logger.setLevel(DEBUG)
 
-    with open('logs/tioPatinhas.log', 'w'):
+    today = datetime.today()
+    dirPathMonth = ("logs/%s" % (today.strftime("%B")))
+    dirPathDay = ("logs/%s/%d" % (today.strftime("%B"), today.day))
+    mkdir(dirPathMonth)
+    mkdir(dirPathDay)
+    logPath = ("logs/%s/%d/TioPatinhas(%d:%d).log" % (today.strftime("%B"), today.day, today.hour, today.minute))
+    with open(logPath, 'w'):
         pass
 
     # Create handlers
-    f_handler = FileHandler('logs/tioPatinhas.log')
+    f_handler = FileHandler(logPath)
     f_handler.setLevel(DEBUG)
 
     # Create formatters and add it to handlers
