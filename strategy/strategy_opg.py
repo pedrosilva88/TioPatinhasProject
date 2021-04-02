@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import *
 from helpers import log, utcToLocal, round_down
-from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType, StrategyConfig, ContractDetails
+from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType, StrategyConfig, PriceIncrement
 from models import Order, OrderAction, OrderType
 from country_config import CountryConfig
 
@@ -38,7 +38,7 @@ class StrategyOPG(Strategy):
     avgVolume: float = None
     volumeFirstMinute: float = None
     datetime: datetime = None
-    contractDetails: ContractDetails = None
+    priceRules: [PriceIncrement] = None
 
     def run(self, strategyData: StrategyData, strategyConfig: StrategyConfig, countryConfig: CountryConfig):
         self.strategyData = strategyData
@@ -98,7 +98,7 @@ class StrategyOPG(Strategy):
         self.datetime = utcToLocal(self.strategyData.ticker.time, self.countryConfig.timezone)
         self.avgVolume = self.strategyData.averageVolume
         self.volumeFirstMinute = self.strategyData.volumeFirstMinute
-        self.contractDetails = self.strategyData.contractDetails
+        self.priceRules = self.strategyData.priceRules
 
         # Strategy Parameters
         self.minGap = self.strategyConfig.minGap
@@ -257,36 +257,46 @@ class StrategyOPG(Strategy):
 
         return int(min(portfolioLoss/stopLossPriceRatio, (totalCash*self.maxToInvestPerStockPercentage)/price))
 
+    def priceIncrement(self, price: float) -> float:
+        index = -1
+        for item in self.priceRules:
+            if price < item.lowEdge:
+                return self.priceRules[index].increment
+            index +=1
+        return self.priceRules[0].increment
+
     # Final Operations
 
     def createOrder(self):
-        minTick = self.contractDetails.minTick
         action = self.gapType
         price = self.getOrderPrice()
         profitTarget = self.calculatePnl()
         stopLossPrice = self.getStopLossPrice()
         size = self.getSize()
+        minTickProfit = self.priceIncrement(profitTarget)
+        minTickLoss = self.priceIncrement(stopLossPrice)
 
         log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
-        profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(round_down(profitTarget, minTick), 2))
-        stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, round(round_down(stopLossPrice, minTick), 2))
+        profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(round_down(profitTarget, minTickProfit), 2))
+        stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, round(round_down(stopLossPrice, minTickLoss), 2))
         return Order(action=action, type=OrderType.LimitOrder, totalQuantity=size, price=price, takeProfitOrder=profitOrder, stopLossOrder=stopLossOrder)
 
     def updateCurrentOrder(self):
-        minTick = self.contractDetails.minTick
         price = self.getOrderPrice()
         profitTarget = self.calculatePnl()
         stopLossPrice = self.getStopLossPrice()
         size = self.getSize()
+        minTickProfit = self.priceIncrement(profitTarget)
+        minTickLoss = self.priceIncrement(stopLossPrice)
 
         log("\t⭐️ [Upadte] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (self.gapType, size, price, profitTarget, stopLossPrice))
 
         self.strategyData.order.lmtPrice = round(price, 2)
         self.strategyData.order.totalQuantity = int(size)
 
-        self.strategyData.order.takeProfitOrder.lmtPrice = round(round_down(profitTarget, minTick), 2)
+        self.strategyData.order.takeProfitOrder.lmtPrice = round(round_down(profitTarget, minTickProfit), 2)
         self.strategyData.order.takeProfitOrder.totalQuantity = int(size)
 
-        self.strategyData.order.stopLossOrder.auxPrice = round(round_down(stopLossPrice, minTick), 2)
+        self.strategyData.order.stopLossOrder.auxPrice = round(round_down(stopLossPrice, minTickLoss), 2)
         self.strategyData.order.stopLossOrder.totalQuantity = int(size)

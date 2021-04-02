@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import datetime, date, time
 from models import Order
-from ib_insync import Ticker as ibTicker, Position as ibPosition, ContractDetails
+from ib_insync import Ticker as ibTicker, Position as ibPosition, PriceIncrement
 from country_config import CountryKey, CountryConfig
 from pytz import timezone
 
@@ -33,7 +33,7 @@ class StrategyResultType(Enum):
 
 class StrategyData:
     ticker: ibTicker
-    contractDetails: ContractDetails
+    priceRules: [PriceIncrement]
     averageVolume: float
     volumeFirstMinute: float
     position: ibPosition
@@ -46,14 +46,14 @@ class StrategyData:
                         totalCash: float,
                         averageVolume: float = None,
                         volumeFirstMinute: float = None,
-                        contractDetails: ContractDetails = None):
+                        priceRules: [PriceIncrement] = None):
         self.ticker = ticker
         self.position = position
         self.order = order
         self.totalCash = totalCash
         self.averageVolume = averageVolume
         self.volumeFirstMinute = volumeFirstMinute
-        self.contractDetails = contractDetails
+        self.priceRules = priceRules
 
 class StrategyResult:
     ticker: ibTicker
@@ -101,19 +101,19 @@ class StrategyConfig():
 
 def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
     if key == CountryKey.USA:
-        return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(9,31)), is_dst=None), 
+        return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(9,30,45)), is_dst=None), 
                                 strategyValidPeriod=timezone.localize(datetime.combine(date.today(),time(9,45)), is_dst=None),
                                 strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(14,0)), is_dst=None), 
-                                minGap= 3, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
+                                minGap= 2, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
                                 willingToLose= 0.04,
                                 stopToLosePercentage= 0.08, 
                                 maxToInvestPerStockPercentage= 0.5, 
                                 averageVolumePercentage= 1.8)
     if key == CountryKey.UK:
-        return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(8,1)), is_dst=None), 
+        return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(8,0,45)), is_dst=None), 
                                 strategyValidPeriod=timezone.localize(datetime.combine(date.today(),time(8,15)), is_dst=None),
                                 strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(13,0)), is_dst=None), 
-                                minGap= 3, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
+                                minGap= 2, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
                                 willingToLose= 0.04, 
                                 stopToLosePercentage= 0.08, 
                                 maxToInvestPerStockPercentage= 1, 

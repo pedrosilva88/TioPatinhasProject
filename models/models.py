@@ -1,6 +1,6 @@
 from enum import Enum
 from datetime import datetime
-from ib_insync import IB, Contract as ibContract, Order as ibOrder, LimitOrder as ibLimitOrder, MarketOrder as ibMarketOrder, StopOrder as ibStopOrder, RealTimeBarList, ContractDetails
+from ib_insync import IB, Contract as ibContract, Order as ibOrder, LimitOrder as ibLimitOrder, MarketOrder as ibMarketOrder, StopOrder as ibStopOrder, RealTimeBarList, ContractDetails, PriceIncrement
 
 class StockInfo:
     symbol: str
@@ -9,14 +9,19 @@ class StockInfo:
     volumeFirstMinute: float
     realTimeBarList: RealTimeBarList
     contractDetails: ContractDetails
+    priceRules: [PriceIncrement]
 
-    def __init__(self, symbol: str, lastExecution: datetime = None, averageVolume: float = None, volumeFirstMinute: float = None, realTimeBarList: RealTimeBarList = None, contractDetails: ContractDetails = None):
+    def __init__(self, symbol: str, lastExecution: datetime = None, 
+                        averageVolume: float = None, volumeFirstMinute: float = None, 
+                        realTimeBarList: RealTimeBarList = None, contractDetails: ContractDetails = None, 
+                        priceRules: [PriceIncrement] = None):
         self.symbol = symbol
         self.lastExecution = lastExecution
         self.averageVolume = averageVolume
         self.volumeFirstMinute = volumeFirstMinute
         self.realTimeBarList = realTimeBarList
         self.contractDetails = contractDetails
+        self.priceRules = priceRules
 
 class OrderAction(Enum):
     Buy = "BUY"

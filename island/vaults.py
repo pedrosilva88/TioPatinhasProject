@@ -122,10 +122,10 @@ class Vault:
             order = self.getOrder(ticker)
             averageVolume = None
             volumeFirstMinute = None
-            contractDetails = None
+            priceRules = None
             if ticker.contract.symbol in self.stocksExtraInfo:
                 stockInfo = self.stocksExtraInfo[ticker.contract.symbol]
-                contractDetails = stockInfo.contractDetails
+                priceRules = stockInfo.priceRules
                 if (stockInfo.averageVolume is not None):
                     log("🧶 🕯 Sending Avg Volume for %s: %.2f 🕯 🧶" % (ticker.contract.symbol, stockInfo.averageVolume))
                     averageVolume = stockInfo.averageVolume
@@ -139,7 +139,7 @@ class Vault:
                                 self.portfolio.totalCashBalance,
                                 averageVolume,
                                 volumeFirstMinute,
-                                contractDetails)
+                                priceRules)
 
             result = self.runStrategy(data)
             self.registerLastExecution(ticker.contract, ticker.time)
@@ -201,21 +201,21 @@ class Vault:
             model = self.stocksExtraInfo[stock.symbol]
             await self.getAverageVolumeOfStock(stock, model)
             await self.getContractDetailsOfStock(stock, model)
+            log("🧶 Contract Details & Volume for %s: Volume(%.2f) 🧶" % (stock.symbol, model.averageVolume))
 
     async def getAverageVolumeOfStock(self, stock: ibContract, model: StockInfo):
         averageVolume = await self.historicalData.getAverageVolume(self.ib, stock, 5)
         if averageVolume is not None:
-            log("🧶 Volume for %s: %.2f 🧶" % (stock.symbol, averageVolume))
             model.averageVolume = averageVolume
         else:
             log("🚨 Error getting AVG Volume for %s: 🚨" % (stock.symbol))
 
     async def getContractDetailsOfStock(self, stock: ibContract, model: StockInfo):
-        contractDetails = await self.historicalData.getContractDetails(self.ib, stock)
+        contractDetails, priceRules = await self.historicalData.getContractDetails(self.ib, stock)
         if (len(contractDetails)> 0 and (contractDetails[0] is not None)):
             details = contractDetails[0]
-            log("🧶 Contract Details for %s: MinTick(%.2f) 🧶" % (stock.symbol, details.minTick))
             model.contractDetails = contractDetails[0]
+            model.priceRules = priceRules
         else:
             log("🚨 Error getting Contract Details for %s: 🚨" % (stock.symbol))
 
@@ -229,12 +229,13 @@ class Vault:
         time = utcToLocal(barDatetime, self.countryConfig.timezone)
         if (time.hour == self.strategyConfig.startRunningStrategy.hour and 
             time.minute >= self.strategyConfig.startRunningStrategy.minute and
+            time.second >= self.strategyConfig.startRunningStrategy.second and
             ((model is None) or (model.volumeFirstMinute is None))):
             volume = 0
             for bar in bars:
                 dataTime = utcToLocal(bar.time, self.countryConfig.timezone)
                 if (dataTime.time().hour == self.strategyConfig.startRunningStrategy.hour and
-                    dataTime.time().minute == self.strategyConfig.startRunningStrategy.minute-1):
+                    dataTime.time().minute == self.strategyConfig.startRunningStrategy.minute):
                     volume += bar.volume
             if volume >= 0:
                 log("🧶 Volume first minute for %s: %.2f 🧶" % (stock.symbol, volume))
