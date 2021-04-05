@@ -6,7 +6,6 @@ class HistoricalData:
     async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
         minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
         value = self.calculateAverageVolume(minute_bars)
-        ib.cancelHistoricalData(minute_bars)
         return value
 
     async def downloadHistoricDataFromIB(self, ib: IB, stock: ibContract, days: int = 5) -> [BarData]:
