@@ -1,6 +1,8 @@
 from enum import Enum
 from datetime import datetime
-from ib_insync import IB, Contract as ibContract, Order as ibOrder, LimitOrder as ibLimitOrder, MarketOrder as ibMarketOrder, StopOrder as ibStopOrder, RealTimeBarList, ContractDetails, PriceIncrement
+from ib_insync import IB, Contract as ibContract, Order as ibOrder, LimitOrder as ibLimitOrder, MarketOrder as ibMarketOrder, StopOrder as ibStopOrder, RealTimeBarList, ContractDetails, PriceIncrement, BarData
+
+
 
 class StockInfo:
     symbol: str
@@ -44,11 +46,12 @@ class Order(ibOrder):
     takeProfitOrder = None
     stopLossOrder = None
 
-    def __init__(self, action: OrderAction, type: OrderType, totalQuantity: int, price: float, orderId = 0, takeProfitOrder = None, stopLossOrder = None, **kwargs):
+    def __init__(self, action: OrderAction, type: OrderType, totalQuantity: int, price: float = None, orderId = 0, takeProfitOrder = None, stopLossOrder = None, **kwargs):
         ibOrder.__init__(self, orderId=orderId, 
                                 orderType=type, action=action, 
                                 totalQuantity=totalQuantity, 
                                 lmtPrice=round(price, 2), **kwargs)
+        
 
         parentId = orderId
         if isinstance(takeProfitOrder, Order):
@@ -58,8 +61,29 @@ class Order(ibOrder):
                                                 parentId=parentId,
                                                 orderId=takeProfitOrder.orderId)
         if isinstance(stopLossOrder, Order):
+
             self.stopLossOrder = ibStopOrder(action=stopLossOrder.action, 
                                             totalQuantity=stopLossOrder.totalQuantity, 
                                             stopPrice=round(stopLossOrder.lmtPrice, 2),
                                             parentId=parentId,
                                             orderId=stopLossOrder.orderId)
+
+class CustomBarData(BarData):
+    zigzag: bool
+    rsi: float
+
+    def __init__(self, barData: BarData, zigzag: bool, rsi: float):
+        BarData.__init__(self)
+        self.date = barData.date
+        self.open = barData.open
+        self.close = barData.close
+        self.high = barData.high
+        self.low = barData.low
+
+        self.volume = barData.volume
+        self.average = barData.average
+        self.barCount = barData.barCount
+
+        self.zigzag = zigzag
+        self.rsi = rsi
+        

@@ -1,6 +1,6 @@
 from enum import Enum
 from datetime import datetime, date, time
-from models import Order
+from models import Order, CustomBarData
 from ib_insync import Ticker as ibTicker, Position as ibPosition, PriceIncrement
 from country_config import CountryKey, CountryConfig
 from pytz import timezone
@@ -39,6 +39,8 @@ class StrategyData:
     position: ibPosition
     order: Order
     totalCash: float
+    previousBars: [CustomBarData]
+    currentBar: CustomBarData
 
     def __init__(self, ticker: ibTicker,
                         position: ibPosition,
@@ -46,7 +48,9 @@ class StrategyData:
                         totalCash: float,
                         averageVolume: float = None,
                         volumeFirstMinute: float = None,
-                        priceRules: [PriceIncrement] = None):
+                        priceRules: [PriceIncrement] = None,
+                        previousBars: [CustomBarData] = None,
+                        currentBar: CustomBarData = None):
         self.ticker = ticker
         self.position = position
         self.order = order
@@ -54,6 +58,8 @@ class StrategyData:
         self.averageVolume = averageVolume
         self.volumeFirstMinute = volumeFirstMinute
         self.priceRules = priceRules
+        self.previousBars = previousBars
+        self.currentBar = currentBar
 
 class StrategyResult:
     ticker: ibTicker
@@ -62,7 +68,7 @@ class StrategyResult:
     position: ibPosition = None
 
     def __str__(self):
-        return "Result for %s: %s\n" % (self.ticker, self.type.name)
+        return "Result for %s: %s %s\n" % (self.ticker.contract.symbol, self.ticker.time, self.type.name)
 
     def __init__(self, ticker: ibTicker, type, order: Order = None, position: ibPosition = None):
         self.ticker = ticker
@@ -76,17 +82,21 @@ class StrategyConfig():
     strategyMaxTime: datetime
     minGap: int
     maxGap: int
+    minRSI: float
+    maxRSI: float
     maxLastGap: int = 9
     gapProfitPercentage: float
     willingToLose: float
     stopToLosePercentage: float
+    profitPercentage: float
     maxToInvestPerStockPercentage: float
     averageVolumePercentage: float #= 1.2 # This means 120% above
 
-    def __init__(self, startRunningStrategy: datetime, strategyValidPeriod: datetime, strategyMaxTime: datetime,
-                        minGap: int, maxGap: int, maxLastGap: int, gapProfitPercentage: float,
-                        willingToLose: float, stopToLosePercentage: float, 
-                        maxToInvestPerStockPercentage: float, averageVolumePercentage: float):
+    def __init__(self, startRunningStrategy: datetime = None, strategyValidPeriod: datetime = None, strategyMaxTime: datetime = None,
+                        minGap: int = None, maxGap: int = None, maxLastGap: int = None, gapProfitPercentage: float = None,
+                        willingToLose: float = None, stopToLosePercentage: float = None, profitPercentage: float = None,
+                        maxToInvestPerStockPercentage: float = None, averageVolumePercentage: float = None, 
+                        minRSI: float = None, maxRSI: float = None):
         self.startRunningStrategy = startRunningStrategy
         self.strategyValidPeriod = strategyValidPeriod
         self.strategyMaxTime = strategyMaxTime
@@ -98,6 +108,9 @@ class StrategyConfig():
         self.stopToLosePercentage = stopToLosePercentage
         self.maxToInvestPerStockPercentage = maxToInvestPerStockPercentage
         self.averageVolumePercentage = averageVolumePercentage
+        self.profitPercentage = profitPercentage
+        self.minRSI = minRSI
+        self.maxRSI = maxRSI
 
 def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
     if key == CountryKey.USA:
@@ -106,9 +119,12 @@ def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
                                 strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(14,0)), is_dst=None), 
                                 minGap= 2, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
                                 willingToLose= 0.04,
-                                stopToLosePercentage= 0.08, 
-                                maxToInvestPerStockPercentage= 0.5, 
-                                averageVolumePercentage= 1.8)
+                                stopToLosePercentage= 0.01, 
+                                maxToInvestPerStockPercentage= 1, 
+                                averageVolumePercentage= 1.8,
+                                profitPercentage = 0.025,
+                                minRSI = 30,
+                                maxRSI = 70)
     if key == CountryKey.UK:
         return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(8,0,45)), is_dst=None), 
                                 strategyValidPeriod=timezone.localize(datetime.combine(date.today(),time(8,15)), is_dst=None),

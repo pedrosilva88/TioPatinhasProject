@@ -62,8 +62,7 @@ def getConfigFor(key: CountryKey) -> CountryConfig:
 
 def getCurrentMarketConfig() -> CountryConfig:
     currentDate = datetime.now().astimezone(timezone('UTC'))
-    markets = [getConfigFor(CountryKey.USA),
-                getConfigFor(CountryKey.UK)]
+    markets = [getConfigFor(CountryKey.USA)]
 
     markets.sort(key=lambda x: x.startSetupData.astimezone(timezone('UTC')))
     currentMarket = markets[0]

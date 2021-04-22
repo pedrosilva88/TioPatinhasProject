@@ -23,8 +23,12 @@ class Scanner:
                     stocks.append(ibStock(row[0], row[1], row[2]))
                 line_count += 1
         
-        self.stocksDownloaded = stocks[:nItems]
-        self.stocks = stocks[:nItems]
+        if nItems > 0:
+            self.stocksDownloaded = stocks[:nItems]
+            self.stocks = stocks[:nItems]
+        else:
+            self.stocksDownloaded = stocks
+            self.stocks = stocks
 
     def removeTicker(self, symbol: str):
         ticker = [d for d in self.stocks if d.symbol == symbol].pop()
