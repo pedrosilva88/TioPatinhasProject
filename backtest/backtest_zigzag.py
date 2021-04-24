@@ -118,10 +118,10 @@ def showPlot(mBars: [BarData], zigzags:[int]):
 def downloadData():
     ib = IB()
     ib.connect('127.0.0.1', 7497, clientId=16)
-    path = ("Scanner/ZigZag/%s/scan.csv" % CountryKey.USA.code)
+    path = ("Scanner/ZigZag/%s/scan_to_download.csv" % CountryKey.USA.code)
     savePath = "ZigZag"
     countryConfig = getConfigFor(key=CountryKey.USA)
-    modelDays = BackTestDownloadModel(path=path, numberOfDays=730, barSize="1 day")
+    modelDays = BackTestDownloadModel(path=path, numberOfDays=1460, barSize="1 day")
     itemsDictionary = downloadStocksData(ib, modelDays)
 
     for key, (stock, mBars) in itemsDictionary.items():
@@ -134,8 +134,8 @@ def downloadData():
 
         #showPlot(mBars, pivots)
 
-def loadStocks():
-    path = ("Scanner/ZigZag/%s/scan.csv" % CountryKey.USA.code)
+def loadStocks(fileName: str = "scan_to_run_strategy.csv"):
+    path = ("Scanner/ZigZag/%s/%s" % (CountryKey.USA.code, fileName))
     countryConfig = getConfigFor(key=CountryKey.USA)
     return loadFiles(path, countryConfig)
 
@@ -151,13 +151,13 @@ def run():
     report.showReport(path, True)
 
 def runStockPerformance():
-    models = loadStocks()
+    models = loadStocks("scan_to_download.csv")
     print("Run Performance")
     model = BackTestSwing()
     report = BackTestReport()
     runStrategy(backtestModel=model, backtestReport=report, models=models, forPerformance=True)
 
-    stocksPath = ("Scanner/ZigZag/%s/scan.csv" % CountryKey.USA.code)
+    stocksPath = ("Scanner/ZigZag/%s/scan_to_download.csv" % CountryKey.USA.code)
     path = ("backtest/Data/CSV/%s/ZigZag/Report" % (CountryKey.USA.code))
     report.showPerformanceReport(path, stocksPath, model.countryConfig)
 
@@ -199,13 +199,15 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                                             orderDate = positionDate.date())
                     if isForStockPerformance:
                         backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
+                        backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                     else:
                         backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
                         backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                         backtestModel.cashAvailable += ganho
                     tempOrders.pop(magicKey(position.contract.symbol, positionDate))
-                elif ((tempOrder.action == OrderAction.Buy and tempOrder.stopLossOrder.auxPrice < ticker.bid) or
-                        (tempOrder.action == OrderAction.Sell and tempOrder.stopLossOrder.auxPrice > ticker.ask)):
+                elif ((tempOrder.action == OrderAction.Buy and tempOrder.stopLossOrder.auxPrice > ticker.bid) or
+                        (tempOrder.action == OrderAction.Sell and tempOrder.stopLossOrder.auxPrice < ticker.ask)):
+                    print(tempOrder.stopLossOrder.auxPrice, ticker.bid, ticker.time)
                     perda = abs(tempOrder.stopLossOrder.auxPrice*tempOrder.stopLossOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     print("StopLoss ❌ - %.2f Size(%.2f)\n" % (perda, tempOrder.totalQuantity))
                     result = BackTestResult(symbol=ticker.contract.symbol, 
@@ -225,6 +227,7 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                                             orderDate = positionDate.date())
                     if isForStockPerformance:
                         backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
+                        backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                     else:
                         backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
                         backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
@@ -252,6 +255,7 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                                                 orderDate = positionDate.date())
                         if isForStockPerformance:
                             backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
+                            backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                         else:
                             backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
                             backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
@@ -277,6 +281,7 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                                                 orderDate = positionDate.date())
                         if isForStockPerformance:
                             backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
+                            backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                         else:
                             backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
                             backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)

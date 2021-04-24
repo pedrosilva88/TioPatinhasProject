@@ -1,7 +1,7 @@
 from datetime import *
 from ib_insync import *
 from portfolio import Portfolio
-from .vaults import Vault
+from .zigzag.vault_zigzag import VaultZigZag
 from helpers import log
 import asyncio
 

@@ -44,7 +44,7 @@ class BackTestOPG():
 
     def loadFiles(self):
         scanner = Scanner()
-        scanner.getOPGRetailers(path=('../scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv' % (self.countryCode)))
+        scanner.fetchStocksFromCSVFile(path=('../scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv' % (self.countryCode)))
         stocks = scanner.stocks
         #stocks = [Stock("DGE","SMART",self.countryConfig.currency), Stock("HBP","SMART",self.countryConfig.currency), Stock("VUZI","SMART",self.countryConfig.currency), Stock("ASO","SMART",self.countryConfig.currency)]
 

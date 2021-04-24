@@ -10,7 +10,7 @@ class Scanner:
         self.tickersDownloaded = []
         self.tickers = []
 
-    def getOPGRetailers(self, path: str, nItems: int):
+    def fetchStocksFromCSVFile(self, path: str, nItems: int):
         modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
         datapath = os.path.join(modpath, path)
         stocks = []

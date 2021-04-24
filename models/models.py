@@ -2,8 +2,6 @@ from enum import Enum
 from datetime import datetime
 from ib_insync import IB, Contract as ibContract, Order as ibOrder, LimitOrder as ibLimitOrder, MarketOrder as ibMarketOrder, StopOrder as ibStopOrder, RealTimeBarList, ContractDetails, PriceIncrement, BarData
 
-
-
 class StockInfo:
     symbol: str
     lastExecution: datetime

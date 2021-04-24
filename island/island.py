@@ -4,7 +4,7 @@ import configparser
 from enum import Enum
 from datetime import datetime
 from ib_insync import IB, IBC
-from .vaults import Vault
+from .zigzag.vault_zigzag import VaultZigZag
 from ._events import *
 from helpers import log
     
@@ -21,7 +21,7 @@ class Island(IslandEvents):
     readonly: bool = False
     account: str = ''
 
-    vault: Vault
+    vault: VaultZigZag
     marketWaiter: asyncio.Future
 
     def __init__(self, configPath: str):
@@ -41,7 +41,7 @@ class Island(IslandEvents):
         if self.ib.isConnected():
             raise ValueError('IB instance must not be connected')
 
-    def start(self, vault: Vault):
+    def start(self, vault: VaultZigZag):
         self._logger.info('Starting')
         self.vault = vault
         self.vault.ib = self.ib

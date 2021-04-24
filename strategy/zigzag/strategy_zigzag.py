@@ -33,21 +33,26 @@ class StrategyZigZag(Strategy):
         if result:
             return result
 
-        # if self.currentBar.date.year == 2019: #and self.currentBar.date.month == 4 and self.currentBar.date.day == 1:
-        #print(self.strategyData.ticker.contract.symbol, self.previousBars[-1].high, self.previousBars[-2].high, self.previousBars[-3].rsi, self.previousBars[-3].zigzag, self.currentBar.date)
+        # if (self.currentBar.date.year == 2021 and self.currentBar.date.month == 1 or
+        #     self.currentBar.date.year == 2020 and self.currentBar.date.month == 13) :
+        #     print(self.strategyData.ticker.contract.symbol, self.previousBars[-1].high, self.previousBars[-2].high, self.previousBars[-3].rsi, self.previousBars[-3].zigzag, self.currentBar.date)
         if (self.previousBars[-3].zigzag == True and (self.previousBars[-3].rsi <= self.minRSI or self.previousBars[-3].rsi >= self.maxRSI) and
             self.previousBars[-2].zigzag == False and self.previousBars[-1].zigzag == False):
+            log("OLE")
             if ((self.currentBar.rsi > self.minRSI or self.currentBar.rsi <= self.maxRSI) and
                 self.currentBar.zigzag == False):
                 if (self.previousBars[-3].rsi <= self.minRSI and
                     self.previousBars[-2].low < self.previousBars[-1].low):
-                    #print(self.previousBars[-1].low, self.previousBars[-2].low, self.previousBars[-3].zigzag)
                     type = StrategyResultType.Buy
                     order = self.createOrder(type)
                     return StrategyResult(strategyData.ticker, type, order)
                 elif (self.previousBars[-3].rsi >= self.maxRSI and
                       self.previousBars[-2].high > self.previousBars[-1].high):
-                    #print(self.previousBars[-1].high, self.previousBars[-2].high, self.previousBars[-3].zigzag)
+                    
+                    # if (self.currentBar.date.year == 2021 and self.currentBar.date.month == 1 or
+                    #     self.currentBar.date.year == 2020 and self.currentBar.date.month == 13):
+                    #     print(self.previousBars[-1].high, self.previousBars[-2].high, self.previousBars[-3].zigzag)
+
                     type = StrategyResultType.Sell
                     order = self.createOrder(type)
                     return StrategyResult(strategyData.ticker, type, order)
@@ -56,7 +61,6 @@ class StrategyZigZag(Strategy):
                 return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)   
         else:
             return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)
-            print("No ZigZag")
 
     # Constructor
 
@@ -135,7 +139,7 @@ class StrategyZigZag(Strategy):
 
     # Calculations
     def getOrderPrice(self, action: OrderAction):
-        return self.currentBar.low if action == OrderAction.Buy else self.currentBar.high
+        return (self.currentBar.high+self.currentBar.low)/2  #self.currentBar.low if action == OrderAction.Buy else self.currentBar.high
 
     def calculatePnl(self, action: OrderAction):
         price = self.getOrderPrice(action)
@@ -170,7 +174,7 @@ class StrategyZigZag(Strategy):
         # minTickProfit = self.priceIncrement(profitTarget)
         # minTickLoss = self.priceIncrement(stopLossPrice)
 
-        print("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
+        #print("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
         log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
 
         profitOrder = Order(action, OrderType.LimitOrder, size, round(profitTarget, 2))

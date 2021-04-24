@@ -3,7 +3,7 @@ name="Tio Patinhas"
 author="Pedro Silva"
 author_email="pedromiguelsilva88@gmail.com"
 url="https://github.com/pedrosilva88/TioPatinhasProject"
-version="0.9"
+version="1"
 description="A Python client library for the Interactive Brokers integration"
 long_description = long_description
 long_description_content_type="text/markdown"
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     try:
         path = sys.argv[1]
         island = Island(configPath=path)
-        vaultOPG = Vault(island)
-        island.start(vaultOPG)
+        vaultZigZag = VaultZigZag(island)
+        island.start(vaultZigZag)
     except (KeyboardInterrupt, SystemExit):
         island.stop()

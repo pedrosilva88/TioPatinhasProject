@@ -151,8 +151,8 @@ class BackTestReport():
             for model in data:
                 writer.writerow(model)
 
-    def saveReportTradesInFile(self, path: str, data:[[]], zigzag: bool = False):
-        name = ("%s/ResultsTrades.csv" % path)
+    def saveReportTradesInFile(self, path: str, data:[[]], zigzag: bool = False, fileName: str = "ResultsTrades.csv"):
+        name = ("%s/%s" % (path, fileName))
         with open(name, 'w', newline='') as file:
             writer = csv.writer(file)
             if zigzag:
@@ -164,7 +164,7 @@ class BackTestReport():
 
     def saveReportPerformance(self, path: str, stocksPath: str, data, countryConfig: CountryConfig):
         scanner = Scanner()
-        scanner.getOPGRetailers(path=stocksPath, nItems=0)
+        scanner.fetchStocksFromCSVFile(path=stocksPath, nItems=0)
         stocks = scanner.stocks
         name = ("%s/ResultsStockPerformance.csv" % path)
         with open(name, 'w', newline='') as file:
@@ -217,6 +217,13 @@ class BackTestReport():
 
     def showPerformanceReport(self, path: str, stocksPath: str, countryConfig: CountryConfig):
         self.saveReportPerformance(path, stocksPath, self.stockPerformance, countryConfig)
+
+        items = [[]]
+        for key, array in self.trades.items():
+            for item in array:
+                items.append(item)
+
+        self.saveReportTradesInFile(path, items, True, "ResultsTradesForPerformance.csv")
 
     def updateResults(self, key: str, value: BackTestResult):
         if key in self.results:
@@ -274,7 +281,7 @@ class BackTestReport():
 
 def downloadStocksData(ib: IB, model: BackTestDownloadModel) -> [str, (Stock, [BarData])]:
     scanner = Scanner()
-    scanner.getOPGRetailers(path=model.path, nItems=0)
+    scanner.fetchStocksFromCSVFile(path=model.path, nItems=0)
     stocks = scanner.stocks
     total = len(stocks)
     current = 0
@@ -360,7 +367,7 @@ def saveDataInCSVFile(filename: str, path: str, data: [BackTestModel], countryCo
 
 def loadFiles(pathToScan: str, countryConfig: CountryConfig):
     scanner = Scanner()
-    scanner.getOPGRetailers(path=pathToScan, nItems=0)
+    scanner.fetchStocksFromCSVFile(path=pathToScan, nItems=0)
     stocks = scanner.stocks
 
     total = len(stocks)

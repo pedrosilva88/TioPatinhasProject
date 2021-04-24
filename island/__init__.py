@@ -1,6 +1,7 @@
-from .vaults import *
 from ._events import *
 from .island import *
+from .zigzag.vault_zigzag import *
+from .opg.vault_opg import *
 
 def main():
     return (u'*Island*\n'

@@ -21,7 +21,7 @@ class IslandProtocol(Protocol):
     def unsubscribeStrategyEvents(self, ib: IB):
         """Subscribe Events"""
 
-class Vault:
+class VaultOPG:
     ib: IB
     countryConfig: CountryConfig
     strategyConfig: StrategyConfig
@@ -49,7 +49,7 @@ class Vault:
         path = ("scanner/Data/CSV/%s/OPG_Retails_SortFromBackTest.csv" % key.code)
 
         self.scanner = Scanner()
-        self.scanner.getOPGRetailers(path=path, nItems=self.countryConfig.nItems)
+        self.scanner.fetchStocksFromCSVFile(path=path, nItems=self.countryConfig.nItems)
         self.strategy = StrategyOPG()
         self.strategyConfig = getStrategyConfigFor(key=key, timezone=self.countryConfig.timezone)
         self.portfolio = Portfolio()
@@ -358,6 +358,3 @@ class Vault:
             model = StockInfo(contract.symbol)
             self.stocksExtraInfo[contract.symbol] = model
         model.realTimeBarList = self.ib.reqRealTimeBars(contract, 5, 'TRADES', True)
-
-def createOPGRetailVault():
-    return Vault()

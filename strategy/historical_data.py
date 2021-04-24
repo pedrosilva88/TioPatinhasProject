@@ -1,5 +1,7 @@
 from datetime import *
-from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, BarDataList, ContractDetails, PriceIncrement
+from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, BarDataList, ContractDetails, PriceIncrement, util
+from zigzag import *
+from models import CustomBarData
 
 class HistoricalData:
 
@@ -8,23 +10,68 @@ class HistoricalData:
         value = self.calculateAverageVolume(minute_bars)
         return value
 
-    async def downloadHistoricDataFromIB(self, ib: IB, stock: ibContract, days: int = 5) -> [BarData]:
+    async def downloadHistoricDataFromIB(self, ib: IB, stock: ibContract, days: int = 5, barSize = "1 min") -> [BarData]:
         nDays = days
+        xYears = int(nDays/365)
+        durationDays = ("%d D" % (nDays+10)) if nDays < 365 else ("%d Y" % xYears)
         today = datetime.now().replace(microsecond=0, tzinfo=None).date()
         startDate = today-timedelta(days=nDays+1)
         
-        minute_bars: [BarData] = []
-        while startDate <= today:
-            endtime = startDate+timedelta(days=1)
-            bars: [BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime=endtime, 
-                                                    durationStr='5 D', 
-                                                    barSizeSetting='1 min', 
+        bars: [BarData] = []
+        if barSize.endswith('min'):
+            while startDate <= today:
+                endtime = startDate+timedelta(days=1)
+                bars: [BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime=endtime, 
+                                                        durationStr='5 D', 
+                                                        barSizeSetting=barSize, 
+                                                        whatToShow='TRADES',
+                                                        useRTH=True,
+                                                        formatDate=1)
+                startDate = startDate+timedelta(days=6)
+                minute_bars += bars
+        else:
+            bars: [BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime='', 
+                                                    durationStr=durationDays, 
+                                                    barSizeSetting=barSize, 
                                                     whatToShow='TRADES',
                                                     useRTH=True,
                                                     formatDate=1)
-            startDate = startDate+timedelta(days=6)
-            minute_bars += bars
-        return minute_bars
+        return bars
+
+    def createListOfCustomBarsData(self, bars: [BarData]):
+        zigzagValues, rsiValues = self.calculateRSIAndZigZag(bars)
+
+        customBarsData = []
+        i = 0
+        for bar in bars:
+            zigzag = True if zigzagValues[i] != 0 else False
+            rsi = None
+            if i > 0:
+                rsi = rsiValues[i-1]
+            # dateString = bar.date.strftime("%Y-%m-%d %H:%M:%S").replace(" 00", " 12")
+            # model = BackTestModel(bar.open, bar.close, bar.low, bar.high, bar.close, 
+            #                         bar.volume, stock.symbol,
+            #                         zigzag, rsi,
+            #                         dateString, 
+            #                         None, None)
+
+            barData = BarData(date=bar.date,
+                                open=bar.open,
+                                high=bar.high,
+                                low=bar.low,
+                                close=bar.close,
+                                volume=bar.volume)
+            
+            customBarsData.append(CustomBarData(barData, zigzag, rsi))
+            i += 1
+
+        return customBarsData
+
+    def calculateRSIAndZigZag(self, bars: [BarData]):
+        X = util.df(bars)['average']
+        RSI = self.computeRSI(util.df(bars)['close'], 14)
+        pivots = peak_valley_pivots(X.values, 0.05, -0.05)
+        return pivots, RSI.values
 
     async def getContractDetails(self, ib: IB, stock: ibContract) -> (ContractDetails, [PriceIncrement]):
         contractDetails = await ib.reqContractDetailsAsync(stock)
@@ -42,3 +89,20 @@ class HistoricalData:
             return sum/nBars
         else:
             return None
+
+    def computeRSI(self, data, time_window):
+        diff = data.diff(1).dropna()
+
+        up_chg = 0 * diff
+        down_chg = 0 * diff
+        
+        up_chg[diff > 0] = diff[ diff>0 ]
+        
+        down_chg[diff < 0] = diff[ diff < 0 ]
+        
+        up_chg_avg   = up_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
+        down_chg_avg = down_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
+        
+        rs = abs(up_chg_avg/down_chg_avg)
+        rsi = 100 - 100/(1+rs)
+        return rsi
