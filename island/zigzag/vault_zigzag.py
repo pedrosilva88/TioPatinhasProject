@@ -111,7 +111,7 @@ class VaultZigZag:
             customBars = self.customBarsDataDict[stock.symbol]
             if len(customBars) >= 4:
                 currentBar = customBars[-1]
-                previousBars = [customBars[-2], customBars[-3], customBars[-4]]
+                previousBars = [customBars[-4], customBars[-3], customBars[-2]]
                 data = StrategyData(ticker=ticker, 
                                     position=None, 
                                     order=None, 
@@ -133,6 +133,8 @@ class VaultZigZag:
         self.delegate.marketWaiter = asyncio.ensure_future(coro)
         await asyncio.wait([self.delegate.marketWaiter])
         self.delegate.marketWaiter = None
+
+        log("⭐️ Checking Positions ⭐️")
 
         fills = self.portfolio.getFills(self.ib)
         

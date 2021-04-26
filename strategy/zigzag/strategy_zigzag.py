@@ -35,9 +35,12 @@ class StrategyZigZag(Strategy):
         if result:
             return result
 
-        # if (self.currentBar.date.year == 2021 and self.currentBar.date.month == 1 or
-        #     self.currentBar.date.year == 2020 and self.currentBar.date.month == 13) :
-        log("😁 %s -> High[-1](%.2f) High[-2](%.2f) RSI[-3](%.2f) ZigZag[-3](%s) 😁" % (self.strategyData.ticker.contract.symbol, self.previousBars[-1].high, self.previousBars[-2].high, self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
+        log("😁 %s 😁" % (self.strategyData.ticker.contract.symbol))
+        log("😁 [%s] Bar[-3]-> Open(%.2f) High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].date, self.previousBars[-3].open, self.previousBars[-3].high, self.previousBars[-3].low, self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
+        log("😁 [%s] Bar[-2]-> Open(%.2f) High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].date, self.previousBars[-2].open, self.previousBars[-2].high, self.previousBars[-2].low, self.previousBars[-2].rsi, self.previousBars[-2].zigzag))
+        log("😁 [%s] Bar[-1]-> Open(%.2f) High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].date, self.previousBars[-1].open, self.previousBars[-1].high, self.previousBars[-1].low, self.previousBars[-1].rsi, self.previousBars[-1].zigzag))
+        log("😁 [%s] CurrentBar-> Open(%.2f) High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.date, self.currentBar.open, self.currentBar.high, self.currentBar.low, self.currentBar.rsi, self.currentBar.zigzag))
+        log("😁  😁")
         if (self.previousBars[-3].zigzag == True and (self.previousBars[-3].rsi <= self.minRSI or self.previousBars[-3].rsi >= self.maxRSI) and
             self.previousBars[-2].zigzag == False and self.previousBars[-1].zigzag == False):
             if (self.currentBar.rsi > self.minRSI or self.currentBar.rsi <= self.maxRSI):

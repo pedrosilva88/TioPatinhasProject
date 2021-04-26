@@ -48,12 +48,6 @@ class HistoricalData:
             rsi = None
             if i > 0:
                 rsi = rsiValues[i-1]
-            # dateString = bar.date.strftime("%Y-%m-%d %H:%M:%S").replace(" 00", " 12")
-            # model = BackTestModel(bar.open, bar.close, bar.low, bar.high, bar.close, 
-            #                         bar.volume, stock.symbol,
-            #                         zigzag, rsi,
-            #                         dateString, 
-            #                         None, None)
 
             barData = BarData(date=bar.date,
                                 open=bar.open,
