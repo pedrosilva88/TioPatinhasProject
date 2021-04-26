@@ -64,3 +64,15 @@ def printTestSuccess():
 
 def printTestFailure():
     print ("Test Failed ❌")
+
+
+from ib_insync import IB, Order as ibOrder, Stock as ibStock, MarketOrder
+from portfolio import *
+ib = IB()
+ib.connect('127.0.0.1', 7497, clientId=3)
+portfolio = Portfolio()
+contract = ibStock("SAN1", "SMART", "EUR")
+order = MarketOrder("SELL", 10)
+profitOrder = LimitOrder("BUY", 10, 1)
+stopOrder = StopOrder("BUY", 10, 10)
+portfolio.createOrder(ib, contract, order, profitOrder, stopOrder)

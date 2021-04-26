@@ -233,7 +233,7 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                         backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                         backtestModel.cashAvailable -= perda
                     tempOrders.pop(magicKey(position.contract.symbol, positionDate))
-                elif ticker.time.date() >= (positionDate+timedelta(days=15)).date():
+                elif ticker.time.date() >= (positionDate+timedelta(days=2)).date():
                     if ((tempOrder.action == OrderAction.Buy and (tempOrder.lmtPrice <= ticker.last)) or
                         (tempOrder.action == OrderAction.Sell and (tempOrder.lmtPrice >= ticker.last))):
                         closePrice = ticker.last
@@ -382,8 +382,8 @@ def magicKey(symbol: str, date: datetime):
 if __name__ == '__main__':
     try:
         #downloadData()
-        runStockPerformance()
-        #run()
+        #runStockPerformance()
+        run()
         
     except (KeyboardInterrupt, SystemExit) as e:
         print(e)
