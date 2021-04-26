@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import datetime, date, time
 from models import Order, CustomBarData
-from ib_insync import Ticker as ibTicker, Position as ibPosition, PriceIncrement
+from ib_insync import Ticker as ibTicker, Position as ibPosition, PriceIncrement, Fill
 from country_config import CountryKey, CountryConfig
 from pytz import timezone
 
@@ -38,6 +38,7 @@ class StrategyData:
     volumeFirstMinute: float
     position: ibPosition
     order: Order
+    fill: Fill
     totalCash: float
     previousBars: [CustomBarData]
     currentBar: CustomBarData
@@ -50,7 +51,8 @@ class StrategyData:
                         volumeFirstMinute: float = None,
                         priceRules: [PriceIncrement] = None,
                         previousBars: [CustomBarData] = None,
-                        currentBar: CustomBarData = None):
+                        currentBar: CustomBarData = None,
+                        fill: Fill = None):
         self.ticker = ticker
         self.position = position
         self.order = order
@@ -60,6 +62,7 @@ class StrategyData:
         self.priceRules = priceRules
         self.previousBars = previousBars
         self.currentBar = currentBar
+        self.fill = fill
 
 class StrategyResult:
     ticker: ibTicker
@@ -119,10 +122,10 @@ def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
                                 strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(14,0)), is_dst=None), 
                                 minGap= 2, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
                                 willingToLose= 0.04,
-                                stopToLosePercentage= 0.02, 
+                                stopToLosePercentage= 0.04, 
                                 maxToInvestPerStockPercentage= 1, 
                                 averageVolumePercentage= 1.8,
-                                profitPercentage = 0.02,
+                                profitPercentage = 0.04,
                                 minRSI = 30,
                                 maxRSI = 70)
     if key == CountryKey.UK:
