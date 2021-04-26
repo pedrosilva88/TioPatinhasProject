@@ -46,7 +46,7 @@ class Order(ibOrder):
 
     def __init__(self, action: OrderAction, type: OrderType, totalQuantity: int, price: float = None, orderId = 0, takeProfitOrder = None, stopLossOrder = None, **kwargs):
         ibOrder.__init__(self, orderId=orderId, 
-                                orderType=type, action=action, 
+                                orderType=type.value, action=action.value, 
                                 totalQuantity=totalQuantity, 
                                 lmtPrice=round(price, 2), **kwargs)
         

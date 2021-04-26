@@ -3,6 +3,7 @@ from helpers import log, utcToLocal, round_down
 from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType, StrategyConfig
 from models import Order, OrderAction, OrderType, CustomBarData
 from country_config import CountryConfig
+from ib_insync import Fill
 
 class StrategyZigZag(Strategy):
     # Properties
@@ -13,6 +14,7 @@ class StrategyZigZag(Strategy):
 
     currentBar: CustomBarData = None
     previousBars: [CustomBarData] = None
+    fill: Fill = None
 
     # Strategy Parameters
     profitPercentage: float = None
@@ -35,12 +37,10 @@ class StrategyZigZag(Strategy):
 
         # if (self.currentBar.date.year == 2021 and self.currentBar.date.month == 1 or
         #     self.currentBar.date.year == 2020 and self.currentBar.date.month == 13) :
-        #     print(self.strategyData.ticker.contract.symbol, self.previousBars[-1].high, self.previousBars[-2].high, self.previousBars[-3].rsi, self.previousBars[-3].zigzag, self.currentBar.date)
+        log("😁 %s -> High[-1](%.2f) High[-2](%.2f) RSI[-3](%.2f) ZigZag[-3](%s) 😁" % (self.strategyData.ticker.contract.symbol, self.previousBars[-1].high, self.previousBars[-2].high, self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
         if (self.previousBars[-3].zigzag == True and (self.previousBars[-3].rsi <= self.minRSI or self.previousBars[-3].rsi >= self.maxRSI) and
             self.previousBars[-2].zigzag == False and self.previousBars[-1].zigzag == False):
-            log("OLE")
-            if ((self.currentBar.rsi > self.minRSI or self.currentBar.rsi <= self.maxRSI) and
-                self.currentBar.zigzag == False):
+            if (self.currentBar.rsi > self.minRSI or self.currentBar.rsi <= self.maxRSI):
                 if (self.previousBars[-3].rsi <= self.minRSI and
                     self.previousBars[-2].low < self.previousBars[-1].low):
                     type = StrategyResultType.Buy
@@ -81,11 +81,8 @@ class StrategyZigZag(Strategy):
     # Validations
 
     def validateStrategy(self):
-        if self.strategyData.position:
-            return self.handlePosition()
-
-        elif self.strategyData.order:
-            return self.handleOrder()
+        if self.strategyData.fill:
+            return self.handleFill()
 
         elif (not self.isConfigsValid() or not self.isStrategyDataValid()):
             log("🙅‍♂️ Invalid data for %s: isConfigsValid(%s) isStrategyDataValid(%s) 🙅‍♂️" % (self.strategyData.ticker.contract.symbol, self.isConfigsValid(), self.isStrategyDataValid()))
@@ -123,19 +120,17 @@ class StrategyZigZag(Strategy):
     
     # Handlers
 
-    def handlePosition(self):
-        # if self.isTimeForThisStartegyExpired():
-        #     if self.strategyData.position.position > 0:
-        #         return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
-        #     elif self.strategyData.position.position < 0:
-        #         return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Buy, None, self.strategyData.position)
-        # else:
+    def handleFill(self):
+        executionDate = self.strategyData.fill.execution.time
+        shares = self.strategyData.position.position
 
-        # TODO: Aqui tenho de arranjar maneira de saber à quantos dias tenho esta position, para ter um limite de dias.
+        if date.today() >= (executionDate+timedelta(days=2)).date():
+            if shares > 0:
+                return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
+            elif shares < 0:
+                return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Buy, None, self.strategyData.position)
+
         return StrategyResult(self.strategyData.ticker, StrategyResultType.KeepPosition)
-
-    def handleOrder(self):
-        return StrategyResult(self.strategyData.ticker, StrategyResultType.DoNothing, self.strategyData.order)
 
     # Calculations
     def getOrderPrice(self, action: OrderAction):
@@ -177,6 +172,6 @@ class StrategyZigZag(Strategy):
         #print("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
         log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
 
-        profitOrder = Order(action, OrderType.LimitOrder, size, round(profitTarget, 2))
-        stopLossOrder = Order(action, OrderType.StopOrder, size, round(stopLossPrice, 2))
+        profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(profitTarget, 2))
+        stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, round(stopLossPrice, 2))
         return Order(action=action, type=OrderType.MarketOrder, totalQuantity=size, price=price, takeProfitOrder=profitOrder, stopLossOrder=stopLossOrder)

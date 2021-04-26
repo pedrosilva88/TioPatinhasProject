@@ -1,5 +1,5 @@
 from datetime import datetime
-from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder
+from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder, Fill
 from models import OrderType, OrderAction
 from helpers import log
 
@@ -18,7 +18,7 @@ class Portfolio:
 
     @property
     def cashAvailable(self):
-        return max(self.cashBalance - self.grossPositionsValue - self.pendingOrdersMarketValue - 400, 0)
+        return max(self.cashBalance - self.grossPositionsValue - self.pendingOrdersMarketValue, 0)
 
     def __init__(self):
         self.positions = []
@@ -88,12 +88,17 @@ class Portfolio:
             limitOrder = LimitOrder(order.action, order.totalQuantity, order.lmtPrice)
             ib.placeOrder(contract, limitOrder)
         else:
-            bracket = ib.bracketOrder(order.action.value, order.totalQuantity, order.lmtPrice, profitOrder.lmtPrice, stopLossOrder.auxPrice)
+            if order.orderType == "MKT":
+                ib.placeOrder(contract, order)
+                ib.placeOrder(contract, profitOrder)
+                ib.placeOrder(contract, stopLossOrder)
+            else:
+                bracket = ib.bracketOrder(order.action, order.totalQuantity, order.lmtPrice, profitOrder.lmtPrice, stopLossOrder.auxPrice)
 
-            for o in bracket:
-                if ((isinstance(o, LimitOrder) and o.lmtPrice > 0) or
-                    (isinstance(o, StopOrder) and o.auxPrice > 0)):
-                    ib.placeOrder(contract, o)
+                for o in bracket:
+                    if ((isinstance(o, LimitOrder) and o.lmtPrice > 0) or
+                        (isinstance(o, StopOrder) and o.auxPrice > 0)):
+                        ib.placeOrder(contract, o)
 
         ib.reqAllOpenOrdersAsync()
         self.trades = ib.openTrades()
@@ -114,6 +119,9 @@ class Portfolio:
                 ib.cancelOrder(trade.order)
 
     # Positions
+
+    def getFills(self, ib: IB) -> [Fill]:
+        return ib.fills()
 
     def getPosition(self, contract: ibContract):
         for position in self.positions:

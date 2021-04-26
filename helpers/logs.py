@@ -54,6 +54,13 @@ def logExecutionTicker(data, result):
                                                                                                             data.ticker.open,
                                                                                                             data.ticker.close))
 
+def logExecutionZigZag(data, result):
+    logger = getLog()
+    if (result.type.value == 2 or result.type.value == 3):
+        logger.info("⭐️ ZigZag %s: %s ⭐️" % (data.ticker.contract.symbol,
+                                            result.type))
+
+
 def logInitTioPatinhas():
     log("\t🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆\n")
     log("\t🦆\t\t\t   🦆\n")

@@ -3,14 +3,13 @@ from enum import Enum
 from typing import Protocol
 from datetime import datetime
 from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData
-from helpers import logExecutionTicker
+from helpers import logExecutionZigZag, log, utcToLocal, logCounter
 from models import Order, OrderAction, CustomBarData
 from scanner import Scanner
 from strategy import Strategy, StrategyZigZag, StrategyData, StrategyResult, StrategyResultType, HistoricalData, StrategyConfig, getStrategyConfigFor
 from country_config import *
 from portfolio import Portfolio
 from earnings_calendar import EarningsCalendar
-from helpers import log, utcToLocal, logCounter
 
 class IslandProtocol(Protocol):
     marketWaiter: asyncio.Future
@@ -71,6 +70,7 @@ class VaultZigZag:
         self.delegate.subscribeStrategyEvents(self.ib)
         await self.fetchHistoricalData()
         self.runStrategy()
+        await self.runStrategyForPositions()
         await self.closeMarketAt(self.countryConfig.closeMarket)
         
     async def runMarketAt(self, time: datetime):
@@ -119,8 +119,36 @@ class VaultZigZag:
                                     previousBars=previousBars,
                                     currentBar=currentBar)
             result = self.strategy.run(data, self.strategyConfig, self.countryConfig)
-            logExecutionTicker(data, result)
+            logExecutionZigZag(data, result)
             self.handleStrategyResult(result, ticker.contract)
+
+    async def runStrategyForPositions(self):
+        time = self.countryConfig.closeMarket-timedelta(hours=2)
+        marketTime = time.astimezone(timezone('UTC'))
+        nowTime = datetime.now().astimezone(timezone('UTC'))
+        localMarketTime = marketTime.astimezone(timezone('Europe/Lisbon'))
+        log("🕐 Validate current Positions scheduled for %d/%d %d:%d 🕐" % (localMarketTime.day, localMarketTime.month, localMarketTime.hour, localMarketTime.minute))
+        difference = (marketTime - nowTime)
+        coro = asyncio.sleep(difference.total_seconds())
+        self.delegate.marketWaiter = asyncio.ensure_future(coro)
+        await asyncio.wait([self.delegate.marketWaiter])
+        self.delegate.marketWaiter = None
+
+        fills = self.portfolio.getFills(self.ib)
+        
+        for fill in fills:
+            tick = ibTicker(contract=fill.contract)
+            position = self.getPosition(tick)
+            if (position is not None and
+                position.position >=  fill.execution.shares):
+                data = StrategyData(ticker=tick, 
+                                    position=position, 
+                                    order=None, 
+                                    totalCash=None,
+                                    fill=fill)
+                result = self.strategy.run(data, self.strategyConfig, self.countryConfig)
+                logExecutionZigZag(data, result)
+                self.handleStrategyResult(result, ticker.contract)
 
     def handleStrategyResult(self, result: StrategyResult, contract: ibContract):
         if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and
