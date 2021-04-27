@@ -178,14 +178,14 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
         #print(len(filteredList))
         if (len(filteredList) > 0):
             for tempOrder, position, positionDate in filteredList:
-                if ((tempOrder.action == OrderAction.Buy and tempOrder.takeProfitOrder.lmtPrice <= ticker.ask) or
-                     (tempOrder.action == OrderAction.Sell and tempOrder.takeProfitOrder.lmtPrice >= ticker.bid)):
+                if ((tempOrder.action == "BUY" and tempOrder.takeProfitOrder.lmtPrice <= ticker.ask) or
+                     (tempOrder.action == "SELL" and tempOrder.takeProfitOrder.lmtPrice >= ticker.bid)):
                     ganho = abs(tempOrder.takeProfitOrder.lmtPrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     print("Success ✅ - %.2f Size(%.2f) high(%.2f) low(%.2f)\n" % (ganho, tempOrder.totalQuantity, ticker.ask, ticker.bid))
                     result = BackTestResult(symbol=ticker.contract.symbol, 
                                             date=ticker.time, 
                                             pnl=(ganho), 
-                                            action=tempOrder.action.code, 
+                                            action=tempOrder.action, 
                                             type=BackTestResultType.takeProfit,
                                             priceCreateTrade= tempOrder.lmtPrice, 
                                             priceCloseTrade= tempOrder.takeProfitOrder.lmtPrice,
@@ -205,15 +205,15 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                         backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                         backtestModel.cashAvailable += ganho
                     tempOrders.pop(magicKey(position.contract.symbol, positionDate))
-                elif ((tempOrder.action == OrderAction.Buy and tempOrder.stopLossOrder.auxPrice > ticker.bid) or
-                        (tempOrder.action == OrderAction.Sell and tempOrder.stopLossOrder.auxPrice < ticker.ask)):
+                elif ((tempOrder.action == "BUY" and tempOrder.stopLossOrder.auxPrice > ticker.bid) or
+                        (tempOrder.action == "SELL" and tempOrder.stopLossOrder.auxPrice < ticker.ask)):
                     print(tempOrder.stopLossOrder.auxPrice, ticker.bid, ticker.time)
                     perda = abs(tempOrder.stopLossOrder.auxPrice*tempOrder.stopLossOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     print("StopLoss ❌ - %.2f Size(%.2f)\n" % (perda, tempOrder.totalQuantity))
                     result = BackTestResult(symbol=ticker.contract.symbol, 
                                             date=ticker.time, 
                                             pnl=(-perda), 
-                                            action=tempOrder.action.code, 
+                                            action=tempOrder.action, 
                                             type=BackTestResultType.stopLoss,
                                             priceCreateTrade= tempOrder.lmtPrice, 
                                             priceCloseTrade= tempOrder.stopLossOrder.auxPrice,
@@ -234,14 +234,14 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                         backtestModel.cashAvailable -= perda
                     tempOrders.pop(magicKey(position.contract.symbol, positionDate))
                 elif ticker.time.date() >= (positionDate+timedelta(days=2)).date():
-                    if ((tempOrder.action == OrderAction.Buy and (tempOrder.lmtPrice <= ticker.last)) or
-                        (tempOrder.action == OrderAction.Sell and (tempOrder.lmtPrice >= ticker.last))):
+                    if ((tempOrder.action == "BUY" and (tempOrder.lmtPrice <= ticker.last)) or
+                        (tempOrder.action == "SELL" and (tempOrder.lmtPrice >= ticker.last))):
                         closePrice = ticker.last
                         ganho = abs(closePrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                         result = BackTestResult(symbol=ticker.contract.symbol, 
                                                 date=ticker.time, 
                                                 pnl=(ganho), 
-                                                action=tempOrder.action.code, 
+                                                action=tempOrder.action, 
                                                 type=BackTestResultType.profit,
                                                 priceCreateTrade= tempOrder.lmtPrice, 
                                                 priceCloseTrade= closePrice,
@@ -267,7 +267,7 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                         result = BackTestResult(symbol=ticker.contract.symbol, 
                                                 date=ticker.time, 
                                                 pnl=(-perda), 
-                                                action=tempOrder.action.code, 
+                                                action=tempOrder.action, 
                                                 type=BackTestResultType.loss,
                                                 priceCreateTrade= tempOrder.lmtPrice, 
                                                 priceCloseTrade= closePrice,
