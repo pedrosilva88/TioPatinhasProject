@@ -34,7 +34,7 @@ class Portfolio:
         self.trades = ib.openTrades()
 
         for account in ib.accountValues():
-            if account.tag == "FullExcessLiquidity":
+            if account.tag == "BuyingPower":
                 self.cashBalance = float(account.value)
             elif account.tag == "GrossPositionValue":
                 self.grossPositionsValue = float(account.value)

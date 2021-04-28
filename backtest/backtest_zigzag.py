@@ -26,7 +26,7 @@ class BackTestSwing():
     def __init__(self):
         self.results = dict()
         self.trades = dict()
-        self.cashAvailable = 6000
+        self.cashAvailable = 40000
         self.countryConfig = getConfigFor(CountryKey.USA)
         self.strategyConfig= getStrategyConfigFor(key=self.countryConfig.key, timezone=self.countryConfig.timezone)
 
@@ -185,7 +185,7 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                     result = BackTestResult(symbol=ticker.contract.symbol, 
                                             date=ticker.time, 
                                             pnl=(ganho), 
-                                            action=tempOrder.action, 
+                                            action="Long" if tempOrder.action == "BUY" else "Short", 
                                             type=BackTestResultType.takeProfit,
                                             priceCreateTrade= tempOrder.lmtPrice, 
                                             priceCloseTrade= tempOrder.takeProfitOrder.lmtPrice,
@@ -207,13 +207,12 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                     tempOrders.pop(magicKey(position.contract.symbol, positionDate))
                 elif ((tempOrder.action == "BUY" and tempOrder.stopLossOrder.auxPrice > ticker.bid) or
                         (tempOrder.action == "SELL" and tempOrder.stopLossOrder.auxPrice < ticker.ask)):
-                    print(tempOrder.stopLossOrder.auxPrice, ticker.bid, ticker.time)
                     perda = abs(tempOrder.stopLossOrder.auxPrice*tempOrder.stopLossOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     print("StopLoss ❌ - %.2f Size(%.2f)\n" % (perda, tempOrder.totalQuantity))
                     result = BackTestResult(symbol=ticker.contract.symbol, 
                                             date=ticker.time, 
                                             pnl=(-perda), 
-                                            action=tempOrder.action, 
+                                            action="Long" if tempOrder.action == "BUY" else "Short", 
                                             type=BackTestResultType.stopLoss,
                                             priceCreateTrade= tempOrder.lmtPrice, 
                                             priceCloseTrade= tempOrder.stopLossOrder.auxPrice,
@@ -233,7 +232,7 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                         backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                         backtestModel.cashAvailable -= perda
                     tempOrders.pop(magicKey(position.contract.symbol, positionDate))
-                elif ticker.time.date() >= (positionDate+timedelta(days=2)).date():
+                elif ticker.time.date() >= (positionDate+timedelta(days=5)).date():
                     if ((tempOrder.action == "BUY" and (tempOrder.lmtPrice <= ticker.last)) or
                         (tempOrder.action == "SELL" and (tempOrder.lmtPrice >= ticker.last))):
                         closePrice = ticker.last
@@ -241,7 +240,7 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                         result = BackTestResult(symbol=ticker.contract.symbol, 
                                                 date=ticker.time, 
                                                 pnl=(ganho), 
-                                                action=tempOrder.action, 
+                                                action="Long" if tempOrder.action == "BUY" else "Short", 
                                                 type=BackTestResultType.profit,
                                                 priceCreateTrade= tempOrder.lmtPrice, 
                                                 priceCloseTrade= closePrice,
@@ -267,7 +266,7 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                         result = BackTestResult(symbol=ticker.contract.symbol, 
                                                 date=ticker.time, 
                                                 pnl=(-perda), 
-                                                action=tempOrder.action, 
+                                                action="Long" if tempOrder.action == "BUY" else "Short", 
                                                 type=BackTestResultType.loss,
                                                 priceCreateTrade= tempOrder.lmtPrice, 
                                                 priceCloseTrade= closePrice,
