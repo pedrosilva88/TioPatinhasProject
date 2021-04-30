@@ -30,6 +30,8 @@ class VaultZigZag:
     historicalData: HistoricalData
     customBarsDataDict: [str, [CustomBarData]]
 
+    resultsToTrade: [StrategyResult] = []
+
     delegate: IslandProtocol
 
     def __init__(self, delegate: IslandProtocol):
@@ -37,6 +39,7 @@ class VaultZigZag:
         self.historicalData = HistoricalData()
         self.delegate = delegate
         self.customBarsDataDict = {}
+        self.resultsToTrade = []
 
     # Setup
 
@@ -52,6 +55,7 @@ class VaultZigZag:
         self.strategyConfig = getStrategyConfigFor(key=key, timezone=self.countryConfig.timezone)
         self.portfolio = Portfolio()
         self.customBarsDataDict = {}
+        self.resultsToTrade = []
 
     async def resetVault(self):
         log("🤖 Reset ZigZag Vault 🤖")
@@ -70,6 +74,7 @@ class VaultZigZag:
         self.delegate.subscribeStrategyEvents(self.ib)
         await self.fetchHistoricalData()
         self.runStrategy()
+        self.handleResultsToTrade()
         await self.runStrategyForPositions()
         await self.closeMarketAt(self.countryConfig.closeMarket)
         
@@ -109,18 +114,62 @@ class VaultZigZag:
         for stock in self.stocks:
             ticker = ibTicker(contract=stock)
             customBars = self.customBarsDataDict[stock.symbol]
-            if len(customBars) >= 4:
+            zigzagFound = False
+            if len(customBars) >= 7:
                 currentBar = customBars[-1]
-                previousBars = [customBars[-4], customBars[-3], customBars[-2]]
+                #log("😳 [%s] CurrentBar-> High(%.2f) Low(%s) 😳" % (currentBar.date, currentBar.high, currentBar.low))
+                previousBars = [] 
+                index = -2
+                while index >= -7:
+                    #log("😳 [%d] 😳" % (index))
+                    bar, zigzagFound = self.getCustomBarData(customBars[index], zigzagFound)
+                    previousBars.insert(0, bar)
+                    index -= 1
                 data = StrategyData(ticker=ticker, 
                                     position=None, 
                                     order=None, 
                                     totalCash=self.portfolio.totalCashBalance,
                                     previousBars=previousBars,
                                     currentBar=currentBar)
+            #if self.isValidToRunStrategy(currentBar, previousBars):
             result = self.strategy.run(data, self.strategyConfig, self.countryConfig)
             logExecutionZigZag(data, result)
             self.handleStrategyResult(result, ticker.contract)
+            #else:
+            #    log("🧐 Invalid previousBars for %s. (Probably because this zigzag match was found in the past)🧐" % ticker.contract.symbol)
+
+    def getCustomBarData(self, bar: CustomBarData, found: bool):
+        #log("😳 [%s] Bar-> High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😳" % (bar.date, bar.high, bar.low, bar.rsi, bar.zigzag))
+        if found:
+            bar.zigzag = False
+        elif bar.zigzag == True:
+            found = True
+        return (bar, found)
+
+    def isValidToRunStrategy(self, currentBar: CustomBarData, previousBars: [CustomBarData]):
+        index = 0
+        reversedPreviousBars = list(reversed(previousBars))
+        zigzagBar = None
+        for bar in reversedPreviousBars:
+            if bar.zigzag == True:
+                zigzagBar = bar
+                break
+        if zigzagBar is not None:
+            for bar in previousBars:
+                if (bar.zigzag == False and 
+                    (self.getPercentageChange(zigzagBar.high, bar.open) >= 5 or self.getPercentageChange(zigzagBar.low, bar.open) >= 5)):
+                    log("🤬 [%s] Bar 🤬" % (bar.date))
+                    log("🤬 [%s] Bar[-1]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-1].date, previousBars[-1].open, previousBars[-1].zigzag))
+                    log("🤬 [%s] Bar[-2]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-2].date, previousBars[-2].open, previousBars[-2].zigzag))
+                    log("🤬 [%s] Bar[-3]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-3].date, previousBars[-3].open, previousBars[-3].zigzag))
+                    log("🤬 [%s] Bar[-4]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-4].date, previousBars[-4].open, previousBars[-4].zigzag))
+                    log("🤬 [%s] Bar[-5]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-5].date, previousBars[-5].open, previousBars[-5].zigzag))
+                    log("🤬 [%s] Bar[-6]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-6].date, previousBars[-6].open, previousBars[-6].zigzag))
+                    log("🤬 [%s] CurrentBar-> Open(%.2f) ZigZag(%s) 🤬" % (currentBar.date, currentBar.open, currentBar.zigzag))
+                    log("🤬  🤬")
+                    return False
+        
+        return True
 
     async def runStrategyForPositions(self):
         time = self.countryConfig.closeMarket-timedelta(hours=2)
@@ -153,13 +202,8 @@ class VaultZigZag:
                 self.handleStrategyResult(result, ticker.contract)
 
     def handleStrategyResult(self, result: StrategyResult, contract: ibContract):
-        if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and
-            self.canCreateOrder(contract, result.order)):
-            if result.order.totalQuantity > 1:
-                return self.createOrder(contract, result.order)
-            else:
-                log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
-                return None
+        if (result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell):
+            self.resultsToTrade.append(result)
 
         elif (result.type == StrategyResultType.PositionExpired_Buy or result.type == StrategyResultType.PositionExpired_Sell):
             orderAction = OrderAction.Buy.value if result.type == StrategyResultType.PositionExpired_Buy else OrderAction.Sell.value
@@ -179,6 +223,16 @@ class VaultZigZag:
         else:
             return True
 
+    def handleResultsToTrade(self):
+        self.resultsToTrade.sort(key=lambda x: x.priority, reverse=True)
+        for result in self.resultsToTrade:
+            if self.canCreateOrder(contract, result.order):
+                if result.order.totalQuantity > 1:
+                    return self.createOrder(contract, result.order)
+                else:
+                    log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
+                    return None
+
     # Historical Data
     
     async def fetchHistoricalData(self):
@@ -192,6 +246,14 @@ class VaultZigZag:
             bars = await self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 40, "1 day")
             self.customBarsDataDict[stock.symbol] = self.historicalData.createListOfCustomBarsData(bars)
             log("🧶 Historical Data for %s 🧶" % (stock.symbol))
+
+    def getPercentageChange(self, current, previous):
+        if current == previous:
+            return 100.0
+        try:
+            return (abs(current - previous) / previous) * 100.0
+        except ZeroDivisionError:
+            return 0
 
     # Portfolio
 

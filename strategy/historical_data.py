@@ -62,9 +62,11 @@ class HistoricalData:
         return customBarsData
 
     def calculateRSIAndZigZag(self, bars: [BarData]):
-        X = util.df(bars)['average']
+        closes = util.df(bars)['close']
+        lows = util.df(bars)['low']
+        highs = util.df(bars)['high']
         RSI = self.computeRSI(util.df(bars)['close'], 14)
-        pivots = peak_valley_pivots(X.values, 0.05, -0.05)
+        pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
         return pivots, RSI.values
 
     async def getContractDetails(self, ib: IB, stock: ibContract) -> (ContractDetails, [PriceIncrement]):

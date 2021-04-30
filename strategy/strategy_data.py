@@ -67,17 +67,19 @@ class StrategyData:
 class StrategyResult:
     ticker: ibTicker
     type: StrategyResultType
+    priority: int = None
     order: Order = None
     position: ibPosition = None
 
     def __str__(self):
         return "Result for %s: %s %s\n" % (self.ticker.contract.symbol, self.ticker.time, self.type.name)
 
-    def __init__(self, ticker: ibTicker, type, order: Order = None, position: ibPosition = None):
+    def __init__(self, ticker: ibTicker, type, order: Order = None, position: ibPosition = None, priority: int = None):
         self.ticker = ticker
         self.type = type
         self.order = order
         self.position = position
+        self.priority = None
 
 class StrategyConfig():
     startRunningStrategy: datetime

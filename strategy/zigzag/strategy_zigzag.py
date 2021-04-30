@@ -36,26 +36,23 @@ class StrategyZigZag(Strategy):
             return result
 
         log("😁 %s 😁" % (self.strategyData.ticker.contract.symbol))
-        log("😁 [%s] Bar[-3]-> Open(%.2f) High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].date, self.previousBars[-3].open, self.previousBars[-3].high, self.previousBars[-3].low, self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
-        log("😁 [%s] Bar[-2]-> Open(%.2f) High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].date, self.previousBars[-2].open, self.previousBars[-2].high, self.previousBars[-2].low, self.previousBars[-2].rsi, self.previousBars[-2].zigzag))
-        log("😁 [%s] Bar[-1]-> Open(%.2f) High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].date, self.previousBars[-1].open, self.previousBars[-1].high, self.previousBars[-1].low, self.previousBars[-1].rsi, self.previousBars[-1].zigzag))
-        log("😁 [%s] CurrentBar-> Open(%.2f) High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.date, self.currentBar.open, self.currentBar.high, self.currentBar.low, self.currentBar.rsi, self.currentBar.zigzag))
+        log("😁 [%s] Bar[-6]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-6].date, self.previousBars[-6].rsi, self.previousBars[-6].zigzag))
+        log("😁 [%s] Bar[-5]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-5].date, self.previousBars[-5].rsi, self.previousBars[-5].zigzag))
+        log("😁 [%s] Bar[-4]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-4].date, self.previousBars[-4].rsi, self.previousBars[-4].zigzag))
+        log("😁 [%s] Bar[-3]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].date, self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
+        log("😁 [%s] Bar[-2]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].date, self.previousBars[-2].rsi, self.previousBars[-2].zigzag))
+        log("😁 [%s] Bar[-1]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].date, self.previousBars[-1].rsi, self.previousBars[-1].zigzag))
+        log("😁 [%s] CurrentBar-> RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.date, self.currentBar.rsi, self.currentBar.zigzag))
         log("😁  😁")
-        if (self.previousBars[-3].zigzag == True and (self.previousBars[-3].rsi <= self.minRSI or self.previousBars[-3].rsi >= self.maxRSI) and
-            self.previousBars[-2].zigzag == False and self.previousBars[-1].zigzag == False):
+
+        zigzagBar, zigzagIndex = self.getZigZag()
+        if (zigzagBar is not None):
             if (self.currentBar.rsi > self.minRSI or self.currentBar.rsi <= self.maxRSI):
-                if (self.previousBars[-3].rsi <= self.minRSI and
-                    self.previousBars[-2].low < self.previousBars[-1].low):
+                if (zigzagBar.rsi <= self.minRSI and self.isLonging(zigzagIndex)):
                     type = StrategyResultType.Buy
                     order = self.createOrder(type)
                     return StrategyResult(strategyData.ticker, type, order)
-                elif (self.previousBars[-3].rsi >= self.maxRSI and
-                      self.previousBars[-2].high > self.previousBars[-1].high):
-                    
-                    # if (self.currentBar.date.year == 2021 and self.currentBar.date.month == 1 or
-                    #     self.currentBar.date.year == 2020 and self.currentBar.date.month == 13):
-                    #     print(self.previousBars[-1].high, self.previousBars[-2].high, self.previousBars[-3].zigzag)
-
+                elif (zigzagBar.rsi >= self.maxRSI and self.isShorting(zigzagIndex)):
                     type = StrategyResultType.Sell
                     order = self.createOrder(type)
                     return StrategyResult(strategyData.ticker, type, order)
@@ -64,6 +61,37 @@ class StrategyZigZag(Strategy):
                 return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)   
         else:
             return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)
+
+    def getZigZag(self) -> (CustomBarData, int):
+        totalBars = len(self.previousBars)
+        index = -1 
+        zigzagBar = None
+        for bar in reversed(self.previousBars):
+            if (bar.zigzag == True and (bar.rsi <= self.minRSI or bar.rsi >= self.maxRSI)):
+                log("🎃 Bar Found %s: %d 🎃" % (self.strategyData.ticker.contract.symbol, index))
+                zigzagBar = bar
+                break
+            index -= 1
+        return (zigzagBar, index)
+
+    def isShorting(self, startIndex: int):
+        index = startIndex + 1
+        while (index < -1):
+            if self.previousBars[index].high < self.previousBars[index-1].high:
+                log("👻 Not Shorting %.2f < %.2f 👻" % (self.previousBars[index].high, self.previousBars[index-1].high))
+                return False
+            index += 1 
+        return True
+
+    def isLonging(self, startIndex: int):
+        index = startIndex + 1
+        while (index < -1):
+            if self.previousBars[index].low > self.previousBars[index-1].low:
+                log("👻 Not Longing %.2f > %.2f 👻" % (self.previousBars[index].low, self.previousBars[index-1].low))
+                return False
+            index += 1
+        return True
+
 
     # Constructor
 
