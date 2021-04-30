@@ -76,11 +76,18 @@ def showPlot(mBars: [BarData], zigzags:[int]):
     i = 0
     dates = []
     items = []
+    isForLow = False
     for bar in mBars:
         zigzag = zigzags[i]
         if zigzag != 0:
             dates.append(bar.date)
-            items.append(bar.average)
+            if isForLow:
+                items.append(bar.low)
+                isForLow = False
+            else:
+                items.append(bar.high)
+                isForLow = True
+
         i += 1
     plt.style.use('ggplot')
 
@@ -121,18 +128,20 @@ def downloadData():
     path = ("Scanner/ZigZag/%s/scan_to_download.csv" % CountryKey.USA.code)
     savePath = "ZigZag"
     countryConfig = getConfigFor(key=CountryKey.USA)
-    modelDays = BackTestDownloadModel(path=path, numberOfDays=1460, barSize="1 day")
+    modelDays = BackTestDownloadModel(path=path, numberOfDays=2190, barSize="1 day") # 6Years = 2190 days
     itemsDictionary = downloadStocksData(ib, modelDays)
 
-    for key, (stock, mBars) in itemsDictionary.items():
-        X = util.df(mBars)['average']
-        RSI = computeRSI(util.df(mBars)['close'], 14)
-        pivots = peak_valley_pivots(X.values, 0.05, -0.05)
-        models = createListOfBackTestModels(stock, mBars, pivots, RSI.values)
+    for key, (stock, bars) in itemsDictionary.items():
+        closes = util.df(bars)['close']
+        lows = util.df(bars)['low']
+        highs = util.df(bars)['high']
+        RSI = computeRSI(closes, 14)
+        pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
+        models = createListOfBackTestModels(stock, bars, pivots, RSI.values)
 
         saveDataInCSVFile(key, savePath, models, countryConfig)
 
-        #showPlot(mBars, pivots)
+        #showPlot(bars, pivots)
 
 def loadStocks(fileName: str = "scan_to_run_strategy.csv"):
     path = ("Scanner/ZigZag/%s/%s" % (CountryKey.USA.code, fileName))
@@ -292,22 +301,28 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
         previousModels = getPreviousBarsData(model, models, i)
         if (previousModels[0] is not None and
             previousModels[1] is not None and
-            previousModels[2] is not None):
-            previousBars = [createCustomBarData(previousModels[2], backtestModel.countryConfig),
+            previousModels[2] is not None and
+            previousModels[3] is not None and
+            previousModels[4] is not None and
+            previousModels[5] is not None):
+            previousBars = [createCustomBarData(previousModels[5], backtestModel.countryConfig),
+                            createCustomBarData(previousModels[4], backtestModel.countryConfig),
+                            createCustomBarData(previousModels[3], backtestModel.countryConfig),
+                            createCustomBarData(previousModels[2], backtestModel.countryConfig),
                             createCustomBarData(previousModels[1], backtestModel.countryConfig),
                             createCustomBarData(previousModels[0], backtestModel.countryConfig)]
             currentBar = createCustomBarData(model, backtestModel.countryConfig)
-            # if ticker.time.year < 2021:
-                # print("[", ticker.time.date(), "]",previousBars[-3].high, "/", previousBars[-3].low, "/",previousBars[-3].zigzag, " - ",
-                #         previousBars[-2].high, "/", previousBars[-2].low, "/",previousBars[-2].zigzag, " - ", 
-                #         previousBars[-1].high, "/", previousBars[-1].low, "/",previousBars[-1].zigzag, " - ",
-                #         currentBar.high, "/", currentBar.low)
             data = StrategyData(ticker=ticker, 
                                 position=None, 
                                 order=None, 
                                 totalCash=backtestModel.cashAvailable,
                                 previousBars=previousBars,
                                 currentBar=currentBar)
+            
+            for bar in previousBars:
+                if getPercentageChange(currentBar.close, bar.close) < 5:
+                    bar.zigzag = False
+            
             result = strategy.run(data, backtestModel.strategyConfig, backtestModel.countryConfig)
             if (result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell):
                 totalInPositions = calculatePriceInPositions(tempOrders)
@@ -318,11 +333,6 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                                                                                     Position(account="",contract=stock, position=result.order.totalQuantity, avgCost=result.order.lmtPrice),
                                                                                     ticker.time)
                     print(result)
-                # else:
-                #     if balance <= totalOrderCost:
-                #         print("Insufficient Funds 🙁")
-                #     elif result.order.totalQuantity <= 0:
-                #         print("Order Size too small 🙁")
 
             elif result.type == StrategyResultType.DoNothing:
                 None
@@ -331,6 +341,14 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
         i += 1
 
     #print("\n\nResult: LimitProfits(%d) Profits(%d) StopLosses(%d) Losses(%d) PnL(%.2f)" % (limitProfits, profits, stopLosses, losses, (totalWon-totalLoss)))
+
+def getPercentageChange(current, previous):
+    if current == previous:
+        return 100.0
+    try:
+        return (abs(current - previous) / previous) * 100.0
+    except ZeroDivisionError:
+        return 0
 
 def createCustomBarData(model: BackTestModel, countryConfig: CountryConfig):
     barData = BarData(date=model.ticker(countryConfig).time,
@@ -345,13 +363,19 @@ def getPreviousBarsData(model: BackTestModel, models: [BackTestModel], currentPo
     previousData_1 = None
     previousData_2 = None
     previousData_3 = None
+    previousData_4 = None
+    previousData_5 = None
+    previousData_6 = None
     position = 0
+    zigzagFound = False
     while (previousData_1 is None and
             currentPosition-position > 0):
         position += 1
         item = models[currentPosition-position]
         if item.symbol == model.symbol:
             previousData_1 = item
+            if item.zigzag == True:
+                zigzagFound = True
     
     while (previousData_2 is None and
             currentPosition-position > 0):
@@ -359,6 +383,10 @@ def getPreviousBarsData(model: BackTestModel, models: [BackTestModel], currentPo
         item = models[currentPosition-position]
         if item.symbol == model.symbol:
             previousData_2 = item
+            if zigzagFound == True:
+                previousData_2.zigzag = False
+            elif item.zigzag == True and zigzagFound == False:
+                zigzagFound = True
     
     while (previousData_3 is None and
             currentPosition-position > 0):
@@ -366,8 +394,78 @@ def getPreviousBarsData(model: BackTestModel, models: [BackTestModel], currentPo
         item = models[currentPosition-position]
         if item.symbol == model.symbol:
             previousData_3 = item
+            if zigzagFound == True:
+                previousData_3.zigzag = False
+            elif item.zigzag == True and zigzagFound == False:
+                zigzagFound = True
 
-    return [previousData_1, previousData_2, previousData_3]
+    
+    while (previousData_4 is None and
+            currentPosition-position > 0):
+        position += 1
+        item = models[currentPosition-position]
+        if item.symbol == model.symbol:
+            previousData_4 = item
+            if zigzagFound == True:
+                previousData_4.zigzag = False
+            elif item.zigzag == True and zigzagFound == False:
+                zigzagFound = True
+
+
+    while (previousData_5 is None and
+            currentPosition-position > 0):
+        position += 1
+        item = models[currentPosition-position]
+        if item.symbol == model.symbol:
+            previousData_5 = item
+            if zigzagFound == True:
+                previousData_5.zigzag = False
+            elif item.zigzag == True and zigzagFound == False:
+                zigzagFound = True
+
+
+    while (previousData_6 is None and
+            currentPosition-position > 0):
+        position += 1
+        item = models[currentPosition-position]
+        if item.symbol == model.symbol:
+            previousData_6 = item
+            if zigzagFound == True:
+                previousData_6.zigzag = False
+            elif item.zigzag == True and zigzagFound == False:
+                zigzagFound = True
+
+    if previousData_6 is not None and previousData_6.zigzag == True:
+        if ((getPercentageChange(previousData_6.close, previousData_1.close) >= 5) or
+            (getPercentageChange(previousData_6.close, previousData_2.close) >= 5) or
+            (getPercentageChange(previousData_6.close, previousData_3.close) >= 5) or
+            (getPercentageChange(previousData_6.close, previousData_4.close) >= 5) or
+            (getPercentageChange(previousData_6.close, previousData_5.close) >= 5)):
+            previousData_6.zigzag = False
+
+    if previousData_5 is not None and previousData_5.zigzag == True:
+        if ((getPercentageChange(previousData_5.close, previousData_1.close) >= 5) or
+            (getPercentageChange(previousData_5.close, previousData_2.close) >= 5) or
+            (getPercentageChange(previousData_5.close, previousData_3.close) >= 5) or
+            (getPercentageChange(previousData_5.close, previousData_4.close) >= 5)):
+            previousData_5.zigzag = False
+
+    if previousData_4 is not None and previousData_4.zigzag == True:
+        if ((getPercentageChange(previousData_4.close, previousData_1.close) >= 5) or
+            (getPercentageChange(previousData_4.close, previousData_2.close) >= 5) or
+            (getPercentageChange(previousData_4.close, previousData_3.close) >= 5)):
+            previousData_4.zigzag = False
+
+    if previousData_3 is not None and previousData_3.zigzag == True:
+        if ((getPercentageChange(previousData_3.close, previousData_1.close) >= 5) or
+            (getPercentageChange(previousData_3.close, previousData_2.close) >= 5)):
+            previousData_3.zigzag = False
+
+    if previousData_2 is not None and previousData_2.zigzag == True:
+        if ((getPercentageChange(previousData_2.close, previousData_1.close) >= 5)):
+            previousData_2.zigzag = False
+
+    return [previousData_1, previousData_2, previousData_3, previousData_4, previousData_5, previousData_6]
 
 def calculatePriceInPositions(tempOrders):
     total = 0
@@ -380,9 +478,9 @@ def magicKey(symbol: str, date: datetime):
 
 if __name__ == '__main__':
     try:
-        #downloadData()
+        downloadData()
         #runStockPerformance()
-        run()
+        #run()
         
     except (KeyboardInterrupt, SystemExit) as e:
         print(e)
