@@ -478,9 +478,9 @@ def magicKey(symbol: str, date: datetime):
 
 if __name__ == '__main__':
     try:
-        downloadData()
+        #downloadData()
         #runStockPerformance()
-        #run()
+        run()
         
     except (KeyboardInterrupt, SystemExit) as e:
         print(e)
