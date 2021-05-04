@@ -26,7 +26,7 @@ class BackTestSwing():
     def __init__(self):
         self.results = dict()
         self.trades = dict()
-        self.cashAvailable = 40000
+        self.cashAvailable = 6000
         self.countryConfig = getConfigFor(CountryKey.USA)
         self.strategyConfig= getStrategyConfigFor(key=self.countryConfig.key, timezone=self.countryConfig.timezone)
 
@@ -126,9 +126,9 @@ def downloadData():
     ib = IB()
     ib.connect('127.0.0.1', 7497, clientId=16)
     path = ("Scanner/ZigZag/%s/scan_to_download.csv" % CountryKey.USA.code)
-    savePath = "ZigZag"
+    savePath = "ZigZag/Stocks"
     countryConfig = getConfigFor(key=CountryKey.USA)
-    modelDays = BackTestDownloadModel(path=path, numberOfDays=2190, barSize="1 day") # 6Years = 2190 days
+    modelDays = BackTestDownloadModel(path=path, numberOfDays=1825, barSize="1 day") # 5Years = 1825 days
     itemsDictionary = downloadStocksData(ib, modelDays)
 
     for key, (stock, bars) in itemsDictionary.items():

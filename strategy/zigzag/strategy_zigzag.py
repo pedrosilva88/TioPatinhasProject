@@ -51,11 +51,11 @@ class StrategyZigZag(Strategy):
                 if (zigzagBar.rsi <= self.minRSI and self.isLonging(zigzagIndex)):
                     type = StrategyResultType.Buy
                     order = self.createOrder(type)
-                    return StrategyResult(strategyData.ticker, type, order)
+                    return StrategyResult(strategyData.ticker, type, order, None, zigzagIndex)
                 elif (zigzagBar.rsi >= self.maxRSI and self.isShorting(zigzagIndex)):
                     type = StrategyResultType.Sell
                     order = self.createOrder(type)
-                    return StrategyResult(strategyData.ticker, type, order)
+                    return StrategyResult(strategyData.ticker, type, order, None, zigzagIndex)
                 return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)   
             else:
                 return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)   
@@ -77,8 +77,8 @@ class StrategyZigZag(Strategy):
     def isShorting(self, startIndex: int):
         index = startIndex + 1
         while (index < -1):
-            if self.previousBars[index].high < self.previousBars[index-1].high:
-                log("👻 Not Shorting %.2f < %.2f 👻" % (self.previousBars[index].high, self.previousBars[index-1].high))
+            if self.previousBars[index-1].high < self.previousBars[index].high:
+                log("👻 Not Shorting %.2f < %.2f 👻" % (self.previousBars[index-1].high, self.previousBars[index].high))
                 return False
             index += 1 
         return True
@@ -86,8 +86,8 @@ class StrategyZigZag(Strategy):
     def isLonging(self, startIndex: int):
         index = startIndex + 1
         while (index < -1):
-            if self.previousBars[index].low > self.previousBars[index-1].low:
-                log("👻 Not Longing %.2f > %.2f 👻" % (self.previousBars[index].low, self.previousBars[index-1].low))
+            if self.previousBars[index-1].low > self.previousBars[index].low:
+                log("👻 Not Longing %.2f > %.2f 👻" % (self.previousBars[index-1].low, self.previousBars[index].low))
                 return False
             index += 1
         return True
@@ -153,9 +153,16 @@ class StrategyZigZag(Strategy):
 
     def handleFill(self):
         executionDate = self.strategyData.fill.execution.time
+        dateLimit = date.today()-timedelta(days=6)
+
+        if (self.strategyData.position is None or
+            dateLimit <= executionDate):
+            log("🥵 Handle Fill for (%s) - Position invalid or the Fill is too old 🥵" % self.strategyData.ticker.contract.symbol)
+            return StrategyResult(self.strategyData.ticker, StrategyResultType.DoNothing)
+
         shares = self.strategyData.position.position
 
-        if date.today() >= (executionDate+timedelta(days=2)).date():
+        if (date.now().hour == self.countryConfig.closeMarket-timedelta(hours=2) and date.today() >= (executionDate+timedelta(days=2)).date()):
             if shares > 0:
                 return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
             elif shares < 0:

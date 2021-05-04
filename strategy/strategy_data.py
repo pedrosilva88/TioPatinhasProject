@@ -79,7 +79,7 @@ class StrategyResult:
         self.type = type
         self.order = order
         self.position = position
-        self.priority = None
+        self.priority = priority
 
 class StrategyConfig():
     startRunningStrategy: datetime

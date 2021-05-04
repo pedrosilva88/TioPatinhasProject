@@ -125,18 +125,21 @@ class VaultZigZag:
                     bar, zigzagFound = self.getCustomBarData(customBars[index], zigzagFound)
                     previousBars.insert(0, bar)
                     index -= 1
+                position = self.getPosition(ticker)
+                fill = self.getFill(ticker)
                 data = StrategyData(ticker=ticker, 
-                                    position=None, 
+                                    position=position, 
                                     order=None, 
                                     totalCash=self.portfolio.totalCashBalance,
                                     previousBars=previousBars,
-                                    currentBar=currentBar)
-            #if self.isValidToRunStrategy(currentBar, previousBars):
+                                    currentBar=currentBar,
+                                    fill=fill)
+            # if self.isValidToRunStrategy(currentBar, previousBars):
             result = self.strategy.run(data, self.strategyConfig, self.countryConfig)
             logExecutionZigZag(data, result)
             self.handleStrategyResult(result, ticker.contract)
-            #else:
-            #    log("🧐 Invalid previousBars for %s. (Probably because this zigzag match was found in the past)🧐" % ticker.contract.symbol)
+            # else:
+            # log("🧐 Invalid previousBars for %s. (Probably because this zigzag match was found in the past)🧐" % ticker.contract.symbol)
 
     def getCustomBarData(self, bar: CustomBarData, found: bool):
         #log("😳 [%s] Bar-> High(%.2f) Low(%.2f) RSI(%.2f) ZigZag(%s) 😳" % (bar.date, bar.high, bar.low, bar.rsi, bar.zigzag))
@@ -226,12 +229,12 @@ class VaultZigZag:
     def handleResultsToTrade(self):
         self.resultsToTrade.sort(key=lambda x: x.priority, reverse=True)
         for result in self.resultsToTrade:
-            if self.canCreateOrder(contract, result.order):
+            if self.canCreateOrder(result.ticker.contract, result.order):
                 if result.order.totalQuantity > 1:
-                    return self.createOrder(contract, result.order)
+                    self.createOrder(result.ticker.contract, result.order)
                 else:
                     log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
-                    return None
+                    None
 
     # Historical Data
     
@@ -262,6 +265,9 @@ class VaultZigZag:
 
     def getPosition(self, ticker: ibTicker):
         return self.portfolio.getPosition(ticker.contract)
+
+    def getFill(self, ticker: ibTicker):
+        return self.portfolio.getFill(self.ib, ticker.contract)
 
     # Portfolio - Manage Orders
 

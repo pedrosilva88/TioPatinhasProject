@@ -18,7 +18,7 @@ class Portfolio:
 
     @property
     def cashAvailable(self):
-        return max(self.cashBalance - self.grossPositionsValue - self.pendingOrdersMarketValue, 0)
+        return max(self.cashBalance, 0)
 
     def __init__(self):
         self.positions = []
@@ -35,7 +35,7 @@ class Portfolio:
 
         for account in ib.accountValues():
             if account.tag == "BuyingPower":
-                self.cashBalance = float(account.value)
+                self.cashBalance = float(account.value)/2
             elif account.tag == "GrossPositionValue":
                 self.grossPositionsValue = float(account.value)
             elif (account.tag == "ExchangeRate" and account.currency == "USD"):
@@ -89,6 +89,8 @@ class Portfolio:
             ib.placeOrder(contract, limitOrder)
         else:
             if order.orderType == "MKT":
+                profitOrder.tif = "GTC"
+                stopLossOrder.tif = "GTC"
                 ib.placeOrder(contract, order)
                 ib.placeOrder(contract, profitOrder)
                 ib.placeOrder(contract, stopLossOrder)
@@ -122,6 +124,12 @@ class Portfolio:
 
     def getFills(self, ib: IB) -> [Fill]:
         return ib.fills()
+
+    def getFill(self, ib: IB, contract: ibContract):
+        for fill in ib.fills():
+            if fill.contract.symbol == contract.symbol:
+                return fill
+        return None
 
     def getPosition(self, contract: ibContract):
         for position in self.positions:

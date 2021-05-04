@@ -381,7 +381,7 @@ def loadFiles(pathToScan: str, countryConfig: CountryConfig):
         else:
             print("")
 
-        name = ("backtest/Data/CSV/%s/ZigZag/%s.csv" % (countryConfig.key.code, stock.symbol))
+        name = ("backtest/Data/CSV/%s/ZigZag/Stocks/%s.csv" % (countryConfig.key.code, stock.symbol))
         if not os.path.isfile(name):
             print("File not found ", name)
             continue
