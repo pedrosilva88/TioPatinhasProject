@@ -1,3 +1,12 @@
+- Strategy
+       * Devia ter uma class Strategy parent mais genérica
+
+- StrategyZigZag
+       * O número de dias a popular o previous bar devia estar nas configs
+       * isStrategyDataValid func só ta a olhar para as ultimas 3 previous bars. Tem que ser dinamico
+       * func handleFill validar todos os números estaticos que ali estão. Tem que vir tudo das configs
+
+
 - Look to `News`
        * Olhar para noticias e perceber se têm um ranking. E apartir disso tomar decisoesse faz sentido apostar ou não.
 

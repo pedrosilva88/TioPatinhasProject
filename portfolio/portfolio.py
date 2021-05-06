@@ -1,5 +1,5 @@
 from datetime import datetime
-from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder, Fill
+from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder, Fill, OrderStatus
 from models import OrderType, OrderAction
 from helpers import log
 
@@ -18,7 +18,7 @@ class Portfolio:
 
     @property
     def cashAvailable(self):
-        return max(self.cashBalance, 0)
+        return max(self.cashBalance - self.pendingOrdersMarketValue, 0)
 
     def __init__(self):
         self.positions = []
@@ -51,7 +51,9 @@ class Portfolio:
     def calcOpenTradesValue(self):
         totalValue = 0
         for item in self.trades:
-            if item.order.parentId == 0:
+            if (item.order.parentId == 0 and
+                item.order.orderType == 'MKT' and
+                (item.orderStatus.status in OrderStatus.ActiveStates)):
                 totalValue += (item.order.lmtPrice * self.exchangeUSDRate) * abs(item.order.totalQuantity)
         self.pendingOrdersMarketValue = totalValue
 

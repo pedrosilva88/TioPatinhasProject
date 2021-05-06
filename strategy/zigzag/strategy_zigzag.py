@@ -140,14 +140,6 @@ class StrategyZigZag(Strategy):
                 self.willingToLose > 0 and
                 self.stopToLosePercentage > 0 and
                 self.maxToInvestPerStockPercentage > 0)
-
-    def isTimeForThisStartegyExpired(self):
-        datetime = self.datetime.replace(microsecond=0).time()
-        maxTime = self.strategyMaxTime.replace(microsecond=0).time()
-        return datetime > maxTime
-
-    def shouldGetStockEarnings(self):
-        return False
     
     # Handlers
 
@@ -156,13 +148,13 @@ class StrategyZigZag(Strategy):
         dateLimit = date.today()-timedelta(days=6)
 
         if (self.strategyData.position is None or
-            dateLimit <= executionDate):
+            dateLimit <= executionDate.date()):
             log("🥵 Handle Fill for (%s) - Position invalid or the Fill is too old 🥵" % self.strategyData.ticker.contract.symbol)
             return StrategyResult(self.strategyData.ticker, StrategyResultType.DoNothing)
 
         shares = self.strategyData.position.position
 
-        if (date.now().hour == self.countryConfig.closeMarket-timedelta(hours=2) and date.today() >= (executionDate+timedelta(days=2)).date()):
+        if (date.now().hour == self.countryConfig.closeMarket-timedelta(hours=2) and date.today() >= (executionDate.time+timedelta(days=2)).date()):
             if shares > 0:
                 return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
             elif shares < 0:
