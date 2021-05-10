@@ -69,14 +69,16 @@ class Order(ibOrder):
 class CustomBarData(BarData):
     zigzag: bool
     rsi: float
+    lastPrice: float
 
-    def __init__(self, barData: BarData, zigzag: bool, rsi: float):
+    def __init__(self, barData: BarData, zigzag: bool, rsi: float, lastPrice = None):
         BarData.__init__(self)
         self.date = barData.date
         self.open = barData.open
         self.close = barData.close
         self.high = barData.high
         self.low = barData.low
+        self.lastPrice = lastPrice if lastPrice is not None else barData.close
 
         self.volume = barData.volume
         self.average = barData.average

@@ -28,7 +28,7 @@ class BackTestSwing():
     def __init__(self):
         self.results = dict()
         self.trades = dict()
-        self.cashAvailable = 170958
+        self.cashAvailable = 6000
         self.countryConfig = getConfigFor(CountryKey.USA)
         self.strategyConfig= getStrategyConfigFor(key=self.countryConfig.key, timezone=self.countryConfig.timezone)
 
@@ -307,32 +307,24 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
         ticker = model.ticker(backtestModel.countryConfig)
         stock = ticker.contract
 
-        if ticker.time.year != 2017:
-            i += 1
-            continue
-
-        if ticker.time.month != 8:
-            i += 1
-            continue
-
-        if ticker.time.day < 18 or ticker.time.day > 28:
-            i += 1
-            continue
-
         if dayChecked != ticker.time or isForStockPerformance == True:
             totalInPositions = calculatePriceInPositions(tempOrders)
             balance = backtestModel.cashAvailable - totalInPositions
 
             tradesAvailable = 0
-            result = math.floor(balance/150000)
-            if balance - (150000*result) >= 6000:
-                tradesAvailable = result+1
-            else: 
-                tradesAvailable = result
+            if balance/3 >= 2000 and balance < 150000:
+                tradesAvailable = 3
+            else:
+                if backtestModel.cashAvailable > 150000:
+                    backtestModel.strategyConfig.maxToInvestPerStockPercentage = 1
+                result = math.floor(balance/150000)
+                if balance - (150000*result) >= 6000:
+                    tradesAvailable = result+1
+                else: 
+                    tradesAvailable = result
+
             clearOldFills(ticker, databaseModule) 
             dayChecked = None
-            print("[%s] TRADES AVALIABLE: %d    BALANCE: %.2f" % (ticker.time.date(), tradesAvailable, balance))
-        #handleProfitAndStop(backtestModel, backtestReport, model, ticker, tempOrders, isForStockPerformance)
 
         result = None
         previousModels = getPreviousBarsData(model, models, i)
@@ -352,8 +344,6 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
             fill = getFill(ticker, databaseModule)
             totalInPositions = calculatePriceInPositions(tempOrders)
             balance = backtestModel.cashAvailable - totalInPositions
-            if ticker.contract.symbol == "LUMN" or ticker.contract.symbol == "MTSI":
-                print("🧐[%s] TRADES AVALIABLE: %d    BALANCE: %.2f" % (ticker.time.date(), tradesAvailable, balance))
             data = StrategyData(ticker=ticker, 
                                 position=None, 
                                 order=None, 
@@ -388,8 +378,6 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
             handleProfitAndStop(backtestModel, backtestReport, model, ticker, tempOrders, isForStockPerformance)
         i += 1
 
-    #print("\n\nResult: LimitProfits(%d) Profits(%d) StopLosses(%d) Losses(%d) PnL(%.2f)" % (limitProfits, profits, stopLosses, losses, (totalWon-totalLoss)))
-
 def getFill(ticker: Ticker, databaseModule: DatabaseModule):
     fills = databaseModule.getFills()
     filteredFills = list(filter(lambda x: ticker.contract.symbol == x.symbol, fills))
@@ -420,7 +408,7 @@ def createCustomBarData(model: BackTestModel, countryConfig: CountryConfig):
                         low=model.bid,
                         close=model.close,
                         volume=model.volume)
-    return CustomBarData(barData, model.zigzag, model.rsi)
+    return CustomBarData(barData, model.zigzag, model.rsi, barData.open)
 
 def getPreviousBarsData(model: BackTestModel, models: [BackTestModel], currentPosition: int):
     previousData_1 = None

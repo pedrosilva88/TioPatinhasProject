@@ -77,7 +77,11 @@ class StrategyZigZag(Strategy):
     def isShorting(self, startIndex: int):
         index = startIndex + 1
         while (index <= -1):
-            if (self.previousBars[index-1].high < self.previousBars[index].high):
+            if index == -1:
+                if (self.previousBars[index].high < self.currentBar.high):
+                    log("👻 Not Shorting %.2f < %.2f 👻" % (self.previousBars[index-1].low, self.previousBars[index].low))
+                    return False  
+            elif (self.previousBars[index-1].high < self.previousBars[index].high):
                 log("👻 Not Shorting %.2f < %.2f 👻" % (self.previousBars[index-1].high, self.previousBars[index].high))
                 return False
             index += 1 
@@ -86,7 +90,11 @@ class StrategyZigZag(Strategy):
     def isLonging(self, startIndex: int):
         index = startIndex + 1
         while (index <= -1):
-            if (self.previousBars[index-1].low > self.previousBars[index].low):
+            if index == -1:
+                if (self.previousBars[index].low > self.currentBar.low):
+                    log("👻 Not Longing %.2f > %.2f 👻" % (self.previousBars[index-1].low, self.previousBars[index].low))
+                    return False    
+            elif (self.previousBars[index-1].low > self.previousBars[index].low):
                 log("👻 Not Longing %.2f > %.2f 👻" % (self.previousBars[index-1].low, self.previousBars[index].low))
                 return False
             index += 1
@@ -164,7 +172,7 @@ class StrategyZigZag(Strategy):
 
     # Calculations
     def getOrderPrice(self, action: OrderAction):
-        return self.currentBar.open #(self.currentBar.high+self.currentBar.low)/2  #self.currentBar.low if action == OrderAction.Buy else self.currentBar.high
+        return self.currentBar.lastPrice #(self.currentBar.high+self.currentBar.low)/2  #self.currentBar.low if action == OrderAction.Buy else self.currentBar.high
 
     def calculatePnl(self, action: OrderAction):
         price = self.getOrderPrice(action)
@@ -191,6 +199,7 @@ class StrategyZigZag(Strategy):
     # Final Operations
 
     def createOrder(self, type: StrategyResultType):
+        log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.ticker.contract.symbol, self.currentBar.lastPrice))
         action = OrderAction.Buy if type == StrategyResultType.Buy else OrderAction.Sell
         price = self.getOrderPrice(action)
         profitTarget = self.calculatePnl(action)
