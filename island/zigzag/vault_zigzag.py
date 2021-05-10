@@ -2,7 +2,7 @@ import asyncio
 from enum import Enum
 from typing import Protocol
 from datetime import datetime
-from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData
+from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, Stock as ibStock
 from helpers import logExecutionZigZag, log, utcToLocal, logCounter
 from models import Order, OrderAction, CustomBarData
 from scanner import Scanner
@@ -10,6 +10,7 @@ from strategy import Strategy, StrategyZigZag, StrategyData, StrategyResult, Str
 from country_config import *
 from portfolio import Portfolio
 from earnings_calendar import EarningsCalendar
+from database import DatabaseModule, FillDB
 
 class IslandProtocol(Protocol):
     marketWaiter: asyncio.Future
@@ -22,6 +23,7 @@ class IslandProtocol(Protocol):
 
 class VaultZigZag:
     ib: IB
+    databaseModule: DatabaseModule
     countryConfig: CountryConfig
     strategyConfig: StrategyConfig
     scanner: Scanner
@@ -31,16 +33,17 @@ class VaultZigZag:
     customBarsDataDict: [str, [CustomBarData]]
 
     resultsToTrade: [StrategyResult] = []
+    currentFills: [FillDB] = []
 
     delegate: IslandProtocol
 
     def __init__(self, delegate: IslandProtocol):
-        self.setupVault()
+        self.databaseModule = DatabaseModule()
         self.historicalData = HistoricalData()
         self.delegate = delegate
-        self.customBarsDataDict = {}
-        self.resultsToTrade = []
 
+        self.setupVault()
+        
     # Setup
 
     def setupVault(self):
@@ -56,6 +59,9 @@ class VaultZigZag:
         self.portfolio = Portfolio()
         self.customBarsDataDict = {}
         self.resultsToTrade = []
+        self.databaseModule.openDatabaseConnection()
+        self.clearOldFills()
+        self.currentFills = self.databaseModule.getFills()
 
     async def resetVault(self):
         log("🤖 Reset ZigZag Vault 🤖")
@@ -188,13 +194,14 @@ class VaultZigZag:
 
         log("⭐️ Checking Positions ⭐️")
 
-        fills = self.portfolio.getFills(self.ib)
+        fills = self.currentFills
         
         for fill in fills:
-            tick = ibTicker(contract=fill.contract)
+            stock = ibStock(symbol=fill.symbol, exchange="SMART", currency="USD")
+            tick = ibTicker(contract=stock)
             position = self.getPosition(tick)
-            if (position is not None and
-                position.position >=  fill.execution.shares):
+            if (position is not None):
+                log("⭐️ Checking Position for (%s) ⭐️" % stock.symbol)
                 data = StrategyData(ticker=tick, 
                                     position=position, 
                                     order=None, 
@@ -232,6 +239,7 @@ class VaultZigZag:
             if self.canCreateOrder(result.ticker.contract, result.order):
                 if result.order.totalQuantity > 1:
                     self.createOrder(result.ticker.contract, result.order)
+                    self.saveFill(result.ticker)
                 else:
                     log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
                     None
@@ -247,8 +255,12 @@ class VaultZigZag:
             if stock.symbol not in self.customBarsDataDict:
                 self.customBarsDataDict[stock.symbol] = []
             bars = await self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 40, "1 day")
-            self.customBarsDataDict[stock.symbol] = self.historicalData.createListOfCustomBarsData(bars)
-            log("🧶 Historical Data for %s 🧶" % (stock.symbol))
+            histData = self.historicalData.createListOfCustomBarsData(bars)
+            if len(histData) > 0:
+                self.customBarsDataDict[stock.symbol] = histData
+                log("🧶 Historical Data for %s 🧶" % (stock.symbol))
+            else:
+                log("🧶 ❗️ Invalid Historical Data for %s ❗️ 🧶" % (stock.symbol))
 
     def getPercentageChange(self, current, previous):
         if current == previous:
@@ -258,6 +270,28 @@ class VaultZigZag:
         except ZeroDivisionError:
             return 0
 
+    # Database
+
+    def getFill(self, ticker: ibTicker):
+        fills = self.currentFills
+        filteredFills = list(filter(lambda x: ticker.contract.symbol == x.symbol, fills))
+        filteredFills.sort(key=lambda x: x.date, reverse=True)
+        if len(filteredFills) > 0:
+            log("🧶 Fill Found %s - %s 🧶" % (filteredFills[0].symbol, filteredFills[0].date))
+            return filteredFills[0]
+        return None
+
+    def saveFill(self, ticker: ibTicker):
+        fill = FillDB(ticker.contract.symbol, date.today())
+        self.databaseModule.createFill(fill)
+        self.currentFills = self.databaseModule.getFills()
+
+    def clearOldFills(self):
+        fills = self.databaseModule.getFills()
+        limitDate = date.today()-timedelta(days=40)
+        filteredFills = list(filter(lambda x: x.date < limitDate, fills))
+        self.databaseModule.deleteFills(filteredFills)
+
     # Portfolio
 
     def updatePortfolio(self):
@@ -265,9 +299,6 @@ class VaultZigZag:
 
     def getPosition(self, ticker: ibTicker):
         return self.portfolio.getPosition(ticker.contract)
-
-    def getFill(self, ticker: ibTicker):
-        return self.portfolio.getFill(self.ib, ticker.contract)
 
     # Portfolio - Manage Orders
 

@@ -41,6 +41,9 @@ class HistoricalData:
     def createListOfCustomBarsData(self, bars: [BarData]):
         zigzagValues, rsiValues = self.calculateRSIAndZigZag(bars)
 
+        if zigzagValues is None or rsiValues is None:
+            return []
+
         customBarsData = []
         i = 0
         for bar in bars:
@@ -62,12 +65,16 @@ class HistoricalData:
         return customBarsData
 
     def calculateRSIAndZigZag(self, bars: [BarData]):
-        closes = util.df(bars)['close']
-        lows = util.df(bars)['low']
-        highs = util.df(bars)['high']
-        RSI = self.computeRSI(util.df(bars)['close'], 14)
-        pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
-        return pivots, RSI.values
+        try:
+            closes = util.df(bars)['close']
+            lows = util.df(bars)['low']
+            highs = util.df(bars)['high']
+            RSI = self.computeRSI(util.df(bars)['close'], 14)
+            pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
+            return pivots, RSI.values
+        except (KeyboardInterrupt, SystemExit) as e:
+            print(e)
+            return None, None
 
     async def getContractDetails(self, ib: IB, stock: ibContract) -> (ContractDetails, [PriceIncrement]):
         contractDetails = await ib.reqContractDetailsAsync(stock)

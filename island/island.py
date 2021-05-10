@@ -15,7 +15,7 @@ class Island(IslandEvents):
     port: int = 7497
     clientId: int = 1
     connectTimeout: float = 5
-    appStartupTime: float = 40
+    appStartupTime: float = 50
     appTimeout: float = 10
     retryDelay: float = 5
     readonly: bool = False
@@ -87,6 +87,7 @@ class Island(IslandEvents):
                 self._logger.debug("Finishing")
                 log("🥺 Finishing 🥺")
                 self.unsubscribeEvents(self.ib)
+                self.vault.databaseModule.closeDatabaseConnection()
                 await self.controller.terminateAsync()
 
                 if self._runner:

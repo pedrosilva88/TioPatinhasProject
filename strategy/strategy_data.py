@@ -1,9 +1,10 @@
 from enum import Enum
 from datetime import datetime, date, time
 from models import Order, CustomBarData
-from ib_insync import Ticker as ibTicker, Position as ibPosition, PriceIncrement, Fill
+from ib_insync import Ticker as ibTicker, Position as ibPosition, PriceIncrement
 from country_config import CountryKey, CountryConfig
 from pytz import timezone
+from database import FillDB
 
 class StrategyResultType(Enum):
     def __str__(self):
@@ -38,7 +39,7 @@ class StrategyData:
     volumeFirstMinute: float
     position: ibPosition
     order: Order
-    fill: Fill
+    fill: FillDB
     totalCash: float
     previousBars: [CustomBarData]
     currentBar: CustomBarData
@@ -52,7 +53,7 @@ class StrategyData:
                         priceRules: [PriceIncrement] = None,
                         previousBars: [CustomBarData] = None,
                         currentBar: CustomBarData = None,
-                        fill: Fill = None):
+                        fill: FillDB = None):
         self.ticker = ticker
         self.position = position
         self.order = order
@@ -125,7 +126,7 @@ def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
                                 minGap= 2, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
                                 willingToLose= 0.04,
                                 stopToLosePercentage= 0.02, 
-                                maxToInvestPerStockPercentage= 0.5, 
+                                maxToInvestPerStockPercentage= 0.3, 
                                 averageVolumePercentage= 1.8,
                                 profitPercentage = 0.04,
                                 minRSI = 30,

@@ -1,5 +1,6 @@
 import os, sys
 import os.path
+import math
 
 import matplotlib.pyplot as plt
 from mpl_finance import candlestick_ohlc
@@ -15,6 +16,7 @@ from scanner import Scanner
 from models import Order as myOrder, OrderAction, CustomBarData
 from datetime import *
 from strategy import StrategyZigZag, StrategyConfig, StrategyData, StrategyResultType, getStrategyConfigFor
+from database import DatabaseModule, FillDB
 
 class BackTestSwing():
     results: [str, [BackTestResult]]
@@ -26,7 +28,7 @@ class BackTestSwing():
     def __init__(self):
         self.results = dict()
         self.trades = dict()
-        self.cashAvailable = 6000
+        self.cashAvailable = 170958
         self.countryConfig = getConfigFor(CountryKey.USA)
         self.strategyConfig= getStrategyConfigFor(key=self.countryConfig.key, timezone=self.countryConfig.timezone)
 
@@ -76,7 +78,7 @@ def showPlot(mBars: [BarData], zigzags:[int]):
     i = 0
     dates = []
     items = []
-    isForLow = False
+    isForLow = True
     for bar in mBars:
         zigzag = zigzags[i]
         if zigzag != 0:
@@ -170,34 +172,81 @@ def runStockPerformance():
     path = ("backtest/Data/CSV/%s/ZigZag/Report" % (CountryKey.USA.code))
     report.showPerformanceReport(path, stocksPath, model.countryConfig)
 
-def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, models: [BackTestModel], forPerformance: bool = False):
-    strategy = StrategyZigZag()
-    tempOrders: [str, (myOrder, Position, date)] = dict()
-    isForStockPerformance = forPerformance
-    i = 0
-    for model in models:
-        ticker = model.ticker(backtestModel.countryConfig)
-        stock = ticker.contract
-        filteredList = [] #[(a,b,c) for key, (a,b,c) in tempOrders if ticker.contract.symbol in key.lower()]
+def handleProfitAndStop(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, ticker: Ticker, tempOrders: [str, (myOrder, Position, date)], isForStockPerformance: bool):
+    filteredList = []
 
-        for key, myTuple in tempOrders.items():
-            if key.split("_")[0] == ticker.contract.symbol:
-                filteredList.append(myTuple)
+    for key, myTuple in tempOrders.items():
+        if key.split("_")[0] == ticker.contract.symbol:
+            filteredList.append(myTuple)
 
-        #print(len(filteredList))
-        if (len(filteredList) > 0):
-            for tempOrder, position, positionDate in filteredList:
-                if ((tempOrder.action == "BUY" and tempOrder.takeProfitOrder.lmtPrice <= ticker.ask) or
-                     (tempOrder.action == "SELL" and tempOrder.takeProfitOrder.lmtPrice >= ticker.bid)):
-                    ganho = abs(tempOrder.takeProfitOrder.lmtPrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
-                    print("Success ✅ - %.2f Size(%.2f) high(%.2f) low(%.2f)\n" % (ganho, tempOrder.totalQuantity, ticker.ask, ticker.bid))
+    if (len(filteredList) > 0):
+        for tempOrder, position, positionDate in filteredList:
+            if ((tempOrder.action == "BUY" and tempOrder.stopLossOrder.auxPrice > ticker.bid) or
+                    (tempOrder.action == "SELL" and tempOrder.stopLossOrder.auxPrice < ticker.ask)):
+                perda = abs(tempOrder.stopLossOrder.auxPrice*tempOrder.stopLossOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
+                print("[%s] ❌ ❌ (%s) -> %.2f Size(%.2f) [%.2f]\n" % (ticker.time.date(), ticker.contract.symbol, perda, tempOrder.totalQuantity, backtestModel.cashAvailable))
+                result = BackTestResult(symbol=ticker.contract.symbol, 
+                                        date=ticker.time, 
+                                        pnl=(-perda), 
+                                        action="Long" if tempOrder.action == "BUY" else "Short", 
+                                        type=BackTestResultType.stopLoss,
+                                        priceCreateTrade= tempOrder.lmtPrice, 
+                                        priceCloseTrade= tempOrder.stopLossOrder.auxPrice,
+                                        size= tempOrder.totalQuantity, 
+                                        averageVolume= model.averageVolume, 
+                                        volumeFirstMinute= model.volumeInFirstMinuteBar, 
+                                        totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
+                                        openPrice= ticker.open, 
+                                        ystdClosePrice= ticker.close,
+                                        cash= backtestModel.cashAvailable,
+                                        orderDate = positionDate.date())
+                if isForStockPerformance:
+                    backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
+                    backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
+                else:
+                    backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
+                    backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
+                    backtestModel.cashAvailable -= perda
+                tempOrders.pop(magicKey(position.contract.symbol, positionDate))
+            elif ((tempOrder.action == "BUY" and tempOrder.takeProfitOrder.lmtPrice <= ticker.ask) or
+                    (tempOrder.action == "SELL" and tempOrder.takeProfitOrder.lmtPrice >= ticker.bid)):
+                ganho = abs(tempOrder.takeProfitOrder.lmtPrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
+                print("[%s] ✅ ✅ (%s) -> %.2f Size(%.2f) high(%.2f) low(%.2f) [%.2f]\n" % (ticker.time.date(), ticker.contract.symbol, ganho, tempOrder.totalQuantity, ticker.ask, ticker.bid, backtestModel.cashAvailable))
+                result = BackTestResult(symbol=ticker.contract.symbol, 
+                                        date=ticker.time, 
+                                        pnl=(ganho), 
+                                        action="Long" if tempOrder.action == "BUY" else "Short", 
+                                        type=BackTestResultType.takeProfit,
+                                        priceCreateTrade= tempOrder.lmtPrice, 
+                                        priceCloseTrade= tempOrder.takeProfitOrder.lmtPrice,
+                                        size= tempOrder.totalQuantity, 
+                                        averageVolume= model.averageVolume, 
+                                        volumeFirstMinute= model.volumeInFirstMinuteBar, 
+                                        totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
+                                        openPrice= ticker.open, 
+                                        ystdClosePrice= ticker.close,
+                                        cash= backtestModel.cashAvailable,
+                                        orderDate = positionDate.date())
+                if isForStockPerformance:
+                    backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
+                    backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
+                else:
+                    backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
+                    backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
+                    backtestModel.cashAvailable += ganho
+                tempOrders.pop(magicKey(position.contract.symbol, positionDate))
+            elif ticker.time.date() >= (positionDate+timedelta(days=2)).date():
+                if ((tempOrder.action == "BUY" and (tempOrder.lmtPrice <= ticker.last)) or
+                    (tempOrder.action == "SELL" and (tempOrder.lmtPrice >= ticker.last))):
+                    closePrice = ticker.last
+                    ganho = abs(closePrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     result = BackTestResult(symbol=ticker.contract.symbol, 
                                             date=ticker.time, 
                                             pnl=(ganho), 
                                             action="Long" if tempOrder.action == "BUY" else "Short", 
-                                            type=BackTestResultType.takeProfit,
+                                            type=BackTestResultType.profit,
                                             priceCreateTrade= tempOrder.lmtPrice, 
-                                            priceCloseTrade= tempOrder.takeProfitOrder.lmtPrice,
+                                            priceCloseTrade= closePrice,
                                             size= tempOrder.totalQuantity, 
                                             averageVolume= model.averageVolume, 
                                             volumeFirstMinute= model.volumeInFirstMinuteBar, 
@@ -213,18 +262,17 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                         backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
                         backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                         backtestModel.cashAvailable += ganho
-                    tempOrders.pop(magicKey(position.contract.symbol, positionDate))
-                elif ((tempOrder.action == "BUY" and tempOrder.stopLossOrder.auxPrice > ticker.bid) or
-                        (tempOrder.action == "SELL" and tempOrder.stopLossOrder.auxPrice < ticker.ask)):
-                    perda = abs(tempOrder.stopLossOrder.auxPrice*tempOrder.stopLossOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
-                    print("StopLoss ❌ - %.2f Size(%.2f)\n" % (perda, tempOrder.totalQuantity))
+                    print("[%s] ✅ (%s) -> %.2f Size(%.2f) [%.2f]\n" % (ticker.time.date(), ticker.contract.symbol, ganho, tempOrder.totalQuantity, backtestModel.cashAvailable))
+                else:
+                    closePrice = ticker.last
+                    perda = abs(closePrice*tempOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
                     result = BackTestResult(symbol=ticker.contract.symbol, 
                                             date=ticker.time, 
                                             pnl=(-perda), 
                                             action="Long" if tempOrder.action == "BUY" else "Short", 
-                                            type=BackTestResultType.stopLoss,
+                                            type=BackTestResultType.loss,
                                             priceCreateTrade= tempOrder.lmtPrice, 
-                                            priceCloseTrade= tempOrder.stopLossOrder.auxPrice,
+                                            priceCloseTrade= closePrice,
                                             size= tempOrder.totalQuantity, 
                                             averageVolume= model.averageVolume, 
                                             volumeFirstMinute= model.volumeInFirstMinuteBar, 
@@ -240,62 +288,51 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                         backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
                         backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                         backtestModel.cashAvailable -= perda
-                    tempOrders.pop(magicKey(position.contract.symbol, positionDate))
-                elif ticker.time.date() >= (positionDate+timedelta(days=5)).date():
-                    if ((tempOrder.action == "BUY" and (tempOrder.lmtPrice <= ticker.last)) or
-                        (tempOrder.action == "SELL" and (tempOrder.lmtPrice >= ticker.last))):
-                        closePrice = ticker.last
-                        ganho = abs(closePrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
-                        result = BackTestResult(symbol=ticker.contract.symbol, 
-                                                date=ticker.time, 
-                                                pnl=(ganho), 
-                                                action="Long" if tempOrder.action == "BUY" else "Short", 
-                                                type=BackTestResultType.profit,
-                                                priceCreateTrade= tempOrder.lmtPrice, 
-                                                priceCloseTrade= closePrice,
-                                                size= tempOrder.totalQuantity, 
-                                                averageVolume= model.averageVolume, 
-                                                volumeFirstMinute= model.volumeInFirstMinuteBar, 
-                                                totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
-                                                openPrice= ticker.open, 
-                                                ystdClosePrice= ticker.close,
-                                                cash= backtestModel.cashAvailable,
-                                                orderDate = positionDate.date())
-                        if isForStockPerformance:
-                            backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
-                            backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
-                        else:
-                            backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
-                            backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
-                            backtestModel.cashAvailable += ganho
-                        print("Success (not profit) ✅ - %.2f Size(%.2f)\n" % (ganho, tempOrder.totalQuantity))
-                    else:
-                        closePrice = ticker.last
-                        perda = abs(closePrice*tempOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
-                        result = BackTestResult(symbol=ticker.contract.symbol, 
-                                                date=ticker.time, 
-                                                pnl=(-perda), 
-                                                action="Long" if tempOrder.action == "BUY" else "Short", 
-                                                type=BackTestResultType.loss,
-                                                priceCreateTrade= tempOrder.lmtPrice, 
-                                                priceCloseTrade= closePrice,
-                                                size= tempOrder.totalQuantity, 
-                                                averageVolume= model.averageVolume, 
-                                                volumeFirstMinute= model.volumeInFirstMinuteBar, 
-                                                totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
-                                                openPrice= ticker.open, 
-                                                ystdClosePrice= ticker.close,
-                                                cash= backtestModel.cashAvailable,
-                                                orderDate = positionDate.date())
-                        if isForStockPerformance:
-                            backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
-                            backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
-                        else:
-                            backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
-                            backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
-                            backtestModel.cashAvailable -= perda
-                        print("Loss ❌ - %.2f Size(%.2f)\n" % (perda, tempOrder.totalQuantity))
-                    tempOrders.pop(magicKey(position.contract.symbol, positionDate))
+                    print("[%s] ❌ (%s) -> %.2f Size(%.2f) [%.2f]\n" % (ticker.time.date(), ticker.contract.symbol, perda, tempOrder.totalQuantity, backtestModel.cashAvailable))
+                tempOrders.pop(magicKey(position.contract.symbol, positionDate))
+
+def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, models: [BackTestModel], forPerformance: bool = False):
+    strategy = StrategyZigZag()
+    tempOrders: [str, (myOrder, Position, date)] = dict()
+    isForStockPerformance = forPerformance
+    dayChecked = None
+    tradesAvailable = 0
+
+    databaseModule = DatabaseModule()
+    databaseModule.openDatabaseConnectionForBacktest()
+    databaseModule.deleteFills(databaseModule.getFills())
+
+    i = 0
+    for model in models:
+        ticker = model.ticker(backtestModel.countryConfig)
+        stock = ticker.contract
+
+        if ticker.time.year != 2017:
+            i += 1
+            continue
+
+        if ticker.time.month != 8:
+            i += 1
+            continue
+
+        if ticker.time.day < 18 or ticker.time.day > 28:
+            i += 1
+            continue
+
+        if dayChecked != ticker.time or isForStockPerformance == True:
+            totalInPositions = calculatePriceInPositions(tempOrders)
+            balance = backtestModel.cashAvailable - totalInPositions
+
+            tradesAvailable = 0
+            result = math.floor(balance/150000)
+            if balance - (150000*result) >= 6000:
+                tradesAvailable = result+1
+            else: 
+                tradesAvailable = result
+            clearOldFills(ticker, databaseModule) 
+            dayChecked = None
+            print("[%s] TRADES AVALIABLE: %d    BALANCE: %.2f" % (ticker.time.date(), tradesAvailable, balance))
+        #handleProfitAndStop(backtestModel, backtestReport, model, ticker, tempOrders, isForStockPerformance)
 
         result = None
         previousModels = getPreviousBarsData(model, models, i)
@@ -312,19 +349,25 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                             createCustomBarData(previousModels[1], backtestModel.countryConfig),
                             createCustomBarData(previousModels[0], backtestModel.countryConfig)]
             currentBar = createCustomBarData(model, backtestModel.countryConfig)
+            fill = getFill(ticker, databaseModule)
+            totalInPositions = calculatePriceInPositions(tempOrders)
+            balance = backtestModel.cashAvailable - totalInPositions
+            if ticker.contract.symbol == "LUMN" or ticker.contract.symbol == "MTSI":
+                print("🧐[%s] TRADES AVALIABLE: %d    BALANCE: %.2f" % (ticker.time.date(), tradesAvailable, balance))
             data = StrategyData(ticker=ticker, 
                                 position=None, 
                                 order=None, 
-                                totalCash=backtestModel.cashAvailable,
+                                totalCash=min(balance, 150000),
                                 previousBars=previousBars,
-                                currentBar=currentBar)
+                                currentBar=currentBar,
+                                fill=fill)
             
             for bar in previousBars:
                 if getPercentageChange(currentBar.close, bar.close) < 5:
                     bar.zigzag = False
             
             result = strategy.run(data, backtestModel.strategyConfig, backtestModel.countryConfig)
-            if (result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell):
+            if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and tradesAvailable > 0):
                 totalInPositions = calculatePriceInPositions(tempOrders)
                 balance = backtestModel.cashAvailable - totalInPositions
                 totalOrderCost = result.order.lmtPrice*result.order.totalQuantity
@@ -333,14 +376,34 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                                                                                     Position(account="",contract=stock, position=result.order.totalQuantity, avgCost=result.order.lmtPrice),
                                                                                     ticker.time)
                     print(result)
-
+                    tradesAvailable -= 1
+                    newFill = FillDB(ticker.contract.symbol, ticker.time.date())
+                    databaseModule.createFill(newFill)
             elif result.type == StrategyResultType.DoNothing:
                 None
             else:
                 None
+
+            dayChecked = ticker.time
+            handleProfitAndStop(backtestModel, backtestReport, model, ticker, tempOrders, isForStockPerformance)
         i += 1
 
     #print("\n\nResult: LimitProfits(%d) Profits(%d) StopLosses(%d) Losses(%d) PnL(%.2f)" % (limitProfits, profits, stopLosses, losses, (totalWon-totalLoss)))
+
+def getFill(ticker: Ticker, databaseModule: DatabaseModule):
+    fills = databaseModule.getFills()
+    filteredFills = list(filter(lambda x: ticker.contract.symbol == x.symbol, fills))
+    filteredFills.sort(key=lambda x: x.date, reverse=True)
+    if len(filteredFills) > 0:
+        log("🧶 Fill Found %s - %s 🧶" % (filteredFills[0].symbol, filteredFills[0].date))
+        return filteredFills[0]
+    return None
+
+def clearOldFills(ticker: Ticker ,databaseModule: DatabaseModule):
+    fills = databaseModule.getFills()
+    limitDate = ticker.time.date()-timedelta(days=40)
+    filteredFills = list(filter(lambda x: x.date < limitDate, fills))
+    databaseModule.deleteFills(filteredFills)
 
 def getPercentageChange(current, previous):
     if current == previous:
@@ -476,8 +539,24 @@ def calculatePriceInPositions(tempOrders):
 def magicKey(symbol: str, date: datetime):
     return ("%s_%s" % (symbol, date.strftime("%y%m%d")))
 
+def showGraphFor(symbol: str):
+    ib = IB()
+    ib.connect('127.0.0.1', 7497, clientId=16)
+    stock = Stock(symbol, "SMART", "USD")
+    model = BackTestDownloadModel(path="", numberOfDays=525, barSize="1 day") # 5Years = 1825 days
+    bars = downloadHistoricDataFromIB(ib, stock, model)
+    
+    closes = util.df(bars)['close']
+    lows = util.df(bars)['low']
+    highs = util.df(bars)['high']
+    RSI = computeRSI(closes, 14)
+    pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
+    showPlot(bars, pivots)
+
 if __name__ == '__main__':
     try:
+        #showGraphFor("ASND")
+
         #downloadData()
         #runStockPerformance()
         run()

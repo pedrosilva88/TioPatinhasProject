@@ -1,5 +1,5 @@
 from datetime import datetime
-from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder, Fill, OrderStatus
+from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder, Fill, OrderStatus, BracketOrder
 from models import OrderType, OrderAction
 from helpers import log
 
@@ -34,8 +34,8 @@ class Portfolio:
         self.trades = ib.openTrades()
 
         for account in ib.accountValues():
-            if account.tag == "BuyingPower":
-                self.cashBalance = float(account.value)/2
+            if account.tag == "FullExcessLiquidity":
+                self.cashBalance = float(account.value)
             elif account.tag == "GrossPositionValue":
                 self.grossPositionsValue = float(account.value)
             elif (account.tag == "ExchangeRate" and account.currency == "USD"):
@@ -91,11 +91,28 @@ class Portfolio:
             ib.placeOrder(contract, limitOrder)
         else:
             if order.orderType == "MKT":
-                profitOrder.tif = "GTC"
-                stopLossOrder.tif = "GTC"
-                ib.placeOrder(contract, order)
-                ib.placeOrder(contract, profitOrder)
-                ib.placeOrder(contract, stopLossOrder)
+                assert order.action in ('BUY', 'SELL')
+                reverseAction = 'BUY' if order.action == 'SELL' else 'SELL'
+                parent = MarketOrder(
+                    order.action, order.totalQuantity,
+                    orderId=ib.client.getReqId(),
+                    transmit=False)
+                takeProfit = LimitOrder(reverseAction, profitOrder.totalQuantity, profitOrder.lmtPrice,
+                                        orderId=ib.client.getReqId(),
+                                        tif="GTC",
+                                        transmit=False,
+                                        parentId=parent.orderId)
+                stopLoss = StopOrder(
+                    reverseAction, stopLossOrder.totalQuantity, stopLossOrder.auxPrice,
+                    orderId=ib.client.getReqId(),
+                    tif="GTC",
+                    transmit=True,
+                    parentId=parent.orderId)
+
+                bracket = BracketOrder(parent, takeProfit, stopLoss)
+                print(bracket)
+                for o in bracket:
+                    ib.placeOrder(contract, o)
             else:
                 bracket = ib.bracketOrder(order.action, order.totalQuantity, order.lmtPrice, profitOrder.lmtPrice, stopLossOrder.auxPrice)
 
@@ -105,7 +122,7 @@ class Portfolio:
                         ib.placeOrder(contract, o)
 
         ib.reqAllOpenOrdersAsync()
-        self.trades = ib.openTrades()
+        self.updatePortfolio(ib)
     
     def updateOrder(self, ib: IB, contract: ibContract, order: ibOrder, profitOrder: LimitOrder = None, stopLossOrder: StopOrder = None):
         o,p,s = self.getTradeOrders(contract)
@@ -118,20 +135,10 @@ class Portfolio:
                 
     def cancelOrder(self, ib: IB, contract: ibContract):
         for trade in self.trades:
-            if (trade.order.parentId == 0 and
-                contract.symbol == trade.contract.symbol):
+            if contract.symbol == trade.contract.symbol:
                 ib.cancelOrder(trade.order)
 
     # Positions
-
-    def getFills(self, ib: IB) -> [Fill]:
-        return ib.fills()
-
-    def getFill(self, ib: IB, contract: ibContract):
-        for fill in ib.fills():
-            if fill.contract.symbol == contract.symbol:
-                return fill
-        return None
 
     def getPosition(self, contract: ibContract):
         for position in self.positions:
