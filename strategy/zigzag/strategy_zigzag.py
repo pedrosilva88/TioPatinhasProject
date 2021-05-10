@@ -148,7 +148,7 @@ class StrategyZigZag(Strategy):
         dateLimit = date.today()-timedelta(days=6)
 
         if (self.strategyData.position is None or
-            dateLimit <= executionDate.date()):
+            dateLimit <= executionDate):
             log("🥵 Cant do nothing with Stock (%s) - Or you already have a position or the you had a Fill for this stock in the last 6 days 🥵" % self.strategyData.ticker.contract.symbol)
             return StrategyResult(self.strategyData.ticker, StrategyResultType.DoNothing)
 

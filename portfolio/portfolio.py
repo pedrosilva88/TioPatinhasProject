@@ -7,6 +7,7 @@ class Portfolio:
     cashBalance: float
     grossPositionsValue: float
     pendingOrdersMarketValue: float
+    pendingOrdersMarketNumber: float
 
     totalCashBalance: float
     totalCashBalanceLastUpdate: datetime
@@ -18,7 +19,7 @@ class Portfolio:
 
     @property
     def cashAvailable(self):
-        return max(self.cashBalance - self.pendingOrdersMarketValue, 0)
+        return max(self.cashBalance - self.pendingOrdersMarketValue - self.grossPositionsValue, 0)
 
     def __init__(self):
         self.positions = []
@@ -50,12 +51,15 @@ class Portfolio:
 
     def calcOpenTradesValue(self):
         totalValue = 0
+        self.pendingOrdersMarketNumber = 0
         for item in self.trades:
             if (item.order.parentId == 0 and
                 item.order.orderType == 'MKT' and
                 (item.orderStatus.status in OrderStatus.ActiveStates)):
                 totalValue += (item.order.lmtPrice * self.exchangeUSDRate) * abs(item.order.totalQuantity)
-        self.pendingOrdersMarketValue = totalValue
+                self.pendingOrdersMarketNumber += 1
+        # TODO: Tenho que melhorar esta lógica. este a dividir por 3 tem que ser dinamico. Esta no strategyData esta info
+        self.pendingOrdersMarketValue = self.pendingOrdersMarketNumber*self.totalCashBalance/3
 
     # Orders
 

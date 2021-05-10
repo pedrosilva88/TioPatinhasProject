@@ -72,7 +72,7 @@ class HistoricalData:
             RSI = self.computeRSI(util.df(bars)['close'], 14)
             pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
             return pivots, RSI.values
-        except (KeyboardInterrupt, SystemExit) as e:
+        except TypeError as e:
             print(e)
             return None, None
 
