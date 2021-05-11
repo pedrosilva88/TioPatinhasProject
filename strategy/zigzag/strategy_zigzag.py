@@ -1,4 +1,5 @@
 from datetime import *
+from typing import List, Tuple
 from helpers import log, utcToLocal, round_down
 from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType, StrategyConfig
 from models import Order, OrderAction, OrderType, CustomBarData
@@ -13,7 +14,7 @@ class StrategyZigZag(Strategy):
     countryConfig: CountryConfig = None  
 
     currentBar: CustomBarData = None
-    previousBars: [CustomBarData] = None
+    previousBars: List[CustomBarData] = None
     fill: Fill = None
 
     # Strategy Parameters
@@ -47,7 +48,7 @@ class StrategyZigZag(Strategy):
 
         zigzagBar, zigzagIndex = self.getZigZag()
         if (zigzagBar is not None):
-            if (self.currentBar.rsi > self.minRSI or self.currentBar.rsi <= self.maxRSI):
+            if (self.currentBar.rsi >= self.minRSI or self.currentBar.rsi <= self.maxRSI):
                 if (zigzagBar.rsi <= self.minRSI and self.isLonging(zigzagIndex)):
                     type = StrategyResultType.Buy
                     order = self.createOrder(type)
@@ -62,7 +63,7 @@ class StrategyZigZag(Strategy):
         else:
             return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)
 
-    def getZigZag(self) -> (CustomBarData, int):
+    def getZigZag(self) -> Tuple[CustomBarData, int]:
         totalBars = len(self.previousBars)
         index = -1 
         zigzagBar = None
@@ -76,27 +77,35 @@ class StrategyZigZag(Strategy):
 
     def isShorting(self, startIndex: int):
         index = startIndex + 1
-        while (index <= -1):
-            if index == -1:
-                if (self.previousBars[index].high < self.currentBar.high):
-                    log("👻 Not Shorting %.2f < %.2f 👻" % (self.previousBars[index-1].low, self.previousBars[index].low))
-                    return False  
+        while (index <= 0):
+            if index == 0:
+                if (self.previousBars[index-1].high < self.currentBar.high):
+                    log("👻 (%.2f) Not Shorting %.2f < %.2f 👻" % (index, self.previousBars[index-1].high, self.currentBar.high))
+                    return False
+                else:
+                    log("👻 😁 (%.2f) Shorting %.2f > %.2f 😁 👻" % (index, self.previousBars[index-1].high, self.currentBar.high))
             elif (self.previousBars[index-1].high < self.previousBars[index].high):
-                log("👻 Not Shorting %.2f < %.2f 👻" % (self.previousBars[index-1].high, self.previousBars[index].high))
+                log("👻  (%.2f) Not Shorting %.2f < %.2f 👻" % (index, self.previousBars[index-1].high, self.previousBars[index].high))
                 return False
+            else:
+                log("👻 😁 (%.2f) Shorting %.2f > %.2f 😁 👻" % (index, self.previousBars[index-1].high, self.previousBars[index].high))
             index += 1 
         return True
 
     def isLonging(self, startIndex: int):
         index = startIndex + 1
-        while (index <= -1):
-            if index == -1:
-                if (self.previousBars[index].low > self.currentBar.low):
-                    log("👻 Not Longing %.2f > %.2f 👻" % (self.previousBars[index-1].low, self.previousBars[index].low))
-                    return False    
+        while (index <= 0):
+            if index == 0:
+                if (self.previousBars[index-1].low > self.currentBar.low):
+                    log("👻  (%.2f) Not Longing %.2f > %.2f 👻" % (index, self.previousBars[index-1].low, self.currentBar.low))
+                    return False
+                else:
+                    log("👻 😁 (%.2f) Longing %.2f < %.2f 😁 👻" % (index, self.previousBars[index-1].low, self.currentBar.low))
             elif (self.previousBars[index-1].low > self.previousBars[index].low):
-                log("👻 Not Longing %.2f > %.2f 👻" % (self.previousBars[index-1].low, self.previousBars[index].low))
+                log("👻 (%.2f) Not Longing %.2f > %.2f 👻" % (index, self.previousBars[index-1].low, self.previousBars[index].low))
                 return False
+            else:
+                log("👻 😁 (%.2f) Longing %.2f < %.2f 😁 👻" % (index, self.previousBars[index-1].low, self.previousBars[index].low))
             index += 1
         return True
 

@@ -254,7 +254,7 @@ class VaultZigZag:
             logCounter("Historical Data", total, current)
             if stock.symbol not in self.customBarsDataDict:
                 self.customBarsDataDict[stock.symbol] = []
-            bars = await self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 40, "1 day")
+            bars = await self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 20, "1 day")
             histData = self.historicalData.createListOfCustomBarsData(bars)
             if len(histData) > 0:
                 self.customBarsDataDict[stock.symbol] = histData

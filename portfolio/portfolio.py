@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder, Fill, OrderStatus, BracketOrder
 from models import OrderType, OrderAction
 from helpers import log
@@ -14,8 +15,8 @@ class Portfolio:
 
     exchangeUSDRate: float = 1
 
-    positions: [ibPosition]
-    trades: [ibTrade]
+    positions: List[ibPosition]
+    trades: List[ibTrade]
 
     @property
     def cashAvailable(self):
@@ -36,7 +37,7 @@ class Portfolio:
 
         for account in ib.accountValues():
             if account.tag == "FullExcessLiquidity":
-                self.cashBalance = float(account.value)
+                self.cashBalance = float(account.value) - 300
             elif account.tag == "GrossPositionValue":
                 self.grossPositionsValue = float(account.value)
             elif (account.tag == "ExchangeRate" and account.currency == "USD"):

@@ -1,6 +1,10 @@
 import os, sys
 import os.path
 import math
+from typing import List, Tuple, Union
+from ib_insync.contract import Contract, Stock
+from ib_insync import ib as IB, BarData, Ticker
+from ib_insync.objects import Position
 
 import matplotlib.pyplot as plt
 from mpl_finance import candlestick_ohlc
@@ -19,8 +23,8 @@ from strategy import StrategyZigZag, StrategyConfig, StrategyData, StrategyResul
 from database import DatabaseModule, FillDB
 
 class BackTestSwing():
-    results: [str, [BackTestResult]]
-    trades: [str, [str]]
+    results: Union[str, List[BackTestResult]]
+    trades: Union[str, List[str]]
     cashAvailable: float
     countryConfig: CountryConfig
     strategyConfig: StrategyConfig
@@ -32,7 +36,7 @@ class BackTestSwing():
         self.countryConfig = getConfigFor(CountryKey.USA)
         self.strategyConfig= getStrategyConfigFor(key=self.countryConfig.key, timezone=self.countryConfig.timezone)
 
-def createListOfBackTestModels(stock: Contract, bars: [BarData], zigzags:[int], rsi: [float], dateFormat: str = "%Y-%m-%d %H:%M:%S") -> [BackTestModel]:
+def createListOfBackTestModels(stock: Contract, bars: List[BarData], zigzags:List[int], rsi: List[float], dateFormat: str = "%Y-%m-%d %H:%M:%S") -> List[BackTestModel]:
     models = []
     i = 0
     for bar in bars:
@@ -74,7 +78,7 @@ def computeRSI(data, time_window):
     rsi = 100 - 100/(1+rs)
     return rsi
 
-def showPlot(mBars: [BarData], zigzags:[int]):
+def showPlot(mBars: List[BarData], zigzags:List[int]):
     i = 0
     dates = []
     items = []
@@ -172,7 +176,7 @@ def runStockPerformance():
     path = ("backtest/Data/CSV/%s/ZigZag/Report" % (CountryKey.USA.code))
     report.showPerformanceReport(path, stocksPath, model.countryConfig)
 
-def handleProfitAndStop(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, tempOrders: [str, (myOrder, Position, date, Ticker)], isForStockPerformance: bool):
+def handleProfitAndStop(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, tempOrders: Union[str, Tuple[myOrder, Position, date, Ticker]], isForStockPerformance: bool):
     orders = tempOrders.copy()
     if (len(orders.values()) > 0):
         for tempOrder, position, positionDate, ticker in orders.values():
@@ -231,7 +235,7 @@ def handleProfitAndStop(backtestModel: BackTestSwing, backtestReport: BackTestRe
                     backtestModel.cashAvailable += ganho
                 tempOrders.pop(magicKey(position.contract.symbol, positionDate))
 
-def handleExpiredFills(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, tempOrders: [str, (myOrder, Position, date, Ticker)], isForStockPerformance: bool):
+def handleExpiredFills(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, tempOrders: Union[str, Tuple[myOrder, Position, date, Ticker]], isForStockPerformance: bool):
     orders = tempOrders.copy()
     if (len(orders.values()) > 0):
         for tempOrder, position, positionDate, ticker in orders.values():
@@ -291,9 +295,9 @@ def handleExpiredFills(backtestModel: BackTestSwing, backtestReport: BackTestRep
                     print("[%s] ❌ (%s) -> %.2f Size(%.2f) [%.2f]\n" % (ticker.time.date(), ticker.contract.symbol, perda, tempOrder.totalQuantity, backtestModel.cashAvailable))
                 tempOrders.pop(magicKey(position.contract.symbol, positionDate))
 
-def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, models: [BackTestModel], forPerformance: bool = False):
+def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, models: List[BackTestModel], forPerformance: bool = False):
     strategy = StrategyZigZag()
-    tempOrders: [str, (myOrder, Position, date)] = dict()
+    tempOrders: Union[str, Tuple[myOrder, Position, date]] = dict()
     isForStockPerformance = forPerformance
     dayChecked = None
     tradesAvailable = 0
@@ -344,8 +348,11 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                             createCustomBarData(previousModels[0], backtestModel.countryConfig)]
             currentBar = createCustomBarData(model, backtestModel.countryConfig)
             fill = getFill(ticker, databaseModule)
-            totalInPositions = calculatePriceInPositions(tempOrders)
-            balance = backtestModel.cashAvailable - totalInPositions
+            if isForStockPerformance == False:
+                totalInPositions = calculatePriceInPositions(tempOrders)
+                balance = backtestModel.cashAvailable - totalInPositions
+            else:
+                balance = 6000
             data = StrategyData(ticker=ticker, 
                                 position=None, 
                                 order=None, 
@@ -417,7 +424,7 @@ def createCustomBarData(model: BackTestModel, countryConfig: CountryConfig):
                         volume=model.volume)
     return CustomBarData(barData, model.zigzag, model.rsi, barData.open)
 
-def getPreviousBarsData(model: BackTestModel, models: [BackTestModel], currentPosition: int):
+def getPreviousBarsData(model: BackTestModel, models: List[BackTestModel], currentPosition: int):
     previousData_1 = None
     previousData_2 = None
     previousData_3 = None
@@ -538,7 +545,7 @@ def showGraphFor(symbol: str):
     ib = IB()
     ib.connect('127.0.0.1', 7497, clientId=16)
     stock = Stock(symbol, "SMART", "USD")
-    model = BackTestDownloadModel(path="", numberOfDays=525, barSize="1 day") # 5Years = 1825 days
+    model = BackTestDownloadModel(path="", numberOfDays=225, barSize="1 day") # 5Years = 1825 days
     bars = downloadHistoricDataFromIB(ib, stock, model)
     
     closes = util.df(bars)['close']
@@ -550,7 +557,7 @@ def showGraphFor(symbol: str):
 
 if __name__ == '__main__':
     try:
-        #showGraphFor("ASND")
+        #showGraphFor("AZPN")
 
         #downloadData()
         runStockPerformance()
