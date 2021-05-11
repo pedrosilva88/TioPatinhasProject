@@ -318,8 +318,8 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
             tradesAvailable = 0
             if isForStockPerformance:
                 tradesAvailable = 2000
-            elif balance/3 >= 2000 and balance < 150000:
-                tradesAvailable = 3
+            elif balance/2 >= 3000 and balance < 150000:
+                tradesAvailable = 2
             else:
                 if backtestModel.cashAvailable > 150000:
                     backtestModel.strategyConfig.maxToInvestPerStockPercentage = 1
@@ -560,8 +560,8 @@ if __name__ == '__main__':
         #showGraphFor("AZPN")
 
         #downloadData()
-        runStockPerformance()
-        #run()
+        #runStockPerformance()
+        run()
         
     except (KeyboardInterrupt, SystemExit) as e:
         print(e)

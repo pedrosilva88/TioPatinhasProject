@@ -126,7 +126,7 @@ def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
                                 minGap= 2, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
                                 willingToLose= 0.04,
                                 stopToLosePercentage= 0.02, 
-                                maxToInvestPerStockPercentage= 0.3, 
+                                maxToInvestPerStockPercentage= 0.5, 
                                 averageVolumePercentage= 1.8,
                                 profitPercentage = 0.04,
                                 minRSI = 30,
