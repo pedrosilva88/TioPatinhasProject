@@ -157,7 +157,7 @@ class StrategyZigZag(Strategy):
 
         if (self.strategyData.position is None or
             dateLimit <= executionDate):
-            log("🥵 Cant do nothing with Stock (%s) - Or you already have a position or the you had a Fill for this stock in the last 6 days 🥵" % self.strategyData.ticker.contract.symbol)
+            log("🥵 Cant do nothing with Stock (%s) - Or you already have a position and it's not expired or the you had a Fill for this stock in the last 6 days 🥵" % self.strategyData.ticker.contract.symbol)
             return StrategyResult(self.strategyData.ticker, StrategyResultType.DoNothing)
 
         shares = self.strategyData.position.position
@@ -208,7 +208,6 @@ class StrategyZigZag(Strategy):
         # minTickProfit = self.priceIncrement(profitTarget)
         # minTickLoss = self.priceIncrement(stopLossPrice)
 
-        #print("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
         log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
 
         profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(profitTarget, 2))

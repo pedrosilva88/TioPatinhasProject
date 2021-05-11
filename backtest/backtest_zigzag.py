@@ -172,15 +172,10 @@ def runStockPerformance():
     path = ("backtest/Data/CSV/%s/ZigZag/Report" % (CountryKey.USA.code))
     report.showPerformanceReport(path, stocksPath, model.countryConfig)
 
-def handleProfitAndStop(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, ticker: Ticker, tempOrders: [str, (myOrder, Position, date)], isForStockPerformance: bool):
-    filteredList = []
-
-    for key, myTuple in tempOrders.items():
-        if key.split("_")[0] == ticker.contract.symbol:
-            filteredList.append(myTuple)
-
-    if (len(filteredList) > 0):
-        for tempOrder, position, positionDate in filteredList:
+def handleProfitAndStop(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, tempOrders: [str, (myOrder, Position, date, Ticker)], isForStockPerformance: bool):
+    orders = tempOrders.copy()
+    if (len(orders.values()) > 0):
+        for tempOrder, position, positionDate, ticker in orders.values():
             if ((tempOrder.action == "BUY" and tempOrder.stopLossOrder.auxPrice > ticker.bid) or
                     (tempOrder.action == "SELL" and tempOrder.stopLossOrder.auxPrice < ticker.ask)):
                 perda = abs(tempOrder.stopLossOrder.auxPrice*tempOrder.stopLossOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
@@ -235,7 +230,12 @@ def handleProfitAndStop(backtestModel: BackTestSwing, backtestReport: BackTestRe
                     backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
                     backtestModel.cashAvailable += ganho
                 tempOrders.pop(magicKey(position.contract.symbol, positionDate))
-            elif ticker.time.date() >= (positionDate+timedelta(days=2)).date():
+
+def handleExpiredFills(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, tempOrders: [str, (myOrder, Position, date, Ticker)], isForStockPerformance: bool):
+    orders = tempOrders.copy()
+    if (len(orders.values()) > 0):
+        for tempOrder, position, positionDate, ticker in orders.values():
+            if ticker.time.date() >= (positionDate+timedelta(days=2)).date():
                 if ((tempOrder.action == "BUY" and (tempOrder.lmtPrice <= ticker.last)) or
                     (tempOrder.action == "SELL" and (tempOrder.lmtPrice >= ticker.last))):
                     closePrice = ticker.last
@@ -312,7 +312,9 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
             balance = backtestModel.cashAvailable - totalInPositions
 
             tradesAvailable = 0
-            if balance/3 >= 2000 and balance < 150000:
+            if isForStockPerformance:
+                tradesAvailable = 2000
+            elif balance/3 >= 2000 and balance < 150000:
                 tradesAvailable = 3
             else:
                 if backtestModel.cashAvailable > 150000:
@@ -364,18 +366,23 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
                 if (balance > totalOrderCost and result.order.totalQuantity > 0) or isForStockPerformance:
                     tempOrders[magicKey(ticker.contract.symbol, ticker.time)] = (result.order,
                                                                                     Position(account="",contract=stock, position=result.order.totalQuantity, avgCost=result.order.lmtPrice),
-                                                                                    ticker.time)
+                                                                                    ticker.time,
+                                                                                    ticker)
                     print(result)
                     tradesAvailable -= 1
                     newFill = FillDB(ticker.contract.symbol, ticker.time.date())
                     databaseModule.createFill(newFill)
-            elif result.type == StrategyResultType.DoNothing:
-                None
             else:
-                None
+                for key, tupe in tempOrders.items():
+                    if key.split("_")[0] == ticker.contract.symbol:
+                        lista = list(tupe)
+                        lista[3] = ticker
+                        tempOrders[key] = tuple(lista)
 
             dayChecked = ticker.time
-            handleProfitAndStop(backtestModel, backtestReport, model, ticker, tempOrders, isForStockPerformance)
+            if len(models) > i+1 and models[i+1].ticker(backtestModel.countryConfig).time != dayChecked:
+                handleProfitAndStop(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
+                handleExpiredFills(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
         i += 1
 
 def getFill(ticker: Ticker, databaseModule: DatabaseModule):
@@ -520,7 +527,7 @@ def getPreviousBarsData(model: BackTestModel, models: [BackTestModel], currentPo
 
 def calculatePriceInPositions(tempOrders):
     total = 0
-    for key, (tempOrder, item, positionDate) in tempOrders.items():
+    for key, (tempOrder, item, positionDate, ticker) in tempOrders.items():
         total += item.position * item.avgCost
     return total
 
@@ -546,8 +553,8 @@ if __name__ == '__main__':
         #showGraphFor("ASND")
 
         #downloadData()
-        #runStockPerformance()
-        run()
+        runStockPerformance()
+        #run()
         
     except (KeyboardInterrupt, SystemExit) as e:
         print(e)

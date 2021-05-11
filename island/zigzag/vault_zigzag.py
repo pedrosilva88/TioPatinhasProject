@@ -209,7 +209,7 @@ class VaultZigZag:
                                     fill=fill)
                 result = self.strategy.run(data, self.strategyConfig, self.countryConfig)
                 logExecutionZigZag(data, result)
-                self.handleStrategyResult(result, ticker.contract)
+                self.handleStrategyResult(result, tick.contract)
 
     def handleStrategyResult(self, result: StrategyResult, contract: ibContract):
         if (result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell):
