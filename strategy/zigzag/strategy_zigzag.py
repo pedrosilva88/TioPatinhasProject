@@ -166,7 +166,7 @@ class StrategyZigZag(Strategy):
 
         if (self.strategyData.position is None or
             dateLimit <= executionDate):
-            log("🥵 Cant do nothing with Stock (%s) - Or you already have a position and it's not expired or the you had a Fill for this stock in the last 6 days 🥵" % self.strategyData.ticker.contract.symbol)
+            log("🥵 Cant do nothing with Stock (%s) - Or you already have a position and it's not expired or you had a Fill for this stock in the last 6 days 🥵" % self.strategyData.ticker.contract.symbol)
             return StrategyResult(self.strategyData.ticker, StrategyResultType.DoNothing)
 
         shares = self.strategyData.position.position
