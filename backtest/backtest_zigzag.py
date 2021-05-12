@@ -32,7 +32,7 @@ class BackTestSwing():
     def __init__(self):
         self.results = dict()
         self.trades = dict()
-        self.cashAvailable = 6000
+        self.cashAvailable = 10000
         self.countryConfig = getConfigFor(CountryKey.USA)
         self.strategyConfig= getStrategyConfigFor(key=self.countryConfig.key, timezone=self.countryConfig.timezone)
 
@@ -318,8 +318,8 @@ def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, mo
             tradesAvailable = 0
             if isForStockPerformance:
                 tradesAvailable = 2000
-            elif balance/2 >= 3000 and balance < 150000:
-                tradesAvailable = 2
+            # elif balance/2 >= 6000 and balance < 150000:
+            #     tradesAvailable = 2
             else:
                 if backtestModel.cashAvailable > 150000:
                     backtestModel.strategyConfig.maxToInvestPerStockPercentage = 1
