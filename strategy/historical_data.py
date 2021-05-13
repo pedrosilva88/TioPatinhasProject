@@ -1,4 +1,5 @@
 from datetime import *
+from typing import List, Tuple
 from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, BarDataList, ContractDetails, PriceIncrement, util
 from zigzag import *
 from models import CustomBarData
@@ -10,18 +11,19 @@ class HistoricalData:
         value = self.calculateAverageVolume(minute_bars)
         return value
 
-    async def downloadHistoricDataFromIB(self, ib: IB, stock: ibContract, days: int = 5, barSize = "1 min") -> [BarData]:
+    async def downloadHistoricDataFromIB(self, ib: IB, stock: ibContract, days: int = 5, barSize = "1 min") -> List[BarData]:
         nDays = days
         xYears = int(nDays/365)
         durationDays = ("%d D" % (nDays+10)) if nDays < 365 else ("%d Y" % xYears)
         today = datetime.now().replace(microsecond=0, tzinfo=None).date()
         startDate = today-timedelta(days=nDays+1)
         
-        bars: [BarData] = []
+        bars: List[BarData] = []
+        minute_bars: List[BarData] = []
         if barSize.endswith('min'):
             while startDate <= today:
                 endtime = startDate+timedelta(days=1)
-                bars: [BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime=endtime, 
+                bars: List[BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime=endtime, 
                                                         durationStr='5 D', 
                                                         barSizeSetting=barSize, 
                                                         whatToShow='TRADES',
@@ -30,7 +32,7 @@ class HistoricalData:
                 startDate = startDate+timedelta(days=6)
                 minute_bars += bars
         else:
-            bars: [BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime='', 
+            bars: List[BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime='', 
                                                     durationStr=durationDays, 
                                                     barSizeSetting=barSize, 
                                                     whatToShow='TRADES',
@@ -38,7 +40,7 @@ class HistoricalData:
                                                     formatDate=1)
         return bars
 
-    def createListOfCustomBarsData(self, bars: [BarData]):
+    def createListOfCustomBarsData(self, bars: List[BarData]):
         zigzagValues, rsiValues = self.calculateRSIAndZigZag(bars)
 
         if zigzagValues is None or rsiValues is None:
@@ -64,7 +66,7 @@ class HistoricalData:
 
         return customBarsData
 
-    def calculateRSIAndZigZag(self, bars: [BarData]):
+    def calculateRSIAndZigZag(self, bars: List[BarData]):
         try:
             closes = util.df(bars)['close']
             lows = util.df(bars)['low']
@@ -76,13 +78,13 @@ class HistoricalData:
             print(e)
             return None, None
 
-    async def getContractDetails(self, ib: IB, stock: ibContract) -> (ContractDetails, [PriceIncrement]):
+    async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple(ContractDetails, [PriceIncrement]):
         contractDetails = await ib.reqContractDetailsAsync(stock)
         ruleId = contractDetails[0].marketRuleIds.split(',')[0]
         priceIncrementRules = await ib.reqMarketRuleAsync(ruleId)
         return (contractDetails, priceIncrementRules)
     
-    def calculateAverageVolume(self, datas: [BarData]):
+    def calculateAverageVolume(self, datas: List[BarData]):
         nBars = len(datas)
         if nBars > 0:
             sum = 0
