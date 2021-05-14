@@ -78,7 +78,7 @@ class HistoricalData:
             print(e)
             return None, None
 
-    async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple(ContractDetails, [PriceIncrement]):
+    async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple[ContractDetails, List[PriceIncrement]]:
         contractDetails = await ib.reqContractDetailsAsync(stock)
         ruleId = contractDetails[0].marketRuleIds.split(',')[0]
         priceIncrementRules = await ib.reqMarketRuleAsync(ruleId)
