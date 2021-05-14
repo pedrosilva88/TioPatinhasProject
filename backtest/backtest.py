@@ -1,3 +1,4 @@
+from models.models import Contract
 import os, sys
 import os.path
 currentdir = os.path.dirname(os.path.realpath(__file__))
