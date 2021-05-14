@@ -1,6 +1,7 @@
+from country_config.country_config import Country
 from enum import Enum
-from datetime import datetime
-from ib_insync import IB, Contract as ibContract, Order as ibOrder, LimitOrder as ibLimitOrder, MarketOrder as ibMarketOrder, StopOrder as ibStopOrder, RealTimeBarList, ContractDetails, PriceIncrement, BarData
+from datetime import date, datetime
+from ib_insync import IB, Contract as ibContract, Order as ibOrder, LimitOrder as ibLimitOrder, MarketOrder as ibMarketOrder, StopOrder as ibStopOrder, RealTimeBarList, ContractDetails, PriceIncrement, BarData, contract        
 
 class StockInfo:
     symbol: str
