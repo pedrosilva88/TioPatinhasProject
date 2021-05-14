@@ -40,7 +40,7 @@ class HistoricalData:
                                                     formatDate=1)
         return bars
 
-    def createListOfCustomBarsData(self, bars: List[BarData]):
+    def createListOfCustomBarsData(self, bars: List[BarData]) -> List[CustomBarData]:
         zigzagValues, rsiValues = self.calculateRSIAndZigZag(bars)
 
         if zigzagValues is None or rsiValues is None:
