@@ -247,14 +247,10 @@ class VaultZigZag:
     # Historical Data
     
     async def fetchHistoricalData(self):
-        total = len(self.stocks)
-        current = 0
-        for stock in self.stocks:
-            current +=1
-            logCounter("Historical Data", total, current)
+        all_bars = await asyncio.gather(*[self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 20, "1 day") for stock in self.stocks ])
+        for stock, bars in zip(self.stocks, all_bars):
             if stock.symbol not in self.customBarsDataDict:
                 self.customBarsDataDict[stock.symbol] = []
-            bars = await self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 20, "1 day")
             histData = self.historicalData.createListOfCustomBarsData(bars)
             if len(histData) > 0:
                 self.customBarsDataDict[stock.symbol] = histData
