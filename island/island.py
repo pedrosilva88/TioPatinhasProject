@@ -1,12 +1,11 @@
 import asyncio
 import logging
-import configparser
-from enum import Enum
-from datetime import datetime
 from ib_insync import IB, IBC
+
+from helpers import log
 from .zigzag.vault_zigzag import VaultZigZag
 from ._events import *
-from helpers import log
+from configs.models import TioPatinhasConfigs
     
 class Island(IslandEvents):
     controller: IBC
@@ -24,9 +23,9 @@ class Island(IslandEvents):
     vault: VaultZigZag
     marketWaiter: asyncio.Future
 
-    def __init__(self, configPath: str):
+    def __init__(self):
         self.ib = IB()
-        self.createIBController(configPath)
+        self.createIBController()
         self.vault = None
         self._runner = None
         self.waiter = None
@@ -53,10 +52,12 @@ class Island(IslandEvents):
         self.ib.disconnect()
         self._runner = None
 
-    def createIBController(self, configPath: str):
-        config = configparser.ConfigParser()
-        config.read(configPath)
-        self.controller = IBC(config['Default']['ibVersion'], tradingMode=config['Default']['TradingMode'], userid=config['Default']['IbLoginId'], password=config['Default']['IbPassword'])
+    def createIBController(self):
+        config = TioPatinhasConfigs()
+        self.controller = IBC(version= config.providerConfigs.version, 
+                                tradingMode= config.providerConfigs.tradingMode, 
+                                userid= config.providerConfigs.user, 
+                                password= config.providerConfigs.password)
     
     async def runAsync(self):
         while self._runner:

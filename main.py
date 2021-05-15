@@ -22,9 +22,7 @@ if __name__ == '__main__':
     createLog()
     logInitTioPatinhas()
     try:
-        # TODO: Não preciso de ir buscar o arg aqui. Nem precisa de ser enviado para o Island.
-        path = sys.argv[1]
-        island = Island(configPath=path)
+        island = Island()
         vaultZigZag = VaultZigZag(island)
         island.start(vaultZigZag)
     except (KeyboardInterrupt, SystemExit):
