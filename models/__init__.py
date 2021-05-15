@@ -1,5 +1,3 @@
-from .models import *
-
-def main():
-    return (u'*Orders*\n'
-            u'In here you will handle the orders!')
+from .base_models import *
+from .zigzag.models import *
+from .opg.models import *

@@ -24,13 +24,29 @@ class ContractOPGInfo(Contract):
         # self.contractDetails = contractDetails
         # self.priceRules = priceRules
 
+    def __str__(self):
+        return ("Contract OPG info %s - %s" % (self.symbol ,self.lastExecution))
+
 class EventOPG(Event):
+    yesterdayClosePrice: float
+    averageVolume: float
+    volumeInFirstMinuteBar: float
+
     def __init__(self, contract: Contract, 
                         datetime: datetime, 
                         open: float, 
                         close: float, 
                         high: float, 
                         low: float, 
-                        volume: float, zigzag: bool, rsi: float, lastPrice = None):
+                        volume: float,
+                        averageVolume: float,
+                        volumeInFirstMinuteBar: float,
+                        yesterdayClosePrice: float):
         Event.__init__(self, contract= contract, datetime= datetime,
                         open= open, close= close, high= high, low= low, volume= volume)
+        self.volumeInFirstMinuteBar = volumeInFirstMinuteBar
+        self.averageVolume = averageVolume
+        self.yesterdayClosePrice = yesterdayClosePrice
+
+    def __str__(self):
+        return ("EventOPG %s" % (self.symbol))
