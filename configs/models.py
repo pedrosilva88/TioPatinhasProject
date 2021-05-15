@@ -17,6 +17,7 @@ class ProviderConfigs:
 
 class TioPatinhasConfigs:
     providerConfigs: ProviderConfigs
+    provider: Provider
     timezone: timezone
 
     def __init__(self) -> None:
@@ -27,6 +28,7 @@ class TioPatinhasConfigs:
         providerConfig.read(sys.argv[2])
 
         if settingsConfig['Default']['provider'] == 'TWS':
+            self.provider = Provider.TWS
             self.providerConfigs = parseTWSConfigs(providerConfig)
 
         self.timezone = timezone(settingsConfig['Default']['timezone'])
