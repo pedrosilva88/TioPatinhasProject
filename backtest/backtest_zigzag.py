@@ -239,7 +239,7 @@ def handleExpiredFills(backtestModel: BackTestSwing, backtestReport: BackTestRep
     orders = tempOrders.copy()
     if (len(orders.values()) > 0):
         for tempOrder, position, positionDate, ticker in orders.values():
-            if ticker.time.date() >= (positionDate+timedelta(days=2)).date():
+            if ticker.time.date() >= (positionDate+timedelta(days=1)).date():
                 if ((tempOrder.action == "BUY" and (tempOrder.lmtPrice <= ticker.last)) or
                     (tempOrder.action == "SELL" and (tempOrder.lmtPrice >= ticker.last))):
                     closePrice = ticker.last
