@@ -1,6 +1,7 @@
 import asyncio
 from enum import Enum
 from typing import Protocol
+from itertools import zip_longest
 from datetime import datetime
 from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, Stock as ibStock
 from helpers import logExecutionZigZag, log, utcToLocal, logCounter
@@ -245,9 +246,16 @@ class VaultZigZag:
                     None
 
     # Historical Data
-    
+
+    def grouper(self, iterable, n, fillvalue=None):
+        args = [iter(iterable)] * n
+        return list(zip_longest(*args, fillvalue=fillvalue))
+
     async def fetchHistoricalData(self):
-        all_bars = await asyncio.gather(*[self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 20, "1 day") for stock in self.stocks ])
+        chunks = self.grouper(self.stocks, 50)
+        all_bars = []
+        for stocks in chunks:
+            all_bars += await asyncio.gather(*[self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 20, "1 day") for stock in stocks ])
         for stock, bars in zip(self.stocks, all_bars):
             if stock.symbol not in self.customBarsDataDict:
                 self.customBarsDataDict[stock.symbol] = []

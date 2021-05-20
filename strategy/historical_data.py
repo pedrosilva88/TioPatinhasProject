@@ -12,6 +12,8 @@ class HistoricalData:
         return value
 
     async def downloadHistoricDataFromIB(self, ib: IB, stock: ibContract, days: int = 5, barSize = "1 min") -> List[BarData]:
+        if stock is None:
+            return []
         nDays = days
         xYears = int(nDays/365)
         durationDays = ("%d D" % (nDays+10)) if nDays < 365 else ("%d Y" % xYears)

@@ -44,6 +44,7 @@ $ python main.py [PATH_TO_FILE]/[FILE_CONFIGS].ini
 - Visual Code
     - Extensions (Python, Pylance, Gitlens)
 - Terminal ZSH
+- SqliteStudio
 
 
 
