@@ -8,6 +8,7 @@ from configs.interpreter.tws_interpreter import parseTWSConfigs
 class Provider(Enum):
     TWS = "TWS"
     Coinbase = "Coinbase"
+    Binance = "Binance"
 
 class ProviderConfigs:
     version: str
