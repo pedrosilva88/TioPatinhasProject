@@ -1,3 +1,4 @@
+from backtest.download_module.download_module import BacktestDownloadModule
 from models.models import Contract
 import os, sys
 import os.path
@@ -14,129 +15,12 @@ from helpers import log, utcToLocal
 from country_config import CountryConfig, CountryKey, getConfigFor
 from scanner import Scanner
 
-class BackTestModel():
-    ticker: Ticker
-    averageVolume: float
-    volumeInFirstMinuteBar: float
-    openPrice: float
-    close: float
-    bid: float
-    ask: float
-    last: float
-    volume: float
-    symbol: str
-    zigzag: bool
-    rsi: float
-    dateString: str
+class Backtest:
+    downloadModule: BacktestDownloadModule
 
-    def __init__(self, openPrice: float,
-                        close: float,
-                        bid: float,
-                        ask: float,
-                        last: float,
-                        volume: float,
-                        symbol: str,
-                        zigzag: bool,
-                        rsi: float,
-                        dateString: str, avgVolume: float, volumeFirstMinuteBar: float):
-        self.openPrice = openPrice
-        self.close = close
-        self.bid = bid
-        self.ask = ask
-        self.last = last
-        self.volume = volume
-        self.symbol = symbol
-        self.zigzag = zigzag
-        self.rsi = rsi
-        self.dateString = dateString
-        self.averageVolume = avgVolume if avgVolume else 0
-        self.volumeInFirstMinuteBar = volumeFirstMinuteBar if volumeFirstMinuteBar else 0
-
-    def __str__(self):
-        return ("%s - %s" % (self.dateString, self.symbol))
-
-    def ticker(self, countryConfig):
-        formatDate = "%Y-%m-%d %H:%M:%S"
-        stock = Stock(self.symbol, "SMART", countryConfig.currency)
-        customDate = self.dateString
-        if ":00+" in self.dateString:
-            customDate = self.dateString.split(":00+")[0]+":00"
-        elif ":00-" in self.dateString:
-            customDate = self.dateString.split(":00-")[0]+":00"
-
-        newTime = utcToLocal(datetime.strptime(customDate, formatDate), countryConfig.timezone)
-        return Ticker(contract=stock, 
-                            time=newTime, 
-                            close=self.close, 
-                            open=self.openPrice,
-                            bid=self.bid, 
-                            ask=self.ask, 
-                            last=self.last,
-                            volume=self.volume)
-
-class BackTestResultType(Enum):
-    takeProfit = 1
-    profit = 2
-    stopLoss = 3
-    loss = 4
-
-    def emoji(self):
-        if self == BackTestResultType.takeProfit:
-            return "✅ ✅"
-        elif self == BackTestResultType.profit:
-            return "✅"
-        elif self == BackTestResultType.stopLoss:
-            return "❌ ❌"
-        elif self == BackTestResultType.loss:
-            return "❌"
-
-class BackTestResult():
-    date: date
-    symbol: str
-    pnl: float
-    action: str
-    type: BackTestResultType
-    priceCreateTrade: float
-    priceCloseTrade: float
-    size: int
-    averageVolume: float
-    volumeFirstMinute: float
-    totalInvested: float
-    openPrice: float
-    ystdClosePrice: float
-    orderDate: date
-    cash: float
-
-    def __init__(self, symbol: str, date: date, pnl, action: str, 
-                type: BackTestResultType, priceCreateTrade: float, priceCloseTrade: float,
-                size: int, averageVolume: float, volumeFirstMinute: float, totalInvested: float,
-                openPrice: float, ystdClosePrice: float,
-                cash: float, orderDate: date):
-        self.symbol = symbol
-        self.date = date
-        self.pnl = pnl
-        self.action = action
-        self.type = type
-        self.priceCreateTrade = priceCreateTrade
-        self.priceCloseTrade = priceCloseTrade
-        self.size = size
-        self.averageVolume =  averageVolume
-        self.volumeFirstMinute =  volumeFirstMinute
-        self.totalInvested = totalInvested
-        self.openPrice = openPrice
-        self.ystdClosePrice = ystdClosePrice
-        self.cash = cash
-        self.orderDate = orderDate
-
-class BackTestDownloadModel():
-    path: str
-    numberOfDays: int
-    barSize: str
-
-    def __init__(self, path: str, numberOfDays: int, barSize: str):
-        self.path = path
-        self.numberOfDays = numberOfDays
-        self.barSize = barSize
+#TODO: Ongoing o objectivo é trocar tudo o que ta em baixo por esta nova class
+    # def downloadStocksData():
+    #     config = Backtes
 
 # Reports
 class BackTestReport():
@@ -301,36 +185,6 @@ def downloadStocksData(ib: IB, model: BackTestDownloadModel) -> [str, (Stock, [B
         #models = self.createListOfBackTestModels(stock, mBars, dBars)
         #self.saveDataInCSVFile(stock.symbol, models)
     return dic
-
-def downloadHistoricDataFromIB(ib: IB, stock: Contract, model: BackTestDownloadModel) -> [BarData]:
-    nDays = model.numberOfDays
-    xYears = int(nDays/365)
-    durationDays = ("%d D" % (nDays+10)) if nDays < 365 else ("%d Y" % xYears)
-    today = datetime.now().replace(microsecond=0, tzinfo=None).date()
-    startDate = today-timedelta(days=nDays+1)
-    
-    bars: [BarData] = []
-    if model.barSize.endswith('min'):
-        while startDate <= today:
-            print("Historical Data: %s - %s" % (stock.symbol, startDate))
-            endtime = startDate+timedelta(days=1)
-            bars: [BarData] = ib.reqHistoricalData(stock, endDateTime=endtime, 
-                                                    durationStr='5 D', 
-                                                    barSizeSetting=model.barSize, 
-                                                    whatToShow='TRADES',
-                                                    useRTH=True,
-                                                    formatDate=1)
-            startDate = startDate+timedelta(days=6)
-            minute_bars += bars
-    else:
-        bars: [BarData] = ib.reqHistoricalData(stock, endDateTime='', 
-                                                durationStr=durationDays, 
-                                                barSizeSetting=model.barSize, 
-                                                whatToShow='TRADES',
-                                                useRTH=True,
-                                                formatDate=1)
-    
-    return bars
 
 # Save
 

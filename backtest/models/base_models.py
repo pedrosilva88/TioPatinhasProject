@@ -22,7 +22,7 @@ class BacktestResultType(Enum):
         elif self == BacktestResultType.loss:
             return "❌"
 
-class BacktestResult():
+class BacktestResult:
     createTradeDate: datetime
     closeTradeDate: datetime
     contract: Contract
@@ -58,8 +58,7 @@ class BacktestResult():
         self.size = size
         self.cash = cash
 
-# TODO: Rever todos as properties que este modelo deveria ter
-class BacktestDownloadModel():
+class BacktestDownloadModel:
     path: str
     numberOfDays: int
     barSize: str
@@ -68,3 +67,22 @@ class BacktestDownloadModel():
         self.path = path
         self.numberOfDays = numberOfDays
         self.barSize = barSize
+
+class BacktestAction(Enum):
+    downloadData = 1
+    showGraph = 2
+    runStockPerformance = 3
+    runStrategy = 4
+
+class BacktestStrategy(Enum):
+    zigzag = 'zigzag'
+    opg = 'opg'
+    macd = 'macd'
+
+def getBacktestStrategyFromCode(code: str) -> BacktestStrategy:
+    if code == 'zigzag':
+        return BacktestStrategy.zigzag
+    elif code == 'opg':
+        return BacktestStrategy.opg
+    elif code == 'macd':
+        return BacktestStrategy.macd

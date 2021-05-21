@@ -1,7 +1,7 @@
 from datetime import datetime
 from models.base_models import Contract
 from models.zigzag.models import EventZigZag
-from backtest.models.base_models import BacktestItem
+from backtest.models.base_models import BacktestItem, BacktestResult
 
 class BacktestZigZagItem(BacktestItem):
     event: EventZigZag
