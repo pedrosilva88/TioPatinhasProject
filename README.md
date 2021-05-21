@@ -1,5 +1,7 @@
 # TioPatinhas Project
 
+![Tio Patinhas](https://media.giphy.com/media/gQdejV5BBChHi/giphy.gif)
+
 ## Introduction
 Tio Patinhas is a personal project for trading assets (stocks, cryptos)
 
@@ -58,7 +60,7 @@ $ cd [PATH]/[PROJECT_FOLDER]/
 $ source [PATH]/[PROJECT_FOLDER]/.env/virtualenv/bin/activate
 $ python main.py [PATH_TO_FILE]/[FILE_CONFIGS].ini
 ```
-
+![Tio Patinhas](https://media.giphy.com/media/qzeCF4ymrgFXy/giphy.gif)
 
 ## Applications
 ### Programming and Debugging
