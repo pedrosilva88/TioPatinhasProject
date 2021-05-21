@@ -171,7 +171,7 @@ class StrategyZigZag(Strategy):
 
         shares = self.strategyData.position.position
 
-        if (date.now().hour == self.countryConfig.closeMarket-timedelta(hours=2) and date.today() >= (executionDate.time+timedelta(days=2)).date()):
+        if (date.now().hour == self.countryConfig.closeMarket-timedelta(hours=2) and date.today() >= (executionDate.time+timedelta(days=1)).date()):
             if shares > 0:
                 return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
             elif shares < 0:
