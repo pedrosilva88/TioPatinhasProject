@@ -1,3 +1,7 @@
+- Create Orders
+       * O o serviço Interactive Broker por vezes pode cancelar as orders que tenho de TakeProfit e StopLoss de um dia para o outro. Podia ter uma action só para criar as Orders dando um stocks
+       * Exemple: `python main.py create_orders_for_position AAPL`
+
 - Strategy
        * Devia ter uma class Strategy parent mais genérica
 
