@@ -2,6 +2,7 @@ import configparser, sys
 from pytz import timezone
 from helpers import log
 from models.base_models import Contract
+from backtest.scanner.scanner_manager import getPathFileToScanStocks
 from country_config.country_manager import getCountryFromCode
 from country_config.models import Country
 from configs.models import Provider
@@ -33,9 +34,11 @@ class BacktestConfigs:
         self.action = BacktestAction(settingsConfig['Options']['action'])
         self.contract = Contract(settingsConfig['Options']['symbol'], self.country)
 
-        # TODO: Só falta criar este objecto, já tenho tudo para o poder construir
-        #self.downloadModel = BacktestDownloadModel()
+        path  = getPathFileToScanStocks(self.provider, self.country, self.strategy, self.action)
+        nDays = ['Options']['nDays']
+        barSize = ['Options']['barSize']
+        self.downloadModel = BacktestDownloadModel(path, nDays, barSize)
 
-        # if self.providerConfigs is None or self.timezone is None:
-        #     log("🚨 Unable to get the initial configs 🚨")
-        #     sys.exit()
+        if self.provider is None or self.action is None:
+            log("🚨 Unable to get the initial backtest configs 🚨")
+            sys.exit()

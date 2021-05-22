@@ -1,3 +1,4 @@
+from backtest.configs.models import BacktestConfigs
 from backtest.download_module.download_module import BacktestDownloadModule
 from models.models import Contract
 import os, sys
@@ -16,11 +17,11 @@ from country_config import CountryConfig, CountryKey, getConfigFor
 from scanner import Scanner
 
 class Backtest:
-    downloadModule: BacktestDownloadModule
-
-#TODO: Ongoing o objectivo é trocar tudo o que ta em baixo por esta nova class
-    # def downloadStocksData():
-    #     config = Backtes
+    def downloadStocksData():
+        config = BacktestConfigs()
+        downloadModule = BacktestDownloadModule(model= config.downloadModel)
+        
+        
 
 # Reports
 class BackTestReport():
@@ -267,11 +268,8 @@ def getModelsFromCSV(filePath: str):
             line_count += 1
     return models
 
-# if __name__ == '__main__':
-#     try:
-#         backtest = BackTest(countryKey=CountryKey.USA)
-#         #backtest.downloadStocksToCSVFile()
-#         backtest.run()
-#         #backtest.runStockPerformance()
-#     except (KeyboardInterrupt, SystemExit):
-#         None
+if __name__ == '__main__':
+    try:
+        Backtest.downloadStocksData()
+    except (KeyboardInterrupt, SystemExit):
+        None

@@ -7,5 +7,6 @@ class BacktestDownloadModule:
 
     def __init__(self, model: BacktestDownloadModel) -> None:
         self.model = model
+        self.historicalData = HistoricalData()
 
         
