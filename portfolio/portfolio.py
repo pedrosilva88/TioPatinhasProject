@@ -139,8 +139,10 @@ class Portfolio:
             ib.placeOrder(contract, stopLossOrder)
                 
     def cancelOrder(self, ib: IB, contract: ibContract):
+        log("🥊  Cancel Orders - %s 🥊" % contract.symbol)
         for trade in self.trades:
             if contract.symbol == trade.contract.symbol:
+                log("🥊  Cancel Order - %s - %s - %s 🥊" % (trade.contract.symbol, trade.order.orderType, trade.orderStatus.status))
                 ib.cancelOrder(trade.order)
 
     # Positions
@@ -154,13 +156,6 @@ class Portfolio:
     def cancelPosition(self, ib: IB, orderAction: OrderAction, position: ibPosition):
         stock = Stock(position.contract.symbol, "SMART", position.contract.currency)
         order = MarketOrder(orderAction, abs(position.position))
-        ib.placeOrder(stock, order)
-
-        o,p,s = self.getTradeOrders(stock)
-        if o:
-            ib.cancelOrder(o)
-        if p:
-            ib.cancelOrder(p)
-        if s:
-            ib.cancelOrder(s)
         
+        self.cancelOrder(ib, stock)
+        ib.placeOrder(stock, order)        
