@@ -10,15 +10,6 @@ from configs.models import TioPatinhasConfigs
 class Island(IslandEvents):
     controller: IBC
     ib: IB
-    host: str = '127.0.0.1'
-    port: int = 7497
-    clientId: int = 1
-    connectTimeout: float = 5
-    appStartupTime: float = 50
-    appTimeout: float = 10
-    retryDelay: float = 5
-    readonly: bool = False
-    account: str = ''
 
     vault: VaultZigZag
     marketWaiter: asyncio.Future

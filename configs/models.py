@@ -16,6 +16,15 @@ class ProviderConfigs:
     user: str
     password: str
 
+    endpoint: str
+    port: str
+    clientID: str
+
+    connectTimeout: int
+    appStartupTime: int
+    appTimeout: int
+    readOnly: bool
+
 class TioPatinhasConfigs:
     providerConfigs: ProviderConfigs
     provider: Provider
