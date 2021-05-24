@@ -25,6 +25,8 @@ class ProviderConfigs:
     appTimeout: int
     readOnly: bool
 
+    useController: bool
+
 class TioPatinhasConfigs:
     providerConfigs: ProviderConfigs
     provider: Provider
