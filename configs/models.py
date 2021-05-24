@@ -1,31 +1,9 @@
 import sys
 import configparser
-from enum import Enum
 from pytz import timezone
 from helpers import log
 from configs.interpreter.tws_interpreter import parseTWSConfigs
-
-class Provider(Enum):
-    TWS = "TWS"
-    Coinbase = "Coinbase"
-    Binance = "Binance"
-
-class ProviderConfigs:
-    version: str
-    tradingMode: str
-    user: str
-    password: str
-
-    endpoint: str
-    port: str
-    clientID: str
-
-    connectTimeout: int
-    appStartupTime: int
-    appTimeout: int
-    readOnly: bool
-
-    useController: bool
+from provider_factory.models import ProviderConfigs, Provider
 
 class TioPatinhasConfigs:
     providerConfigs: ProviderConfigs

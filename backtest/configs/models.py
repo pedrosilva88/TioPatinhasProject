@@ -4,12 +4,13 @@ from helpers import log
 from models.base_models import Contract
 from backtest.scanner.scanner_manager import getPathFileToScanStocks
 from country_config.country_manager import getCountryFromCode
+from provider_factory.models import ProviderConfigs, Provider
 from country_config.models import Country
-from configs.models import Provider
 from backtest.models.base_models import BacktestAction, BacktestDownloadModel, BacktestStrategy, getBacktestStrategyFromCode
 
 class BacktestConfigs:
     provider: Provider
+    providerConfigs: ProviderConfigs
     timezone: timezone
     country: Country
     strategy: BacktestStrategy
@@ -22,6 +23,9 @@ class BacktestConfigs:
     def __init__(self) -> None:
         settingsConfig = configparser.ConfigParser()
         settingsConfig.read(sys.argv[1])
+
+        providerConfig = configparser.ConfigParser()
+        providerConfig.read(sys.argv[2])
         
         if settingsConfig['Default']['provider'] == 'TWS':
             self.provider = Provider.TWS

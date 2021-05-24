@@ -1,5 +1,8 @@
+
+from typing import List
 from helpers import log
 from provider_factory.TWS.tws_module import TWSModule
+from models.base_models import Event
 from provider_factory.models import ProviderClient, ProviderController
 from configs.models import Provider, ProviderConfigs
 

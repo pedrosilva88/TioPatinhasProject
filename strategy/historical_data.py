@@ -1,89 +1,71 @@
 from datetime import *
-from typing import List, Tuple
-from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, BarDataList, ContractDetails, PriceIncrement, util
-from zigzag import *
-from models import CustomBarData
+from typing import Any, List, Tuple
+from pandas import util
+from zigzag import peak_valley_pivots_candlestick
+from strategy.configs.zigzag.models import StrategyZigZagConfig
+from models.zigzag.models import EventZigZag
+from models.base_models import Event
 
 class HistoricalData:
-    async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
-        minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
-        value = self.calculateAverageVolume(minute_bars)
-        return value
-
-    async def downloadHistoricDataFromIB(self, ib: IB, stock: ibContract, days: int = 5, barSize = "1 min") -> List[BarData]:
-        if stock is None:
-            return []
-        nDays = days
-        xYears = int(nDays/365)
-        durationDays = ("%d D" % (nDays+10)) if nDays < 365 else ("%d Y" % xYears)
-        today = datetime.now().replace(microsecond=0, tzinfo=None).date()
-        startDate = today-timedelta(days=nDays+1)
-        
-        bars: List[BarData] = []
-        minute_bars: List[BarData] = []
-        if barSize.endswith('min'):
-            while startDate <= today:
-                endtime = startDate+timedelta(days=1)
-                bars: List[BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime=endtime, 
-                                                        durationStr='5 D', 
-                                                        barSizeSetting=barSize, 
-                                                        whatToShow='TRADES',
-                                                        useRTH=True,
-                                                        formatDate=1)
-                startDate = startDate+timedelta(days=6)
-                minute_bars += bars
-        else:
-            bars: List[BarData] = await ib.reqHistoricalDataAsync(stock, endDateTime='', 
-                                                    durationStr=durationDays, 
-                                                    barSizeSetting=barSize, 
-                                                    whatToShow='TRADES',
-                                                    useRTH=True,
-                                                    formatDate=1)
-        return bars
-
-    def createListOfCustomBarsData(self, bars: List[BarData]) -> List[CustomBarData]:
-        zigzagValues, rsiValues = self.calculateRSIAndZigZag(bars)
+    def computeEventsForZigZagStrategy(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[EventZigZag]:
+        zigzagValues = HistoricalData.calculateZigZag(events, strategyConfigs)
+        rsiValues = HistoricalData.calculateRSI(events, strategyConfigs)
 
         if zigzagValues is None or rsiValues is None:
             return []
 
-        customBarsData = []
+        zigzagEvents = []
         i = 0
-        for bar in bars:
+        for event in events:
             zigzag = True if zigzagValues[i] != 0 else False
             rsi = None
             if i > 0:
                 rsi = rsiValues[i-1]
 
-            barData = BarData(date=bar.date,
-                                open=bar.open,
-                                high=bar.high,
-                                low=bar.low,
-                                close=bar.close,
-                                volume=bar.volume)
+            eventZigZag = EventZigZag(date=event.date,
+                                        open=event.open,
+                                        high=event.high,
+                                        low=event.low,
+                                        close=event.close,
+                                        volume=event.volume, zigzag=zigzag, rsi=rsi)
             
-            customBarsData.append(CustomBarData(barData, zigzag, rsi))
+            zigzagEvents.append(eventZigZag)
             i += 1
 
-        return customBarsData
+        return zigzagEvents
 
-    def calculateRSIAndZigZag(self, bars: List[BarData]):
+    def computeEventsForOPGStrategy(events: List[Event]) -> Tuple[Any, List[Any]]: #Tuple[ContractDetails, List[PriceIncrement]]
+        pass
+
+    def calculateRSI(self, events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
         try:
-            closes = util.df(bars)['close']
-            lows = util.df(bars)['low']
-            highs = util.df(bars)['high']
-            RSI = self.computeRSI(util.df(bars)['close'], 14)
-            pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
-            return pivots, RSI.values
+            RSI = self.computeRSI(util.df(events)['close'], strategyConfigs.rsiOffsetDays)
+            return RSI.values
         except TypeError as e:
             print(e)
-            return None, None
+            return None
+
+    def calculateZigZag(self, events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
+        try:
+            closes = util.df(events)['close']
+            lows = util.df(events)['low']
+            highs = util.df(events)['high']
+            pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, strategyConfigs.zigzagSpread, -strategyConfigs.zigzagSpread)
+            return pivots
+        except TypeError as e:
+            print(e)
+            return None
 
     async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple[ContractDetails, List[PriceIncrement]]:
         contractDetails = await ib.reqContractDetailsAsync(stock)
         ruleId = contractDetails[0].marketRuleIds.split(',')[0]
         priceIncrementRules = await ib.reqMarketRuleAsync(ruleId)
         return (contractDetails, priceIncrementRules)
+
+    async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
+        minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
+        value = self.calculateAverageVolume(minute_bars)
+        return value
     
     def calculateAverageVolume(self, datas: List[BarData]):
         nBars = len(datas)
