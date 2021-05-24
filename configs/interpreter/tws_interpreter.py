@@ -14,6 +14,7 @@ def parseTWSConfigs(config: configparser) -> ProviderConfigs:
                                 connectTimeout=config['Default']['connectTimeout'],
                                 appStartupTime=config['Default']['appStartUpTime'],
                                 appTimeout=config['Default']['appTimeout'],
-                                readOnly=config['Default']['readOnly'])
+                                readOnly=config['Default']['readOnly'],
+                                useController=config['TioPatinhas']['useController'])
     except Exception as e:
         log("🚨 Unable to parse Provider Settings 🚨")
