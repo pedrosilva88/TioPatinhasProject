@@ -37,15 +37,15 @@ class HistoricalData:
     def computeEventsForOPGStrategy(events: List[Event]) -> Tuple[Any, List[Any]]: #Tuple[ContractDetails, List[PriceIncrement]]
         pass
 
-    def calculateRSI(self, events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
+    def calculateRSI(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
         try:
-            RSI = self.computeRSI(util.df(events)['close'], strategyConfigs.rsiOffsetDays)
+            RSI = HistoricalData.computeRSI(util.df(events)['close'], strategyConfigs.rsiOffsetDays)
             return RSI.values
         except TypeError as e:
             print(e)
             return None
 
-    def calculateZigZag(self, events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
+    def calculateZigZag(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
         try:
             closes = util.df(events)['close']
             lows = util.df(events)['low']
@@ -55,6 +55,23 @@ class HistoricalData:
         except TypeError as e:
             print(e)
             return None
+
+    def computeRSI(data, time_window):
+        diff = data.diff(1).dropna()
+
+        up_chg = 0 * diff
+        down_chg = 0 * diff
+        
+        up_chg[diff > 0] = diff[ diff>0 ]
+        
+        down_chg[diff < 0] = diff[ diff < 0 ]
+        
+        up_chg_avg   = up_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
+        down_chg_avg = down_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
+        
+        rs = abs(up_chg_avg/down_chg_avg)
+        rsi = 100 - 100/(1+rs)
+        return rsi
 
     async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple[ContractDetails, List[PriceIncrement]]:
         contractDetails = await ib.reqContractDetailsAsync(stock)
@@ -77,20 +94,3 @@ class HistoricalData:
             return sum/nBars
         else:
             return None
-
-    def computeRSI(self, data, time_window):
-        diff = data.diff(1).dropna()
-
-        up_chg = 0 * diff
-        down_chg = 0 * diff
-        
-        up_chg[diff > 0] = diff[ diff>0 ]
-        
-        down_chg[diff < 0] = diff[ diff < 0 ]
-        
-        up_chg_avg   = up_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
-        down_chg_avg = down_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
-        
-        rs = abs(up_chg_avg/down_chg_avg)
-        rsi = 100 - 100/(1+rs)
-        return rsi

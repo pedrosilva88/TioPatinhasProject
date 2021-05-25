@@ -1,4 +1,5 @@
-from datetime import time, datetime
+from datetime import time, datetime, timedelta
+from country_config.models import Market
 from strategy.models import StrategyConfig
 
 class StrategyZigZagConfig(StrategyConfig):
@@ -11,14 +12,15 @@ class StrategyZigZagConfig(StrategyConfig):
 
     runPositionsCheckTime: time
 
-    def __init__(self, runStrategyTime: time,
+    def __init__(self, market: Market,
+                        runStrategyTime: time,
                         willingToLose: float, stopToLosePercentage: float, profitPercentage: float,
                         maxToInvestPerStockPercentage: float, 
                         minRSI: float, maxRSI: float,
                         rsiOffsetDays: int, zigzagSpread:float,
                         runPositionsCheckTime: time):
 
-        StrategyConfig.__init__(self, runStrategyTime=runStrategyTime, willingToLose=willingToLose, maxToInvestPerStockPercentage=maxToInvestPerStockPercentage)
+        self.__init__(self, market= market, runStrategyTime=runStrategyTime, willingToLose=willingToLose, maxToInvestPerStockPercentage=maxToInvestPerStockPercentage)
         self.willingToLose = willingToLose
         self.stopToLosePercentage = stopToLosePercentage
         self.maxToInvestPerStockPercentage = maxToInvestPerStockPercentage
@@ -32,6 +34,11 @@ class StrategyZigZagConfig(StrategyConfig):
         self.runPositionsCheckTime = runPositionsCheckTime
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
-        # TODO tenho que terminar esta logica. Basicamente tenho que verificar se ainda posso correr esta estrategia hoje, ou validar as positions. 
-        # Senao tenho que gerar uma data para o dia seguinte
-        return now
+        currentTime = now.time
+        if self.runStrategyTime > currentTime:
+            return datetime.combine(now.date, self.runStrategyTime)
+        elif self.runPositionsCheckTime > currentTime:
+            return datetime.combine(now.date, self.runPositionsCheckTime)
+        else:
+            nextDay = now.date+timedelta(days=1)
+            return datetime.combine(nextDay, self.runStrategyTime)
