@@ -1,7 +1,7 @@
-from models.base_models import Contract, Event
-from configs.models import Provider
 from enum import Enum
 from typing import Any, List
+from models.base_models import Contract, Event
+from configs.models import Provider
 
 class Provider(Enum):
     TWS = "TWS"
