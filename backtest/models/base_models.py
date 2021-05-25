@@ -73,16 +73,3 @@ class BacktestAction(Enum):
     showGraph = 2
     runStockPerformance = 3
     runStrategy = 4
-
-class BacktestStrategy(Enum):
-    zigzag = 'zigzag'
-    opg = 'opg'
-    macd = 'macd'
-
-def getBacktestStrategyFromCode(code: str) -> BacktestStrategy:
-    if code == 'zigzag':
-        return BacktestStrategy.zigzag
-    elif code == 'opg':
-        return BacktestStrategy.opg
-    elif code == 'macd':
-        return BacktestStrategy.macd

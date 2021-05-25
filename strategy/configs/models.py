@@ -7,6 +7,14 @@ class StrategyType(Enum):
     opg = 'opg'
     stochi = 'stochi'
 
+    def strategyFromCode(code: str) -> StrategyType:
+        if code == 'zigzag':
+            return StrategyType.zigzag
+        elif code == 'opg':
+            return StrategyType.opg
+        elif code == 'stochi':
+            return StrategyType.stochi
+
 class StrategyConfig:
     market: Market
     runStrategyTime: time

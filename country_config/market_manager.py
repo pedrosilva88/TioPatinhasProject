@@ -1,4 +1,3 @@
-from configs.models import TioPatinhasConfigs
 from typing import List
 from pytz import timezone
 from country_config.models import Country, Market
@@ -22,8 +21,7 @@ class MarketManager:
                             openTime= Constants.HK.openTime,
                             closeTime= Constants.HK.closeTime)
 
-    def getCurrentMarket(markets: List[Market]) -> Market:
-        localTimezone = TioPatinhasConfigs().timezone
+    def getCurrentMarket(markets: List[Market], localTimezone: timezone) -> Market:
         currentDate = datetime.now().astimezone(localTimezone)
         markets.sort(key=lambda x: x.openTime.astimezone(localTimezone))
         currentMarket = markets[0]
@@ -42,7 +40,6 @@ class MarketManager:
                         openTime=datetime.combine(nextday,previousMarket.openTime.time()),
                         closeTime=datetime.combine(nextday,previousMarket.closeTime.time()))
 
-# Constants
 class Constants:
     class General:
         tomorrow = date.today()+timedelta(days= 1)    

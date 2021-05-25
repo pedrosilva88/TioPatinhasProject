@@ -1,16 +1,9 @@
 import os, sys
 import csv
-from ib_insync import Contract as ibContract, Stock as ibStock
+from models.base_models import Contract
 
 class Scanner:
-    stocksDownloaded: [ibStock]
-    stocks: [ibStock]
-
-    def __init__(self):
-        self.tickersDownloaded = []
-        self.tickers = []
-
-    def fetchStocksFromCSVFile(self, path: str, nItems: int):
+    def stocksFrom(path= str):
         modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
         datapath = os.path.join(modpath, path)
         stocks = []
@@ -20,15 +13,10 @@ class Scanner:
             line_count = 0
             for row in csv_reader:
                 if line_count > 0:
-                    stocks.append(ibStock(row[0], row[1], row[2]))
+                    stocks.append(Contract(row[0], row[1], row[2]))
                 line_count += 1
         
-        if nItems > 0:
-            self.stocksDownloaded = stocks[:nItems]
-            self.stocks = stocks[:nItems]
-        else:
-            self.stocksDownloaded = stocks
-            self.stocks = stocks
+        return stocks            
 
     def removeTicker(self, symbol: str):
         ticker = [d for d in self.stocks if d.symbol == symbol].pop()

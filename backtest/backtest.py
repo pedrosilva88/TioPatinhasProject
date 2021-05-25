@@ -1,6 +1,7 @@
+from provider_factory.provider_module import ProviderModule
 from backtest.configs.models import BacktestConfigs
 from backtest.download_module.download_module import BacktestDownloadModule
-from models.models import Contract
+
 import os, sys
 import os.path
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -19,9 +20,12 @@ from scanner import Scanner
 class Backtest:
     def downloadStocksData():
         config = BacktestConfigs()
-        downloadModule = BacktestDownloadModule(model= config.downloadModel)
+        client = ProviderModule.createClient(config.provider, config.providerConfigs)
+        stocks = Scanner.stocksFrom(config.downloadModel.path)
+        stocksData = BacktestDownloadModule.downloadStocks(client, stocks, config.downloadModel.numberOfDays, config.downloadModel.barSize)
         
-        
+        return stocksData
+
 
 # Reports
 class BackTestReport():
@@ -163,30 +167,6 @@ class BackTestReport():
         self.stockPerformance[ticker.contract.symbol] = array
 
 
-# Download Stocks Data
-
-def downloadStocksData(ib: IB, model: BackTestDownloadModel) -> [str, (Stock, [BarData])]:
-    scanner = Scanner()
-    scanner.fetchStocksFromCSVFile(path=model.path, nItems=0)
-    stocks = scanner.stocks
-    total = len(stocks)
-    current = 0
-    dic = dict()
-    for stock in stocks:
-        current += 1
-        sys.stdout.write("\t Contracts: %i/%i \r" % (current, total) )
-        if current <= total-1:
-            sys.stdout.flush()
-        else:
-            print("")
-
-        bars = downloadHistoricDataFromIB(ib, stock, model)
-        dic[stock.symbol] = (stock, bars)
-        #dBars = self.downloadHistoricDataFromIB(stock, model)
-        #models = self.createListOfBackTestModels(stock, mBars, dBars)
-        #self.saveDataInCSVFile(stock.symbol, models)
-    return dic
-
 # Save
 
 def saveDataInCSVFile(filename: str, path: str, data: [BackTestModel], countryConfig: CountryConfig):
@@ -267,9 +247,3 @@ def getModelsFromCSV(filePath: str):
                 models.append(BackTestModel(openPrice, close, bid, ask, last, volume, row[0], zigzag, rsi, row[1], averageVolume, volumeMinute))
             line_count += 1
     return models
-
-if __name__ == '__main__':
-    try:
-        Backtest.downloadStocksData()
-    except (KeyboardInterrupt, SystemExit):
-        None

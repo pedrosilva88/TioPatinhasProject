@@ -1,6 +1,6 @@
 import configparser
 from helpers import log
-from configs.models import ProviderConfigs
+from provider_factory.models import ProviderConfigs
 
 def parseTWSConfigs(config: configparser) -> ProviderConfigs:
     try:
