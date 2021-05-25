@@ -1,6 +1,3 @@
-from country_config.market_manager import getMarketFor
-from country_config.models import Country
-from strategy.configs.models import StrategyConfig, StrategyType
 import sys
 import configparser
 from typing import List, Tuple
@@ -9,6 +6,9 @@ from helpers import log
 from configs.interpreter.tws_interpreter import parseTWSConfigs
 from provider_factory.models import ProviderConfigs, Provider
 from strategy.configs.factory.strategy_config_factory import StrategyConfigFactory
+from country_config.market_manager import getMarketFor
+from country_config.models import Country
+from strategy.configs.models import StrategyConfig, StrategyType
 
 class TioPatinhasConfigs:
     providerConfigs: ProviderConfigs

@@ -1,4 +1,8 @@
 import configparser, sys
+from country_config.market_manager import getMarketFor
+from strategy.configs.factory.strategy_config_factory import StrategyConfigFactory
+from strategy.configs.models import StrategyConfig, StrategyType
+from strategy.strategy import Strategy
 from pytz import timezone
 from helpers import log
 from models.base_models import Contract
@@ -13,12 +17,14 @@ class BacktestConfigs:
     providerConfigs: ProviderConfigs
     timezone: timezone
     country: Country
-    strategy: BacktestStrategy
+    strategyType: BacktestStrategy
     wallet: float
 
     action: BacktestAction
     contract: Contract
     downloadModel: BacktestDownloadModel
+
+    strategy: StrategyConfig
 
     def __init__(self) -> None:
         settingsConfig = configparser.ConfigParser()
@@ -32,7 +38,7 @@ class BacktestConfigs:
 
         self.country = getCountryFromCode(settingsConfig['Default']['country'] )
         self.timezone = timezone(settingsConfig['Default']['timezone'])
-        self.strategy = getBacktestStrategyFromCode(settingsConfig['Default']['strategy'])
+        self.strategyType = getBacktestStrategyFromCode(settingsConfig['Default']['strategy'])
         self.wallet = settingsConfig['Default']['wallet']
 
         self.action = BacktestAction(settingsConfig['Options']['action'])
@@ -42,6 +48,9 @@ class BacktestConfigs:
         nDays = ['Options']['nDays']
         barSize = ['Options']['barSize']
         self.downloadModel = BacktestDownloadModel(path, nDays, barSize)
+
+        market = getMarketFor(self.country)
+        self.strategy = StrategyConfigFactory(strategyType=self.strategyType, market=market)
 
         if self.provider is None or self.action is None:
             log("🚨 Unable to get the initial backtest configs 🚨")

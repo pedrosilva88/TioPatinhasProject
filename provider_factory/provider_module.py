@@ -15,6 +15,6 @@ class ProviderModule:
 
     def createController(provider: Provider, providerConfigs: ProviderConfigs) -> ProviderController:
         if provider == Provider.TWS:
-            TWSModule.createClient(providerConfigs)
+            TWSModule.createController(providerConfigs)
         else:
             log("🚨 Dont know this Provider - %s 🚨" % provider)

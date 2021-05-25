@@ -4,59 +4,57 @@ from pytz import timezone
 from country_config.models import Country, Market
 from datetime import datetime, date, time, timedelta
 
-def getMarketFor(country: Country) -> Market:
-    if country == Country.USA:
-        return Market(country= Country.USA,
-                        timezone= USATimezone,
-                        openTime= USAOpenTime,
-                        closeTime= USACloseTime)
-    if country == Country.UK:
-        return Market(country= Country.UK,
-                            timezone= UKTimezone,
-                            openTime= UKOpenTime,
-                            closeTime= UKCloseTime)
-    if country == Country.HongKong:
-        return Market(country= Country.HongKong,
-                        timezone= HKTimezone,
-                        openTime= HKOpenTime,
-                        closeTime= HKCloseTime)
+class MarketManager:
+    def getMarketFor(country: Country) -> Market:
+        if country == Country.USA:
+            return Market(country= Country.USA,
+                            timezone= Constants.USA.timezone,
+                            openTime= Constants.USA.openTime,
+                            closeTime= Constants.USA.closeTime)
+        if country == Country.UK:
+            return Market(country= Country.UK,
+                                timezone= Constants.UK.timezone,
+                                openTime= Constants.UK.openTime,
+                                closeTime= Constants.UK.closeTime)
+        if country == Country.HongKong:
+            return Market(country= Country.HongKong,
+                            timezone= Constants.HK.timezone,
+                            openTime= Constants.HK.openTime,
+                            closeTime= Constants.HK.closeTime)
 
-def getCurrentMarket(markets: List[Market]) -> Market:
-    localTimezone = TioPatinhasConfigs().timezone
-    currentDate = datetime.now().astimezone(localTimezone)
-    markets.sort(key=lambda x: x.openTime.astimezone(localTimezone))
-    currentMarket = markets[0]
+    def getCurrentMarket(markets: List[Market]) -> Market:
+        localTimezone = TioPatinhasConfigs().timezone
+        currentDate = datetime.now().astimezone(localTimezone)
+        markets.sort(key=lambda x: x.openTime.astimezone(localTimezone))
+        currentMarket = markets[0]
 
-    for item in markets:
-        if item.openTime.astimezone(localTimezone) > currentDate:
-            currentMarket = item
-            break
+        for item in markets:
+            if item.openTime.astimezone(localTimezone) > currentDate:
+                currentMarket = item
+                break
 
-    return currentMarket
+        return currentMarket
 
-def updateMarketConfigForNextDay(previousMarket: Market) -> Market:
-    nextday = tomorrow
-    return Market(country=previousMarket.country,
-                    timezone=previousMarket.timezone,
-                    openTime=datetime.combine(nextday,previousMarket.openTime.time()),
-                    closeTime=datetime.combine(nextday,previousMarket.closeTime.time()))
+    def updateMarketConfigForNextDay(previousMarket: Market) -> Market:
+        nextday = Constants.General.tomorrow
+        return Market(country=previousMarket.country,
+                        timezone=previousMarket.timezone,
+                        openTime=datetime.combine(nextday,previousMarket.openTime.time()),
+                        closeTime=datetime.combine(nextday,previousMarket.closeTime.time()))
 
 # Constants
-
-# General
-tomorrow = date.today()+timedelta(days= 1)
-
-# USA
-USATimezone = timezone('America/New_York')
-USAOpenTime = datetime.combine(date.today(),time(9,30))
-USACloseTime = datetime.combine(date.today(),time(15,30))
-
-# UK
-UKTimezone = timezone('Europe/London')
-UKOpenTime = datetime.combine(date.today(),time(8,0))
-UKCloseTime = datetime.combine(date.today(),time(13,10))
-
-# HongKong
-HKTimezone = timezone('Asia/Hong_Kong')
-HKOpenTime = datetime.combine(date.today(),time(9,10))
-HKCloseTime = datetime.combine(date.today(),time(14,10))
+class Constants:
+    class General:
+        tomorrow = date.today()+timedelta(days= 1)    
+    class USA:
+        timezone = timezone('America/New_York')
+        openTime = datetime.combine(date.today(),time(9,30))
+        closeTime = datetime.combine(date.today(),time(15,30))
+    class UK:
+        timezone = timezone('Europe/London')
+        openTime = datetime.combine(date.today(),time(8,0))
+        closeTime = datetime.combine(date.today(),time(13,10))
+    class HK:
+        timezone = timezone('Asia/Hong_Kong')
+        openTime = datetime.combine(date.today(),time(9,10))
+        closeTime = datetime.combine(date.today(),time(14,10))
