@@ -1,6 +1,6 @@
-from provider_factory.provider_module import ProviderModule
 from backtest.configs.models import BacktestConfigs
 from backtest.download_module.download_module import BacktestDownloadModule
+from provider_factory.provider_module import ProviderModule
 
 import os, sys
 import os.path

@@ -1,5 +1,4 @@
 from .strategy import *
-from .strategy_data import *
 from .historical_data import *
 from .zigzag.strategy_zigzag import *
 from .opg.strategy_opg import *

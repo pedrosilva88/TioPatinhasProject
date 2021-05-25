@@ -73,24 +73,24 @@ class HistoricalData:
         rsi = 100 - 100/(1+rs)
         return rsi
 
-    async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple[ContractDetails, List[PriceIncrement]]:
-        contractDetails = await ib.reqContractDetailsAsync(stock)
-        ruleId = contractDetails[0].marketRuleIds.split(',')[0]
-        priceIncrementRules = await ib.reqMarketRuleAsync(ruleId)
-        return (contractDetails, priceIncrementRules)
+    # async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple[ContractDetails, List[PriceIncrement]]:
+    #     contractDetails = await ib.reqContractDetailsAsync(stock)
+    #     ruleId = contractDetails[0].marketRuleIds.split(',')[0]
+    #     priceIncrementRules = await ib.reqMarketRuleAsync(ruleId)
+    #     return (contractDetails, priceIncrementRules)
 
-    async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
-        minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
-        value = self.calculateAverageVolume(minute_bars)
-        return value
+    # async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
+    #     minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
+    #     value = self.calculateAverageVolume(minute_bars)
+    #     return value
     
-    def calculateAverageVolume(self, datas: List[BarData]):
-        nBars = len(datas)
-        if nBars > 0:
-            sum = 0
-            for data in datas: 
-                sum += data.volume
+    # def calculateAverageVolume(self, datas: List[BarData]):
+    #     nBars = len(datas)
+    #     if nBars > 0:
+    #         sum = 0
+    #         for data in datas: 
+    #             sum += data.volume
             
-            return sum/nBars
-        else:
-            return None
+    #         return sum/nBars
+    #     else:
+    #         return None

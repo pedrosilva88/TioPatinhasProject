@@ -1,9 +1,10 @@
 from enum import Enum
 from datetime import datetime, date, time
+from models.zigzag.models import EventZigZag
+from models.base_models import Event
 from typing import List
-from models import Order, CustomBarData
+from models import Order
 from ib_insync import Ticker as ibTicker, Position as ibPosition, PriceIncrement
-from country_config import CountryKey, CountryConfig
 from pytz import timezone
 from database import FillDB
 
@@ -42,8 +43,8 @@ class StrategyData:
     order: Order
     fill: FillDB
     totalCash: float
-    previousBars: List[CustomBarData]
-    currentBar: CustomBarData
+    previousBars: List[EventZigZag]
+    currentBar: EventZigZag
 
     def __init__(self, ticker: ibTicker,
                         position: ibPosition,
@@ -52,8 +53,8 @@ class StrategyData:
                         averageVolume: float = None,
                         volumeFirstMinute: float = None,
                         priceRules: List[PriceIncrement] = None,
-                        previousBars: List[CustomBarData] = None,
-                        currentBar: CustomBarData = None,
+                        previousBars: List[EventZigZag] = None,
+                        currentBar: EventZigZag = None,
                         fill: FillDB = None):
         self.ticker = ticker
         self.position = position

@@ -1,6 +1,6 @@
 from datetime import time, datetime, timedelta
 from country_config.models import Market
-from strategy.models import StrategyConfig
+from strategy.configs.models import StrategyConfig
 
 class StrategyZigZagConfig(StrategyConfig):
     minRSI: float
