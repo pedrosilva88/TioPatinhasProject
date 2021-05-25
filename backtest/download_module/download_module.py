@@ -1,12 +1,23 @@
-from strategy.historical_data import HistoricalData
-from backtest.models.base_models import BacktestDownloadModel
+import sys
+from typing import List
+from models.base_models import Contract
+from provider_factory.models import ProviderClient
 
 class BacktestDownloadModule:
-    model: BacktestDownloadModel
-    historicalData: HistoricalData
+    def downloadStocks(client: ProviderClient, stocks: List[Contract], days: int, barSize: str):
+        total = len(stocks)
+        current = 0
+        dic = dict()
 
-    def __init__(self, model: BacktestDownloadModel) -> None:
-        self.model = model
-        self.historicalData = HistoricalData()
+        for stock in stocks:
+            current += 1
+            sys.stdout.write("\t Contracts: %i/%i \r" % (current, total) )
+            if current <= total-1:
+                sys.stdout.flush()
+            else:
+                print("")
+
+            bars = client.downloadHistoricalData(stock, days, barSize)
+            dic[stock.symbol] = (stock, bars)
 
         
