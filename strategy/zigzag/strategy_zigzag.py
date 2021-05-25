@@ -1,20 +1,21 @@
-from datetime import *
 from typing import List, Tuple
-from helpers import log, utcToLocal, round_down
-from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType, StrategyConfig
-from models import Order, OrderAction, OrderType, CustomBarData
-from country_config import CountryConfig
 from ib_insync import Fill
+from helpers import log
+from strategy import Strategy
+from strategy.models import StrategyData, StrategyResult, StrategyResultType
+from strategy.configs.zigzag.models import StrategyZigZagConfig
+from models.base_models import Order, OrderAction, OrderType
+from country_config.models import Market
+from models.zigzag.models import EventZigZag
 
 class StrategyZigZag(Strategy):
     # Properties
 
     strategyData: StrategyData = None
-    strategyConfig: StrategyConfig = None
-    countryConfig: CountryConfig = None  
+    strategyConfig: StrategyZigZagConfig = None
 
-    currentBar: CustomBarData = None
-    previousBars: List[CustomBarData] = None
+    currentBar: EventZigZag = None
+    previousBars: List[EventZigZag] = None
     fill: Fill = None
 
     # Strategy Parameters
@@ -26,10 +27,9 @@ class StrategyZigZag(Strategy):
     minRSI: float = None
     maxRSI: float = None
 
-    def run(self, strategyData: StrategyData, strategyConfig: StrategyConfig, countryConfig: CountryConfig):
+    def run(self, strategyData: StrategyData, strategyConfig: StrategyZigZagConfig):
         self.strategyData = strategyData
         self.strategyConfig = strategyConfig
-        self.countryConfig = countryConfig
         self.fetchInformation()
 
         result = self.validateStrategy()
@@ -63,7 +63,7 @@ class StrategyZigZag(Strategy):
         else:
             return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)
 
-    def getZigZag(self) -> Tuple[CustomBarData, int]:
+    def getZigZag(self) -> Tuple[EventZigZag, int]:
         totalBars = len(self.previousBars)
         index = -1 
         zigzagBar = None

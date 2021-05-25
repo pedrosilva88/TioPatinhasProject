@@ -1,3 +1,7 @@
+
+from datetime import datetime
+from strategy.configs.models import StrategyConfig
+
 class StrategyOPGConfig(StrategyConfig):
     strategyValidPeriod: datetime
     strategyMaxTime: datetime

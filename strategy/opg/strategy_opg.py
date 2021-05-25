@@ -1,16 +1,16 @@
 from enum import Enum
 from datetime import *
 from helpers import log, utcToLocal, round_down
-from strategy import Strategy, StrategyData, StrategyResult, StrategyResultType, StrategyConfig, PriceIncrement
-from models import Order, OrderAction, OrderType
-from country_config import CountryConfig
+from strategy import Strategy
+from strategy.models import StrategyData, StrategyResult, StrategyResultType
+from strategy.configs.opg.models import StrategyOPGConfig
+from models.base_models import Order, OrderAction, OrderType
 
 class StrategyOPG(Strategy):
     # Properties
 
     strategyData: StrategyData = None
-    strategyConfig: StrategyConfig = None
-    countryConfig: CountryConfig = None
+    strategyConfig: StrategyOPGConfig = None
 
     minGap: int = None
     maxGap: int = None
@@ -38,12 +38,11 @@ class StrategyOPG(Strategy):
     avgVolume: float = None
     volumeFirstMinute: float = None
     datetime: datetime = None
-    priceRules: [PriceIncrement] = None
+    #priceRules: [PriceIncrement] = None
 
-    def run(self, strategyData: StrategyData, strategyConfig: StrategyConfig, countryConfig: CountryConfig):
+    def run(self, strategyData: StrategyData, strategyConfig: StrategyOPGConfig):
         self.strategyData = strategyData
         self.strategyConfig = strategyConfig
-        self.countryConfig = countryConfig
         self.fetchInformation()
 
         result = self.validateStrategy()
