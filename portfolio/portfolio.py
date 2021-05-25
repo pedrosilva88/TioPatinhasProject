@@ -37,7 +37,7 @@ class Portfolio:
 
         for account in ib.accountValues():
             if account.tag == "FullExcessLiquidity":
-                self.cashBalance = max(10000, float(account.value)) - 200
+                self.cashBalance = max(9800, float(account.value)) - 200
             elif account.tag == "GrossPositionValue":
                 self.grossPositionsValue = float(account.value)
             elif (account.tag == "ExchangeRate" and account.currency == "USD"):
