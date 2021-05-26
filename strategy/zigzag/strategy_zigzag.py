@@ -128,14 +128,18 @@ class StrategyZigZag(Strategy):
     # Validations
 
     def validateStrategy(self):
+        handleFillResult = None
         if self.strategyData.fill:
-            return self.handleFill()
+            handleFillResult = self.handleFill()
 
-        elif (not self.isConfigsValid() or not self.isStrategyDataValid()):
-            log("🙅‍♂️ Invalid data for %s: isConfigsValid(%s) isStrategyDataValid(%s) 🙅‍♂️" % (self.strategyData.ticker.contract.symbol, self.isConfigsValid(), self.isStrategyDataValid()))
-            return StrategyResult(self.strategyData.ticker, StrategyResultType.IgnoreEvent)
-
-        return None
+        if handleFillResult is None:
+            if (not self.isConfigsValid() or not self.isStrategyDataValid()):
+                log("🙅‍♂️ Invalid data for %s: isConfigsValid(%s) isStrategyDataValid(%s) 🙅‍♂️" % (self.strategyData.ticker.contract.symbol, self.isConfigsValid(), self.isStrategyDataValid()))
+                return StrategyResult(self.strategyData.ticker, StrategyResultType.IgnoreEvent)
+            else: 
+                return None
+        else:
+            return handleFillResult
 
     def isStrategyDataValid(self):
         return ((self.currentBar is not None) and (self.currentBar.zigzag is not None) and (self.currentBar.rsi is not None) and
@@ -160,23 +164,29 @@ class StrategyZigZag(Strategy):
     # Handlers
 
     def handleFill(self):
-        executionDate = self.strategyData.fill.date
-        dateLimit = date.today()-timedelta(days=6)
+        today = date.today() #date(2021, 5, 21)
+        now = datetime.now() #datetime(2021,5,21,17,30) 
 
-        if (self.strategyData.position is None or
+        executionDate = self.strategyData.fill.date
+        dateLimit = today-timedelta(days=6)
+
+        if (self.strategyData.position is None and
             dateLimit <= executionDate):
-            log("🥵 Cant do nothing with Stock (%s) - Or you already have a position and it's not expired or you had a Fill for this stock in the last 6 days 🥵" % self.strategyData.ticker.contract.symbol)
+            log("🥵 Cant do nothing with Stock (%s) - You had a Fill for this stock in the last 6 days 🥵" % self.strategyData.ticker.contract.symbol)
             return StrategyResult(self.strategyData.ticker, StrategyResultType.DoNothing)
 
-        shares = self.strategyData.position.position
+        elif self.strategyData.position is not None:
+            shares = self.strategyData.position.position
+            closeMarketDate = self.countryConfig.closeMarket.astimezone(timezone('UTC'))
+            if (now.hour == (closeMarketDate-timedelta(hours=2)).hour and today >= (executionDate+timedelta(days=0))):
+                if shares > 0:
+                    return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
+                elif shares < 0:
+                    return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Buy, None, self.strategyData.position)
+            log("🥵 Cant do nothing with Stock (%s) - You already have a position and it's not expired 🥵" % self.strategyData.ticker.contract.symbol)
+            return StrategyResult(self.strategyData.ticker, StrategyResultType.KeepPosition)
 
-        if (date.now().hour == self.countryConfig.closeMarket-timedelta(hours=2) and date.today() >= (executionDate.time+timedelta(days=1)).date()):
-            if shares > 0:
-                return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
-            elif shares < 0:
-                return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Buy, None, self.strategyData.position)
-
-        return StrategyResult(self.strategyData.ticker, StrategyResultType.KeepPosition)
+        return None
 
     # Calculations
     def getOrderPrice(self, action: OrderAction):
