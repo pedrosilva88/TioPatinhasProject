@@ -4,11 +4,10 @@ from models.base_models import Contract
 from provider_factory.models import ProviderClient
 
 class BacktestDownloadModule:
-    async def downloadStocks(client: ProviderClient, stocks: List[Contract], days: int, barSize: str):
+    def downloadStocks(client: ProviderClient, stocks: List[Contract], days: int, barSize: str):
         total = len(stocks)
         current = 0
         dic = dict()
-
         for stock in stocks:
             current += 1
             sys.stdout.write("\t Contracts: %i/%i \r" % (current, total) )
@@ -17,7 +16,7 @@ class BacktestDownloadModule:
             else:
                 print("")
 
-            bars = await client.downloadHistoricalData(stock, days, barSize)
+            bars = client.downloadHistoricalData(stock, days, barSize)
             dic[stock.symbol] = (stock, bars)
 
         

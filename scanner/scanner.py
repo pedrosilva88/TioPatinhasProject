@@ -1,3 +1,4 @@
+from country_config.country_manager import getCountryFromCurrency
 import os, sys
 import csv
 from models.base_models import Contract
@@ -13,7 +14,7 @@ class Scanner:
             line_count = 0
             for row in csv_reader:
                 if line_count > 0:
-                    stocks.append(Contract(row[0], row[1], row[2]))
+                    stocks.append(Contract(row[0], getCountryFromCurrency(row[2]), row[1]))
                 line_count += 1
         
         return stocks            

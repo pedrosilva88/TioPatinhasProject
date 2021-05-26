@@ -46,9 +46,22 @@ class ProviderConfigs:
 
 class ProviderClient:
     provider: Provider
+    providerConfigs = ProviderConfigs
     session: Any
 
+    def run(self):
+        pass
+
+    def connect(self):
+        pass
+
+    async def connectAsync(self):
+        pass
+
     def downloadHistoricalData(self, stock: Contract, days: int, barSize: str) -> List[Event]:
+        pass
+
+    async def downloadHistoricalDataAsync(self, stock: Contract, days: int, barSize: str) -> List[Event]:
         pass
 
 class ProviderController:

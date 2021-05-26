@@ -19,16 +19,13 @@ from scanner import Scanner
 # from country_config import CountryConfig
 # from scanner import Scanner
 
-class Backtest:
-    async def downloadStocksData():
+class BacktestModule:
+    def downloadStocksData():
         config = BacktestConfigs()
-        print(config)
-        print(config.provider)
-        print(config.providerConfigs)
         client = ProviderModule.createClient(config.provider, config.providerConfigs)
+        client.connect()
         stocks = Scanner.stocksFrom(config.downloadModel.path)
-        stocksData = await BacktestDownloadModule.downloadStocks(client, stocks, config.downloadModel.numberOfDays, config.downloadModel.barSize)
-        print(stocksData)
+        stocksData = BacktestDownloadModule.downloadStocks(client, stocks, config.downloadModel.numberOfDays, config.downloadModel.barSize)
         return stocksData
 
 
