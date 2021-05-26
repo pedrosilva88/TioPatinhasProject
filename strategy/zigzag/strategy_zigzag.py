@@ -5,7 +5,6 @@ from strategy import Strategy
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from models.base_models import Order, OrderAction, OrderType
-from country_config.models import Market
 from models.zigzag.models import EventZigZag
 
 class StrategyZigZag(Strategy):

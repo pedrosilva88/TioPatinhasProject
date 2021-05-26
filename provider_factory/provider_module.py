@@ -9,12 +9,14 @@ from configs.models import Provider, ProviderConfigs
 class ProviderModule:
     def createClient(provider: Provider, providerConfigs: ProviderConfigs) -> ProviderClient:
         if provider == Provider.TWS:
-            TWSModule.createClient(providerConfigs)
+            return TWSModule.createClient(providerConfigs)
         else:
             log("🚨 Dont know this Provider - %s 🚨" % provider)
+            return None
 
     def createController(provider: Provider, providerConfigs: ProviderConfigs) -> ProviderController:
         if provider == Provider.TWS:
-            TWSModule.createController(providerConfigs)
+            return TWSModule.createController(providerConfigs)
         else:
             log("🚨 Dont know this Provider - %s 🚨" % provider)
+            return None

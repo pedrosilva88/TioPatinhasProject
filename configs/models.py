@@ -6,7 +6,7 @@ from helpers import log
 from configs.interpreter.tws_interpreter import parseTWSConfigs
 from provider_factory.models import ProviderConfigs, Provider
 from strategy.configs.factory.strategy_config_factory import StrategyConfigFactory
-from country_config.market_manager import getMarketFor
+from country_config.market_manager import MarketManager
 from country_config.models import Country
 from strategy.configs.models import StrategyConfig, StrategyType
 
@@ -49,7 +49,7 @@ class TioPatinhasConfigs:
                 country = Country.USA
 
             if strategyType is not None and country is not None:
-                market = getMarketFor(country)
+                market = MarketManager.getMarketFor(country)
                 if market is not None:
                     strategy = StrategyConfigFactory.createStrategyFor(strategyType=strategyType, market=market)
                     if strategy is not None:

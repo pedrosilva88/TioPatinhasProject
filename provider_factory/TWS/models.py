@@ -14,14 +14,14 @@ class TWSClient(ProviderClient):
 
         ib = IB()
         ib.connect(providerConfigs.endpoint, providerConfigs.port, clientId=providerConfigs.clientID)
-
+        ib.run()
         self.session = ib
 
     async def downloadHistoricalData(self, contract: Contract, days: int, barSize: str) -> List[Event]:
         ib: IB = self.session
         if contract is None:
             return []
-
+        print("BLI")
         nDays = days
         nYears = int(nDays/365)
         durationDays = ("%d D" % (nDays+10)) if nDays < 365 else ("%d Y" % nYears)
