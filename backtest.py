@@ -1,4 +1,3 @@
-import asyncio
 from backtest.backtest_module import BacktestModule
 
 if __name__ == '__main__':
