@@ -1,10 +1,10 @@
 import sys
-from typing import List
-from models.base_models import Contract
+from typing import List, Tuple, Union
+from models.base_models import Contract, Event
 from provider_factory.models import ProviderClient
 
 class BacktestDownloadModule:
-    def downloadStocks(client: ProviderClient, stocks: List[Contract], days: int, barSize: str):
+    def downloadStocks(client: ProviderClient, stocks: List[Contract], days: int, barSize: str) -> Union[str, Tuple[Contract, List[Event]]]:
         total = len(stocks)
         current = 0
         dic = dict()
@@ -17,6 +17,7 @@ class BacktestDownloadModule:
                 print("")
 
             bars = client.downloadHistoricalData(stock, days, barSize)
+            print(len(bars))
             dic[stock.symbol] = (stock, bars)
-
+        return dic
         

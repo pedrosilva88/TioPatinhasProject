@@ -4,6 +4,9 @@ from datetime import datetime
 def utcToLocal(datetime: datetime, timezone:timezone):
     return datetime.astimezone(timezone)
 
+def systemDateStringFormat(date: datetime):
+    formatDate = "%Y-%m-%d %H:%M:%S"
+    return date.strftime(formatDate)
 
 # local = pytz.timezone('America/New_York')
 # naive_1 = datetime(2021, 3, 12, 9, 30, 0, 0)

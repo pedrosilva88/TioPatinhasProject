@@ -1,4 +1,9 @@
-import asyncio
+import csv
+from backtest.scanner.scanner_manager import getPathFolderToSaveStocksData
+from models.base_models import Contract, Event
+from typing import Any, List, Tuple, Union
+from strategy.configs.models import StrategyType
+from backtest.models.base_models import BacktestAction
 from backtest.configs.models import BacktestConfigs
 from backtest.download_module.download_module import BacktestDownloadModule
 from provider_factory.provider_module import ProviderModule
@@ -20,12 +25,46 @@ from scanner import Scanner
 # from scanner import Scanner
 
 class BacktestModule:
-    def downloadStocksData():
+    def runBacktest(self):
         config = BacktestConfigs()
+        if config.action == BacktestAction.downloadData:
+            self.runDownloadStocksAction()
+        else: 
+            print("Nothing to do")
+
+    def runDownloadStocksAction(self):
+        config = BacktestConfigs()
+        stocksData = self.downloadStocksData(config)
+        strategyStocksData = self.addIndicatorsToStocksData(stocksData, config)
+        self.saveDataInCSVFiles(config, strategyStocksData)
+        
+    def addIndicatorsToStocksData(self, stocksData: Union[str, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[str, Tuple[Contract, List[Event]]]:
+        pass
+
+    def saveDataInCSVFiles(self, config: BacktestConfigs, stocksData: Union[str, Tuple[Contract, List[Event]]]):
+        folder = getPathFolderToSaveStocksData(config.provider, config.country, config.strategyType)
+        for stockSymbol, (stock, bars) in stocksData.items():
+            filePath = ('%s/%s.csv' % (folder, stock.symbol))
+            with open(filePath, 'w', newline='') as file:
+                writer = csv.writer(file)
+                headerRow = self.getStockFileHeaderRow()
+                writer.writerow(headerRow)
+                for event in bars:
+                    row = self.getStockFileDataRow(stock, event)
+                    writer.writerow(row)
+    
+    def getStockFileHeaderRow(self) -> List[str]:
+        pass
+
+    def getStockFileDataRow(self) -> List[Any]:
+        pass
+
+    def downloadStocksData(self, config: BacktestConfigs) -> Union[str, Tuple[Contract, List[Event]]]:
         client = ProviderModule.createClient(config.provider, config.providerConfigs)
         client.connect()
         stocks = Scanner.stocksFrom(config.downloadModel.path)
         stocksData = BacktestDownloadModule.downloadStocks(client, stocks, config.downloadModel.numberOfDays, config.downloadModel.barSize)
+
         return stocksData
 
 
