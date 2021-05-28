@@ -122,12 +122,12 @@ class VaultZigZag:
             ticker = ibTicker(contract=stock)
             customBars = self.customBarsDataDict[stock.symbol]
             zigzagFound = False
-            if len(customBars) >= 7:
+            if len(customBars) >= 5:
                 currentBar = customBars[-1]
                 #log("😳 [%s] CurrentBar-> High(%.2f) Low(%s) 😳" % (currentBar.date, currentBar.high, currentBar.low))
                 previousBars = [] 
                 index = -2
-                while index >= -7:
+                while index >= -5:
                     #log("😳 [%d] 😳" % (index))
                     bar, zigzagFound = self.getCustomBarData(customBars[index], zigzagFound)
                     previousBars.insert(0, bar)
@@ -173,8 +173,6 @@ class VaultZigZag:
                     log("🤬 [%s] Bar[-2]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-2].date, previousBars[-2].open, previousBars[-2].zigzag))
                     log("🤬 [%s] Bar[-3]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-3].date, previousBars[-3].open, previousBars[-3].zigzag))
                     log("🤬 [%s] Bar[-4]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-4].date, previousBars[-4].open, previousBars[-4].zigzag))
-                    log("🤬 [%s] Bar[-5]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-5].date, previousBars[-5].open, previousBars[-5].zigzag))
-                    log("🤬 [%s] Bar[-6]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-6].date, previousBars[-6].open, previousBars[-6].zigzag))
                     log("🤬 [%s] CurrentBar-> Open(%.2f) ZigZag(%s) 🤬" % (currentBar.date, currentBar.open, currentBar.zigzag))
                     log("🤬  🤬")
                     return False
