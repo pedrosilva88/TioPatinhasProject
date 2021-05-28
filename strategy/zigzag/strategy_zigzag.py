@@ -38,8 +38,6 @@ class StrategyZigZag(Strategy):
             return result
 
         log("😁 %s 😁" % (self.strategyData.ticker.contract.symbol))
-        log("😁 [%s] Bar[-6]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-6].date, self.previousBars[-6].rsi, self.previousBars[-6].zigzag))
-        log("😁 [%s] Bar[-5]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-5].date, self.previousBars[-5].rsi, self.previousBars[-5].zigzag))
         log("😁 [%s] Bar[-4]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-4].date, self.previousBars[-4].rsi, self.previousBars[-4].zigzag))
         log("😁 [%s] Bar[-3]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].date, self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
         log("😁 [%s] Bar[-2]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].date, self.previousBars[-2].rsi, self.previousBars[-2].zigzag))

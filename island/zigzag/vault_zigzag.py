@@ -82,6 +82,7 @@ class VaultZigZag:
         await self.fetchHistoricalData()
         self.runStrategy()
         self.handleResultsToTrade()
+        await self.ib.reqPositionsAsync()
         await self.runStrategyForPositions()
         await self.closeMarketAt(self.countryConfig.closeMarket)
         
