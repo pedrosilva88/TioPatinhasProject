@@ -36,7 +36,6 @@ class BacktestConfigs:
         
         if settingsConfig['Default']['provider'] == 'TWS':
             self.provider = Provider.TWS
-            print(providerConfig)
             self.providerConfigs = parseTWSConfigs(providerConfig)
 
         self.country = getCountryFromCode(settingsConfig['Default']['country'] )

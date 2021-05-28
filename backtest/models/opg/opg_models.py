@@ -4,7 +4,7 @@ from models.base_models import Contract, OrderAction
 from models.opg.models import EventOPG
 from models.zigzag.models import EventZigZag
 
-class BacktestZigZagItem(BacktestItem):
+class BacktestOPGItem(BacktestItem):
     event: EventOPG
 
     def __init__(self, contract: Contract, 
@@ -16,26 +16,6 @@ class BacktestZigZagItem(BacktestItem):
                         volume: float) -> None:
         self.event = EventOPG(contract= contract, datetime=datetime, 
                                 open=open, close=close, high=high, low=low, volume=volume)
-
-    # TODO: Não sei pa que preciso disto    
-    # def ticker(self, countryConfig):
-    #     formatDate = "%Y-%m-%d %H:%M:%S"
-    #     stock = Stock(self.symbol, "SMART", countryConfig.currency)
-    #     customDate = self.dateString
-    #     if ":00+" in self.dateString:
-    #         customDate = self.dateString.split(":00+")[0]+":00"
-    #     elif ":00-" in self.dateString:
-    #         customDate = self.dateString.split(":00-")[0]+":00"
-
-    #     newTime = utcToLocal(datetime.strptime(customDate, formatDate), countryConfig.timezone)
-    #     return Ticker(contract=stock, 
-    #                         time=newTime, 
-    #                         close=self.close, 
-    #                         open=self.openPrice,
-    #                         bid=self.bid, 
-    #                         ask=self.ask, 
-    #                         last=self.last,
-    #                         volume=self.volume)
 
 class BacktestOPGResult(BacktestResult):
     openPrice: float
