@@ -7,18 +7,18 @@ runStartegyFilename = "scan_to_run_strategy.csv"
 downloadFilename = "scan_to_download.csv"
 
 scannerPath = "backtest/scanner/Data/CSV/%s/%s/%s/%s"
-dataCSVStocksPath = "backtest/Data/CSV/%s/%s/%s/Stocks"
-dataCSVReportsPath = "backtest/Data/CSV/%s/%s/%s/Report"
+dataCSVStocksPath = "backtest/data/CSV/%s/%s/%s/Stocks"
+dataCSVReportsPath = "backtest/data/CSV/%s/%s/%s/Report"
 
-def getPathFileToScanStocks(provider: Provider, country: Country, strategy: StrategyType, action: BacktestAction):
+def getPathFileToScanStocks(provider: Provider, country: Country, strategy: StrategyType, action: BacktestAction) -> str:
     filename = runStartegyFilename if action == BacktestAction.runStrategy else downloadFilename
     # backtest/scanner/Data/CSV/TWS/ZigZag/US/scan_to_download.csv
     return scannerPath % (provider.value, strategy.value, country.code, filename)
 
-def getPathFolderToSaveStocksData(provider: Provider, country: Country, strategy: StrategyType):
+def getPathFolderToSaveStocksData(provider: Provider, country: Country, strategy: StrategyType) -> str:
     # backtest/Data/CSV/TWS/ZigZag/US/Stocks
     return dataCSVStocksPath % (provider.value, strategy.value, country.code)
 
-def getPathFolderToSaveReports(provider: Provider, country: Country, strategy: StrategyType):
+def getPathFolderToSaveReports(provider: Provider, country: Country, strategy: StrategyType) -> str:
     # backtest/Data/CSV/TWS/ZigZag/US/Report
     return dataCSVStocksPath % (provider.value, strategy.value, country.code)
