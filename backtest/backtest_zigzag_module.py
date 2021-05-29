@@ -23,9 +23,9 @@
 # from strategy import StrategyZigZag, StrategyConfig, StrategyData, StrategyResultType, getStrategyConfigFor
 # from database import DatabaseModule, FillDB
 
+from backtest.models.base_models import ContractSymbol
 from strategy.historical_data import HistoricalData
 from typing import Any, List, Tuple, Union
-from pandas import util
 from helpers.date_timezone import systemDateStringFormat
 from models.zigzag.models import EventZigZag
 from models.base_models import Contract, Event
@@ -33,7 +33,7 @@ from backtest.backtest_module import BacktestModule
 from backtest.configs.models import BacktestConfigs
 
 class BacktestZigZagModule(BacktestModule):
-    def addIndicatorsToStocksData(self, stocksData: Union[str, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[str, Tuple[Contract, List[Event]]]:
+    def addIndicatorsToStocksData(self, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
         newData: Union[str, Tuple[Contract, List[Event]]] = dict()
         for stockSymbol, (stock, bars) in stocksData.items():
             print(len(bars))

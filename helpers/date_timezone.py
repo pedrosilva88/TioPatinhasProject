@@ -5,6 +5,8 @@ def utcToLocal(datetime: datetime, timezone:timezone):
     return datetime.astimezone(timezone)
 
 def systemDateStringFormat(date: datetime):
+    #dateString = bar.date.strftime("%Y-%m-%d %H:%M:%S").replace(" 00", " 12") Faço este hack antes de gravar no ficheiro?? Não sei porqê!!
+
     formatDate = "%Y-%m-%d %H:%M:%S"
     return date.strftime(formatDate)
 

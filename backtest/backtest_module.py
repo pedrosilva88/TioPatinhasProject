@@ -1,9 +1,9 @@
 import csv
 from backtest.scanner.scanner_manager import getPathFolderToSaveStocksData
 from models.base_models import Contract, Event
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Tuple, Union, NewType
 from strategy.configs.models import StrategyType
-from backtest.models.base_models import BacktestAction
+from backtest.models.base_models import BacktestAction, ContractSymbol
 from backtest.configs.models import BacktestConfigs
 from backtest.download_module.download_module import BacktestDownloadModule
 from provider_factory.provider_module import ProviderModule
@@ -38,10 +38,10 @@ class BacktestModule:
         strategyStocksData = self.addIndicatorsToStocksData(stocksData, config)
         self.saveDataInCSVFiles(config, strategyStocksData)
         
-    def addIndicatorsToStocksData(self, stocksData: Union[str, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[str, Tuple[Contract, List[Event]]]:
+    def addIndicatorsToStocksData(self, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
         pass
 
-    def saveDataInCSVFiles(self, config: BacktestConfigs, stocksData: Union[str, Tuple[Contract, List[Event]]]):
+    def saveDataInCSVFiles(self, config: BacktestConfigs, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]]):
         folder = getPathFolderToSaveStocksData(config.provider, config.country, config.strategyType)
         for stockSymbol, (stock, bars) in stocksData.items():
             filePath = ('%s/%s.csv' % (folder, stock.symbol))
@@ -59,7 +59,7 @@ class BacktestModule:
     def getStockFileDataRow(self) -> List[Any]:
         pass
 
-    def downloadStocksData(self, config: BacktestConfigs) -> Union[str, Tuple[Contract, List[Event]]]:
+    def downloadStocksData(self, config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
         client = ProviderModule.createClient(config.provider, config.providerConfigs)
         client.connect()
         stocks = Scanner.stocksFrom(config.downloadModel.path)

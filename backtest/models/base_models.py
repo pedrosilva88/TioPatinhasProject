@@ -1,6 +1,9 @@
 from datetime import datetime
 from enum import Enum
+from typing import NewType
 from models.base_models import Contract, OrderAction
+
+ContractSymbol = NewType("ContractSymbol", str)
 
 class BacktestItem:
     pass
