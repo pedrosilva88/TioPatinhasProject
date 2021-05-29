@@ -18,7 +18,6 @@ class BacktestDownloadModule:
                 print("")
 
             bars = client.downloadHistoricalData(stock, days, barSize)
-            print(len(bars))
             dic[stock.symbol] = (stock, bars)
         return dic
         

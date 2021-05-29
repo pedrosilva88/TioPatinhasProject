@@ -1,5 +1,5 @@
 from enum import Enum
-from datetime import datetime
+import datetime as dt
 from country_config.models import Country
 
 class Contract:
@@ -18,7 +18,7 @@ class Contract:
 
 class Event:
     contract: Contract
-    datetime: datetime
+    datetime: dt.datetime
 
     open: float
     close: float
@@ -27,7 +27,7 @@ class Event:
     volume: float
 
     def __init__(self, contract: Contract, 
-                        datetime: datetime, 
+                        datetime: dt.datetime, 
                         open: float, 
                         close: float, 
                         high: float, 
@@ -40,6 +40,17 @@ class Event:
         self.high = high
         self.low = low
         self.volume = volume
+
+    def to_dict(self):
+        return {
+            'contract': self.contract,
+            'datetime': self.datetime,
+            'open': self.open,
+            'close': self.close,
+            'high': self.high,
+            'low': self.low,
+            'volume': self.volume,
+        }
 
 class OrderAction(Enum):
     Buy = "BUY"

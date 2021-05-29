@@ -1,5 +1,5 @@
 from typing import Any, List, Tuple
-from ib_insync import util
+from pandas import DataFrame
 from zigzag import peak_valley_pivots_candlestick
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from models.zigzag.models import EventZigZag
@@ -9,7 +9,7 @@ class HistoricalData:
     def computeEventsForZigZagStrategy(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[EventZigZag]:
         zigzagValues = HistoricalData.calculateZigZag(events, strategyConfigs)
         rsiValues = HistoricalData.calculateRSI(events, strategyConfigs)
-
+        
         if zigzagValues is None or rsiValues is None:
             return []
 
@@ -21,7 +21,8 @@ class HistoricalData:
             if i > 0:
                 rsi = rsiValues[i-1]
 
-            eventZigZag = EventZigZag(date=event.date,
+            eventZigZag = EventZigZag(contract=event.contract,
+                                        datetime=event.datetime,
                                         open=event.open,
                                         high=event.high,
                                         low=event.low,
@@ -37,18 +38,21 @@ class HistoricalData:
         pass
 
     def calculateRSI(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
+        dfEvents = DataFrame.from_records([event.to_dict() for event in events])
         try:
-            RSI = HistoricalData.computeRSI(util.df(events)['close'], strategyConfigs.rsiOffsetDays)
+            RSI = HistoricalData.computeRSI(dfEvents['close'], strategyConfigs.rsiOffsetDays)
             return RSI.values
         except TypeError as e:
             print(e)
             return None
 
     def calculateZigZag(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
+        dfEvents = DataFrame.from_records([event.to_dict() for event in events])
+        print()
         try:
-            closes = util.df(events)['close']
-            lows = util.df(events)['low']
-            highs = util.df(events)['high']
+            closes = dfEvents['close']
+            lows = dfEvents['low']
+            highs = dfEvents['high']
             pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, strategyConfigs.zigzagSpread, -strategyConfigs.zigzagSpread)
             return pivots
         except TypeError as e:

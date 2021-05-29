@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any, Union
 from models.base_models import Contract, Event
 
 class EventZigZag(Event):
@@ -19,4 +20,9 @@ class EventZigZag(Event):
         self.lastPrice = lastPrice if lastPrice is not None else close
         self.zigzag = zigzag
         self.rsi = rsi
-        
+
+    def to_dict(self):
+        dict: Union[str, Any] = super().to_dict() 
+        dict['zigzag'] = self.zigzag
+        dict['rsi'] = self.rsi
+        dict['lastPrice'] = self.lastPrice

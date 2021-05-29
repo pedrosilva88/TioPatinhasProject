@@ -1,8 +1,8 @@
 import csv
+from typing import Any, List, Tuple, Union
+
 from backtest.scanner.scanner_manager import getPathFolderToSaveStocksData
 from models.base_models import Contract, Event
-from typing import Any, List, Tuple, Union, NewType
-from strategy.configs.models import StrategyType
 from backtest.models.base_models import BacktestAction, ContractSymbol
 from backtest.configs.models import BacktestConfigs
 from backtest.download_module.download_module import BacktestDownloadModule
@@ -30,7 +30,7 @@ class BacktestModule:
         if config.action == BacktestAction.downloadData:
             self.runDownloadStocksAction()
         else: 
-            print("Nothing to do")
+            print("🚨 Unkwon Action - nothing to do 🚨")
 
     def runDownloadStocksAction(self):
         config = BacktestConfigs()
@@ -43,15 +43,18 @@ class BacktestModule:
 
     def saveDataInCSVFiles(self, config: BacktestConfigs, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]]):
         folder = getPathFolderToSaveStocksData(config.provider, config.country, config.strategyType)
-        for stockSymbol, (stock, bars) in stocksData.items():
-            filePath = ('%s/%s.csv' % (folder, stock.symbol))
-            with open(filePath, 'w', newline='') as file:
-                writer = csv.writer(file)
-                headerRow = self.getStockFileHeaderRow()
-                writer.writerow(headerRow)
-                for event in bars:
-                    row = self.getStockFileDataRow(stock, event)
-                    writer.writerow(row)
+        for contractSymbol, (contract, bars) in stocksData.items():
+            filePath = ('%s/%s.csv' % (folder, contractSymbol))
+            self.saveDataInCSVFile(filePath, contract, bars)
+
+    def saveDataInCSVFile(self, filePath: str, contract: Contract, bars: List[Event]):
+        with open(filePath, 'w', newline='') as file:
+            writer = csv.writer(file)
+            headerRow = self.getStockFileHeaderRow()
+            writer.writerow(headerRow)
+            for event in bars:
+                row = self.getStockFileDataRow(contract, event)
+                writer.writerow(row)
     
     def getStockFileHeaderRow(self) -> List[str]:
         pass

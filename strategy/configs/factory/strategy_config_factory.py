@@ -14,7 +14,7 @@ class StrategyConfigFactory:
 
 
     def createZigZagStrategyFor(market: Market) -> StrategyConfig:
-        if market == market.country.USA:
+        if market.country == market.country.USA:
             return StrategyZigZagConfig(market= market, runStrategyTime= market.openTime+timedelta(minutes=Constants.ZigZag.runStrategyAfterMinutes),
                                         willingToLose=Constants.ZigZag.willingToLose,
                                         stopToLosePercentage=Constants.ZigZag.stopToLosePercentage, 
@@ -23,6 +23,8 @@ class StrategyConfigFactory:
                                         minRSI=Constants.ZigZag.minRSI, maxRSI=Constants.ZigZag.maxRSI, 
                                         rsiOffsetDays=Constants.ZigZag.rsiOffsetDays, zigzagSpread=Constants.ZigZag.zigzagSpread,
                                         runPositionsCheckTime=market.closeTime-timedelta(hours=Constants.ZigZag.runPositionsCheckBeforeHours))
+        else:
+            print("🚨 Cant Create ZigZag Strategy for this country - %s 🚨" % market.country)
 
 class Constants:
     class ZigZag:

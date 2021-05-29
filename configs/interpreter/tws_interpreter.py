@@ -17,6 +17,5 @@ def parseTWSConfigs(config: configparser) -> ProviderConfigs:
                                 readOnly=config['Default']['readOnly'],
                                 useController=config['TioPatinhas']['useController'])
     except Exception as e:
-        print("ERRRRRO")
         print(e)
         log("🚨 Unable to parse Provider Settings 🚨")

@@ -36,9 +36,7 @@ class BacktestZigZagModule(BacktestModule):
     def addIndicatorsToStocksData(self, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
         newData: Union[str, Tuple[Contract, List[Event]]] = dict()
         for stockSymbol, (stock, bars) in stocksData.items():
-            print(len(bars))
             newData[stockSymbol] = (stock, HistoricalData.computeEventsForZigZagStrategy(bars, config.strategy))
-
         return newData
 
     def getStockFileHeaderRow(self) -> List[str]:
