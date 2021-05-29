@@ -4,21 +4,22 @@ import csv
 from models.base_models import Contract
 
 class Scanner:
-    def stocksFrom(path= str):
+    def contratcsFrom(path= str):
         modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
         datapath = os.path.join(modpath, path)
-        stocks = []
+        contracts = []
         
         with open(datapath) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
             for row in csv_reader:
                 if line_count > 0:
-                    stocks.append(Contract(row[0], getCountryFromCurrency(row[2]), row[1]))
+                    contracts.append(Contract(row[0], getCountryFromCurrency(row[2]), row[1]))
                 line_count += 1
         
-        return stocks            
+        return contracts        
 
+    # Isto nao devia ser preciso. Ter um method de instancia
     def removeTicker(self, symbol: str):
         ticker = [d for d in self.stocks if d.symbol == symbol].pop()
         self.stocks.remove(ticker)

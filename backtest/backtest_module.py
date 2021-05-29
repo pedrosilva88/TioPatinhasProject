@@ -1,7 +1,9 @@
+from backtest.Scanner.scanner_manager import BacktestScannerManager
+from backtest.backtest_zigzag_module import BacktestZigZagModule
 import csv
 from typing import Any, List, Tuple, Union
 
-from backtest.scanner.scanner_manager import getPathFolderToSaveStocksData
+from backtest.scanner.scanner_manager import getPathFolderToSaveStocksData, getPathFileToScanStocks
 from models.base_models import Contract, Event
 from backtest.models.base_models import BacktestAction, ContractSymbol
 from backtest.configs.models import BacktestConfigs
@@ -29,17 +31,52 @@ class BacktestModule:
         config = BacktestConfigs()
         if config.action == BacktestAction.downloadData:
             self.runDownloadStocksAction()
+        elif config.action == BacktestAction.runStrategy:
+            pass
+        elif config.action == BacktestAction.runStockPerformance:
+            pass
+        elif config.action == BacktestAction.showGraph:
+            pass
         else: 
             print("🚨 Unkwon Action - nothing to do 🚨")
+
+    #### ABSTRACT METHODS ####  
+
+    def addIndicatorsToStocksData(self, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
+        pass
+    
+    def getStockFileHeaderRow(self) -> List[str]:
+        pass
+
+    def getStockFileDataRow(self) -> List[Any]:
+        pass
+
+    def parseCSVFile(reader: csv.reader) -> List[Event]:
+        pass
+
+    #### ACTIONS ####
 
     def runDownloadStocksAction(self):
         config = BacktestConfigs()
         stocksData = self.downloadStocksData(config)
         strategyStocksData = self.addIndicatorsToStocksData(stocksData, config)
         self.saveDataInCSVFiles(config, strategyStocksData)
+
+    def runStrategyAction(self):
+        config = BacktestConfigs()
+        allContractsEvents = BacktestScannerManager.loadStockFiles(config, self.parseCSVFile)
+        print("🧙‍♀️ Sort all Events by date 🧙‍♀️")
+        allContractsEvents.sort(key=lambda x: x.datetime, reverse=False)
         
-    def addIndicatorsToStocksData(self, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
+
+    def runStrategyPerformanceAction(self):
         pass
+
+    def runShowGraphAction(self):
+        pass
+
+
+    #### SAVE IN CSV FILES ####
 
     def saveDataInCSVFiles(self, config: BacktestConfigs, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]]):
         folder = getPathFolderToSaveStocksData(config.provider, config.country, config.strategyType)
@@ -55,17 +92,13 @@ class BacktestModule:
             for event in bars:
                 row = self.getStockFileDataRow(contract, event)
                 writer.writerow(row)
-    
-    def getStockFileHeaderRow(self) -> List[str]:
-        pass
 
-    def getStockFileDataRow(self) -> List[Any]:
-        pass
+    #### DOWNLOAD ####
 
     def downloadStocksData(self, config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
         client = ProviderModule.createClient(config.provider, config.providerConfigs)
         client.connect()
-        stocks = Scanner.stocksFrom(config.downloadModel.path)
+        stocks = Scanner.contratcsFrom(config.downloadModel.path)
         stocksData = BacktestDownloadModule.downloadStocks(client, stocks, config.downloadModel.numberOfDays, config.downloadModel.barSize)
 
         return stocksData
@@ -210,38 +243,6 @@ class BacktestModule:
 
 #         self.stockPerformance[ticker.contract.symbol] = array
 
-
-# # Save
-
-# def saveDataInCSVFile(filename: str, path: str, data: [BackTestModel], countryConfig: CountryConfig):
-#     name = ("backtest/Data/CSV/%s/%s/%s.csv" % (countryConfig.key.code,path, filename))
-#     with open(name, 'w', newline='') as file:
-#         writer = csv.writer(file)
-#         writer.writerow(["Symbol", "Date", "Close", "Open", "Bid", "Ask", "Last", "Volume", "AvgVolume", "VolumeFirstMinute", "ZigZag", "RSI"])
-#         for model in data:
-#             ticker = model.ticker(countryConfig)
-#             volumeMinute = None if not model.volumeInFirstMinuteBar else round(model.volumeInFirstMinuteBar, 2)
-#             averageVolume = None if not model.averageVolume else round(model.averageVolume, 2)
-#             openPrice = 0 if not ticker.open else round(ticker.open, 2)
-#             close = 0 if not ticker.close else round(ticker.close, 2)
-#             bid = 0 if not ticker.bid else round(ticker.bid, 2)
-#             ask = 0 if not ticker.ask else round(ticker.ask, 2)
-#             last = 0 if not ticker.last else round(ticker.last, 2)
-#             volume = None if not ticker.volume else round(ticker.volume, 2)
-#             zigzag = False if model.zigzag is None else model.zigzag
-#             rsi = None if model.rsi is None else round(model.rsi, 2)
-#             writer.writerow([ticker.contract.symbol, 
-#                             ticker.time, 
-#                             close, 
-#                             openPrice, 
-#                             bid, 
-#                             ask, 
-#                             last, 
-#                             volume, 
-#                             averageVolume, 
-#                             volumeMinute,
-#                             zigzag,
-#                             rsi])
 
 # # Load
 

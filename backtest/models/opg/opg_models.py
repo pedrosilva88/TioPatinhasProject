@@ -1,21 +1,21 @@
 from datetime import datetime
-from backtest.models.base_models import BacktestItem, BacktestResult, BacktestResultType
+from backtest.models.base_models import BacktestResult, BacktestResultType
 from models.base_models import Contract, OrderAction
 from models.opg.models import EventOPG
 from models.zigzag.models import EventZigZag
 
-class BacktestOPGItem(BacktestItem):
-    event: EventOPG
+# class BacktestOPGItem(BacktestItem):
+#     event: EventOPG
 
-    def __init__(self, contract: Contract, 
-                        datetime: datetime, 
-                        open: float,
-                        close: float,
-                        high: float,
-                        low: float,
-                        volume: float) -> None:
-        self.event = EventOPG(contract= contract, datetime=datetime, 
-                                open=open, close=close, high=high, low=low, volume=volume)
+#     def __init__(self, contract: Contract, 
+#                         datetime: datetime, 
+#                         open: float,
+#                         close: float,
+#                         high: float,
+#                         low: float,
+#                         volume: float) -> None:
+#         self.event = EventOPG(contract= contract, datetime=datetime, 
+#                                 open=open, close=close, high=high, low=low, volume=volume)
 
 class BacktestOPGResult(BacktestResult):
     openPrice: float
