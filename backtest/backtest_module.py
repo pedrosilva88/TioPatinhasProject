@@ -59,6 +59,16 @@ class BacktestModule:
     def runShowGraphAction(self):
         pass
 
+    #### STRATEGIES ####
+
+    def runStrategy(self):
+        print("🧙‍♀️ Start running strategy 🧙‍♀️")
+        model = BackTestSwing()
+        report = BackTestReport()
+        runStrategy(backtestModel=model, backtestReport=report, models=models)
+        path = ("backtest/Data/CSV/%s/ZigZag/Report" % (model.countryConfig.key.code))
+        report.showReport(path, True)
+
     #### SAVE IN CSV FILES ####
 
     def saveDataInCSVFiles(self, config: BacktestConfigs, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]]):
@@ -225,53 +235,3 @@ class BacktestModule:
 #             array[3] += 1
 
 #         self.stockPerformance[ticker.contract.symbol] = array
-
-
-# # Load
-
-# def loadFiles(pathToScan: str, countryConfig: CountryConfig):
-#     scanner = Scanner()
-#     scanner.fetchStocksFromCSVFile(path=pathToScan, nItems=0)
-#     stocks = scanner.stocks
-
-#     total = len(stocks)
-#     current = 0
-#     models = []
-#     for stock in stocks:
-#         current += 1
-#         sys.stdout.write("\t Fetching CSV Files: %i/%i \r" % (current, total) )
-#         if current <= total-1:
-#             sys.stdout.flush()
-#         else:
-#             print("")
-
-#         name = ("backtest/Data/CSV/%s/ZigZag/Stocks/%s.csv" % (countryConfig.key.code, stock.symbol))
-#         if not os.path.isfile(name):
-#             print("File not found ", name)
-#             continue
-#         models += getModelsFromCSV(name)
-#     print("Sort all Ticks by date")
-#     models.sort(key=lambda x: x.dateString, reverse=False)
-#     return models
-
-# def getModelsFromCSV(filePath: str):
-#     formatDate = "%Y-%m-%d %H:%M:%S"
-#     models = []
-#     with open(filePath) as csv_file:
-#         csv_reader = csv.reader(csv_file, delimiter=',')
-#         line_count = 0
-#         for row in csv_reader:
-#             if line_count > 0:
-#                 volumeMinute = None if not row[9] else float(row[9])
-#                 averageVolume = None if not row[8] else float(row[8])
-#                 openPrice = 0 if not row[3] else float(row[3])
-#                 close = 0 if not row[2] else float(row[2])
-#                 bid = 0 if not row[4] else float(row[4])
-#                 ask = 0 if not row[5] else float(row[5])
-#                 last = 0 if not row[6] else float(row[6])
-#                 volume = 0 if not row[7] else float(row[7])
-#                 zigzag = False if not row[10] else bool(distutils.util.strtobool(row[10]))
-#                 rsi = 0 if not row[11] else float(row[11])
-#                 models.append(BackTestModel(openPrice, close, bid, ask, last, volume, row[0], zigzag, rsi, row[1], averageVolume, volumeMinute))
-#             line_count += 1
-#     return models

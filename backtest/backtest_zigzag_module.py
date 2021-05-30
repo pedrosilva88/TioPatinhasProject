@@ -172,42 +172,6 @@ class BacktestZigZagModule(BacktestModule):
 
 #     plt.show()
 
-# def downloadData():
-#     ib = IB()
-#     ib.connect('127.0.0.1', 7497, clientId=16)
-#     path = ("Scanner/ZigZag/%s/scan_to_download.csv" % CountryKey.USA.code)
-#     savePath = "ZigZag/Stocks"
-#     countryConfig = getConfigFor(key=CountryKey.USA)
-#     modelDays = BackTestDownloadModel(path=path, numberOfDays=1825, barSize="1 day") # 5Years = 1825 days
-#     itemsDictionary = downloadStocksData(ib, modelDays)
-
-#     for key, (stock, bars) in itemsDictionary.items():
-#         closes = util.df(bars)['close']
-#         lows = util.df(bars)['low']
-#         highs = util.df(bars)['high']
-#         RSI = computeRSI(closes, 14)
-#         pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
-#         models = createListOfBackTestModels(stock, bars, pivots, RSI.values)
-
-#         saveDataInCSVFile(key, savePath, models, countryConfig)
-
-#         #showPlot(bars, pivots)
-
-# def loadStocks(fileName: str = "scan_to_run_strategy.csv"):
-#     path = ("Scanner/ZigZag/%s/%s" % (CountryKey.USA.code, fileName))
-#     countryConfig = getConfigFor(key=CountryKey.USA)
-#     return loadFiles(path, countryConfig)
-
-# # Run Strategy
-
-# def run():
-#     models = loadStocks()
-#     print("Run Strategy")
-#     model = BackTestSwing()
-#     report = BackTestReport()
-#     runStrategy(backtestModel=model, backtestReport=report, models=models)
-#     path = ("backtest/Data/CSV/%s/ZigZag/Report" % (model.countryConfig.key.code))
-#     report.showReport(path, True)
 
 # def runStockPerformance():
 #     models = loadStocks("scan_to_download.csv")
