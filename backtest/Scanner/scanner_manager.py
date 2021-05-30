@@ -1,7 +1,6 @@
 import sys, os, csv
 from typing import List
 from scanner.scanner import Scanner
-from backtest.configs.models import BacktestConfigs
 from configs.models import Provider
 from country_config.models import Country
 from models.base_models import Contract, Event
@@ -34,8 +33,8 @@ class BacktestScannerManager:
         # backtest/Data/CSV/TWS/ZigZag/US/Report
         return dataCSVStocksPath % (provider.value, strategy.value, country.code)
 
-    def loadStockFiles(config: BacktestConfigs, parserBlock) -> List[Event]:
-        filePathForStocks = BacktestScannerManager.getPathFileToScanStocks(config.provider, config.country, config.strategyType, config.action)
+    def loadStockFiles(provider: Provider, country: Country, strategy: StrategyType, action: BacktestAction,  parserBlock) -> List[Event]:
+        filePathForStocks = BacktestScannerManager.getPathFileToScanStocks(provider, country, strategy, action)
         contracts = Scanner.contratcsFrom(filePathForStocks)
 
         total = len(contracts)
@@ -49,7 +48,7 @@ class BacktestScannerManager:
             else:
                 print("")
 
-            filePathForStock =  BacktestScannerManager.getPathFileToReadStocksData(contract, config.provider, config.country, config.strategyType, config.action)
+            filePathForStock =  BacktestScannerManager.getPathFileToReadStocksData(contract, provider, country, strategy, action)
             if not os.path.isfile(filePathForStock):
                 print("File not found ", filePathForStock)
                 continue

@@ -1,9 +1,7 @@
-from backtest.Scanner.scanner_manager import BacktestScannerManager
-from backtest.backtest_zigzag_module import BacktestZigZagModule
+
 import csv
 from typing import Any, List, Tuple, Union
-
-from backtest.scanner.scanner_manager import getPathFolderToSaveStocksData, getPathFileToScanStocks
+from backtest.scanner.scanner_manager import BacktestScannerManager
 from models.base_models import Contract, Event
 from backtest.models.base_models import BacktestAction, ContractSymbol
 from backtest.configs.models import BacktestConfigs

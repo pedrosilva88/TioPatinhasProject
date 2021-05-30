@@ -1,7 +1,6 @@
-import asyncio
 from datetime import date, datetime, timedelta
 from os import name
-from typing import List, Tuple
+from typing import List
 
 from ib_insync.objects import BarData
 from ib_insync import IB, IBC, Stock
@@ -12,9 +11,8 @@ from provider_factory.models import ProviderClient, ProviderController
 
 class TWSClient(ProviderClient):
     @property
-    def client(self):
-        model: IB = self.session
-        return model
+    def client(self) -> IB :
+        return self.session
 
     def __init__(self, providerConfigs: ProviderConfigs) -> None:
         super().__init__()

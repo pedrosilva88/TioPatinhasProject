@@ -48,7 +48,6 @@ class HistoricalData:
 
     def calculateZigZag(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
         dfEvents = DataFrame.from_records([event.to_dict() for event in events])
-        print()
         try:
             closes = dfEvents['close']
             lows = dfEvents['low']
