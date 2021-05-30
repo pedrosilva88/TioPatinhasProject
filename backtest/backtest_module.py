@@ -11,32 +11,17 @@ from backtest.download_module.download_module import BacktestDownloadModule
 from provider_factory.provider_module import ProviderModule
 from scanner import Scanner
 
-# import os, sys
-# import os.path
-# currentdir = os.path.dirname(os.path.realpath(__file__))
-# parentdir = os.path.dirname(currentdir)
-# sys.path.append(parentdir)
-
-# import csv
-# import distutils.util
-# from enum import Enum
-# from ib_insync import *
-# from datetime import datetime, date, timedelta, time
-# from helpers import log, utcToLocal
-# from country_config import CountryConfig
-# from scanner import Scanner
-
 class BacktestModule:
     def runBacktest(self):
         config = BacktestConfigs()
         if config.action == BacktestAction.downloadData:
             self.runDownloadStocksAction()
         elif config.action == BacktestAction.runStrategy:
-            pass
+            self.runStrategyAction()
         elif config.action == BacktestAction.runStockPerformance:
-            pass
+            self.runShowGraphAction()
         elif config.action == BacktestAction.showGraph:
-            pass
+            self.runShowGraphAction()
         else: 
             print("🚨 Unkwon Action - nothing to do 🚨")
 
@@ -68,13 +53,11 @@ class BacktestModule:
         print("🧙‍♀️ Sort all Events by date 🧙‍♀️")
         allContractsEvents.sort(key=lambda x: x.datetime, reverse=False)
         
-
     def runStrategyPerformanceAction(self):
         pass
 
     def runShowGraphAction(self):
         pass
-
 
     #### SAVE IN CSV FILES ####
 

@@ -23,11 +23,11 @@
 # from strategy import StrategyZigZag, StrategyConfig, StrategyData, StrategyResultType, getStrategyConfigFor
 # from database import DatabaseModule, FillDB
 
-import csv
+import csv, distutils
+from typing import Any, List, Tuple, Union
 from backtest.models.base_models import ContractSymbol
 from strategy.historical_data import HistoricalData
-from typing import Any, List, Tuple, Union
-from helpers.date_timezone import systemDateStringFormat
+from helpers.date_timezone import systemDateFromString, systemDateToString
 from models.zigzag.models import EventZigZag
 from models.base_models import Contract, Event
 from backtest.backtest_module import BacktestModule
@@ -45,7 +45,7 @@ class BacktestZigZagModule(BacktestModule):
 
     def getStockFileDataRow(self, contract: Contract, data: EventZigZag) -> List[Any]:
         symbol = contract.symbol
-        date = systemDateStringFormat(data.datetime)
+        date = systemDateFromString(data.datetime)
 
         open = 0 if not data.open else round(data.open, 2)
         close = 0 if not data.close else round(data.close, 2)
@@ -58,48 +58,37 @@ class BacktestZigZagModule(BacktestModule):
         return [symbol, date, open, close, high, low, zigzag, rsi]
 
     def parseCSVFile(reader: csv.reader) -> List[Event]:
+        configs = BacktestConfigs()
         line_count = 0
         contractEvents = []
         for row in reader:
             if line_count > 0:
-                volumeMinute = None if not row[9] else float(row[9])
-                averageVolume = None if not row[8] else float(row[8])
-                openPrice = 0 if not row[3] else float(row[3])
-                close = 0 if not row[2] else float(row[2])
-                bid = 0 if not row[4] else float(row[4])
-                ask = 0 if not row[5] else float(row[5])
-                last = 0 if not row[6] else float(row[6])
-                volume = 0 if not row[7] else float(row[7])
-                zigzag = False if not row[10] else bool(distutils.util.strtobool(row[10]))
-                rsi = 0 if not row[11] else float(row[11])
+                symbol = None if not row[0] else float(row[0])
+                contract = Contract(symbol, configs.country)
 
-                contractEvents.append(BackTestModel(openPrice, close, bid, ask, last, volume, row[0], zigzag, rsi, row[1], averageVolume, volumeMinute))
+                datetimeStr = None if not row[1] else float(row[1])
+                datetime = systemDateToString(datetimeStr)
 
-            line_count += 1
-        return contractEvents
-        
+                open = 0 if not row[2] else float(row[2])
+                close = 0 if not row[3] else float(row[3])
+                high = 0 if not row[4] else float(row[4])
+                low = 0 if not row[5] else float(row[5])
 
-# def getModelsFromCSV(filePath: str):
-#     formatDate = "%Y-%m-%d %H:%M:%S"
-#     models = []
-#     with open(filePath) as csv_file:
-#         csv_reader = csv.reader(csv_file, delimiter=',')
-#         line_count = 0
-#         for row in csv_reader:
-#             if line_count > 0:
-#                 volumeMinute = None if not row[9] else float(row[9])
-#                 averageVolume = None if not row[8] else float(row[8])
-#                 openPrice = 0 if not row[3] else float(row[3])
+                zigzag = False if not row[6] else bool(distutils.util.strtobool(row[6]))
+                rsi = 0 if not row[7] else float(row[7])
+
+#                 open = 0 if not row[3] else float(row[3])
 #                 close = 0 if not row[2] else float(row[2])
-#                 bid = 0 if not row[4] else float(row[4])
-#                 ask = 0 if not row[5] else float(row[5])
-#                 last = 0 if not row[6] else float(row[6])
-#                 volume = 0 if not row[7] else float(row[7])
+#                 high = 0 if not row[5] else float(row[5])
+#                 low = 0 if not row[4] else float(row[4])
+
 #                 zigzag = False if not row[10] else bool(distutils.util.strtobool(row[10]))
 #                 rsi = 0 if not row[11] else float(row[11])
-#                 models.append(BackTestModel(openPrice, close, bid, ask, last, volume, row[0], zigzag, rsi, row[1], averageVolume, volumeMinute))
-#             line_count += 1
-#     return models
+
+                event = EventZigZag(contract, datetime, open, close, high, low, zigzag, rsi)
+                contractEvents.append(event)
+            line_count += 1
+        return contractEvents
 
 # class BackTestSwing():
 #     results: Union[str, List[BackTestResult]]
