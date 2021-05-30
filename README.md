@@ -58,9 +58,17 @@ In this `config.ini` you should provide your username, password, the version of 
 ```
 $ cd [PATH]/[PROJECT_FOLDER]/
 $ source [PATH]/[PROJECT_FOLDER]/.env/virtualenv/bin/activate
-$ python main.py [PATH_TO_FILE]/[FILE_CONFIGS].ini
+$ python main.py [PATH_TO_FILE]/[PROJECT_CONFIGS].ini [PATH_TO_FILE]/[PROVIDER_CONFIGS].ini
 ```
 ![Tio Patinhas](https://media.giphy.com/media/qzeCF4ymrgFXy/giphy.gif)
+
+## Run Backtest
+```
+$ cd [PATH]/[PROJECT_FOLDER]/
+$ source [PATH]/[PROJECT_FOLDER]/.env/virtualenv/bin/activate
+$ python backtest.py [PATH_TO_FILE]/[BACKTEST_CONFIGS].ini [PATH_TO_FILE]/[PROVIDER_CONFIGS].ini
+
+```
 
 ## Applications
 ### Programming and Debugging
