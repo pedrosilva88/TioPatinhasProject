@@ -70,7 +70,7 @@ class BacktestModule:
     #### SAVE IN CSV FILES ####
 
     def saveDataInCSVFiles(self, config: BacktestConfigs, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]]):
-        folder = getPathFolderToSaveStocksData(config.provider, config.country, config.strategyType)
+        folder = BacktestScannerManager.getPathFolderToSaveStocksData(config.provider, config.country, config.strategyType)
         for contractSymbol, (contract, bars) in stocksData.items():
             filePath = ('%s/%s.csv' % (folder, contractSymbol))
             self.saveDataInCSVFile(filePath, contract, bars)

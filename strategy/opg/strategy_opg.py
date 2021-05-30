@@ -1,6 +1,6 @@
 from enum import Enum
 from datetime import *
-from helpers import log, utcToLocal, round_down
+from helpers import log, Helpers, round_down
 from strategy import Strategy
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from strategy.configs.opg.models import StrategyOPGConfig
@@ -94,7 +94,7 @@ class StrategyOPG(Strategy):
         self.lastPrice = self.strategyData.ticker.last
         self.askPrice = self.strategyData.ticker.ask
         self.bidPrice = self.strategyData.ticker.bid
-        self.datetime = utcToLocal(self.strategyData.ticker.time, self.countryConfig.timezone)
+        self.datetime = Helpers.utcToLocal(self.strategyData.ticker.time, self.countryConfig.timezone)
         self.avgVolume = self.strategyData.averageVolume
         self.volumeFirstMinute = self.strategyData.volumeFirstMinute
         self.priceRules = self.strategyData.priceRules

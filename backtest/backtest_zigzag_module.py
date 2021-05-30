@@ -27,7 +27,7 @@ import csv, distutils
 from typing import Any, List, Tuple, Union
 from backtest.models.base_models import ContractSymbol
 from strategy.historical_data import HistoricalData
-from helpers.date_timezone import systemDateFromString, systemDateToString
+from helpers.date_timezone import Helpers
 from models.zigzag.models import EventZigZag
 from models.base_models import Contract, Event
 from backtest.backtest_module import BacktestModule
@@ -45,7 +45,7 @@ class BacktestZigZagModule(BacktestModule):
 
     def getStockFileDataRow(self, contract: Contract, data: EventZigZag) -> List[Any]:
         symbol = contract.symbol
-        date = systemDateFromString(data.datetime)
+        date = Helpers.dateToString(data.datetime)
 
         open = 0 if not data.open else round(data.open, 2)
         close = 0 if not data.close else round(data.close, 2)
@@ -67,7 +67,7 @@ class BacktestZigZagModule(BacktestModule):
                 contract = Contract(symbol, configs.country)
 
                 datetimeStr = None if not row[1] else float(row[1])
-                datetime = systemDateToString(datetimeStr)
+                datetime = Helpers.stringToDate(datetimeStr)
 
                 open = 0 if not row[2] else float(row[2])
                 close = 0 if not row[3] else float(row[3])
