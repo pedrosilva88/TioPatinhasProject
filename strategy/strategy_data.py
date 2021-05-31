@@ -44,6 +44,8 @@ class StrategyData:
     totalCash: float
     previousBars: List[CustomBarData]
     currentBar: CustomBarData
+    today: date
+    now: datetime
 
     def __init__(self, ticker: ibTicker,
                         position: ibPosition,
@@ -54,7 +56,9 @@ class StrategyData:
                         priceRules: List[PriceIncrement] = None,
                         previousBars: List[CustomBarData] = None,
                         currentBar: CustomBarData = None,
-                        fill: FillDB = None):
+                        fill: FillDB = None,
+                        today: date = date.today(),
+                        now: datetime = datetime.now()):
         self.ticker = ticker
         self.position = position
         self.order = order
@@ -65,6 +69,8 @@ class StrategyData:
         self.previousBars = previousBars
         self.currentBar = currentBar
         self.fill = fill
+        self.today = today
+        self.now = now
 
 class StrategyResult:
     ticker: ibTicker

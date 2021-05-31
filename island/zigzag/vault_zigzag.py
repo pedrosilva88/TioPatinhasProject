@@ -157,29 +157,6 @@ class VaultZigZag:
             found = True
         return (bar, found)
 
-    def isValidToRunStrategy(self, currentBar: CustomBarData, previousBars: [CustomBarData]):
-        index = 0
-        reversedPreviousBars = list(reversed(previousBars))
-        zigzagBar = None
-        for bar in reversedPreviousBars:
-            if bar.zigzag == True:
-                zigzagBar = bar
-                break
-        if zigzagBar is not None:
-            for bar in previousBars:
-                if (bar.zigzag == False and 
-                    (self.getPercentageChange(zigzagBar.high, bar.open) >= 5 or self.getPercentageChange(zigzagBar.low, bar.open) >= 5)):
-                    log("🤬 [%s] Bar 🤬" % (bar.date))
-                    log("🤬 [%s] Bar[-1]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-1].date, previousBars[-1].open, previousBars[-1].zigzag))
-                    log("🤬 [%s] Bar[-2]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-2].date, previousBars[-2].open, previousBars[-2].zigzag))
-                    log("🤬 [%s] Bar[-3]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-3].date, previousBars[-3].open, previousBars[-3].zigzag))
-                    log("🤬 [%s] Bar[-4]-> Open(%.2f) ZigZag(%s) 🤬" % (previousBars[-4].date, previousBars[-4].open, previousBars[-4].zigzag))
-                    log("🤬 [%s] CurrentBar-> Open(%.2f) ZigZag(%s) 🤬" % (currentBar.date, currentBar.open, currentBar.zigzag))
-                    log("🤬  🤬")
-                    return False
-        
-        return True
-
     async def runStrategyForPositions(self):
         time = self.countryConfig.closeMarket-timedelta(hours=2)
         marketTime = time.astimezone(timezone('UTC'))
@@ -254,7 +231,7 @@ class VaultZigZag:
         chunks = self.grouper(self.stocks, 50)
         all_bars = []
         for stocks in chunks:
-            all_bars += await asyncio.gather(*[self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 20, "1 day") for stock in stocks ])
+            all_bars += await asyncio.gather(*[self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 50, "1 day") for stock in stocks ])
         for stock, bars in zip(self.stocks, all_bars):
             if stock.symbol not in self.customBarsDataDict:
                 self.customBarsDataDict[stock.symbol] = []
