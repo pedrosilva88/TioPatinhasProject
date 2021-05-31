@@ -23,17 +23,39 @@
 # from strategy import StrategyZigZag, StrategyConfig, StrategyData, StrategyResultType, getStrategyConfigFor
 # from database import DatabaseModule, FillDB
 
+from country_config.market_manager import MarketManager
+from country_config.models import Market
 import csv, distutils
+from datetime import date
+from strategy.configs.models import StrategyConfig
+from strategy.configs.factory.strategy_config_factory import StrategyConfigFactory
+from strategy.strategy import Strategy
+from strategy.zigzag.strategy_zigzag import StrategyZigZag
 from typing import Any, List, Tuple, Union
-from backtest.models.base_models import ContractSymbol
+from backtest.models.base_models import BacktestAction, ContractSymbol
 from strategy.historical_data import HistoricalData
 from helpers.date_timezone import Helpers
 from models.zigzag.models import EventZigZag
-from models.base_models import Contract, Event
+from models.base_models import Contract, Event, Order, Position
 from backtest.backtest_module import BacktestModule
 from backtest.configs.models import BacktestConfigs
+from database.database_module import DatabaseModule
 
 class BacktestZigZagModule(BacktestModule):
+    class RunStrategyZigZagModel(BacktestModule.RunStrategyModel):
+        databaseModule: DatabaseModule
+        currentDay: date
+        tradesAvailable: int
+
+        def __init__(self, strategy: Strategy, strategyConfig: StrategyConfig, isForStockPerformance: bool) -> None:
+            super().__init__(strategy, strategyConfig, isForStockPerformance)
+            self.databaseModule = DatabaseModule()
+            self.databaseModule.openDatabaseConnectionForBacktest()
+            self.databaseModule.deleteFills(self.databaseModule.getFills())
+            
+            self.currentDay = None
+            self.tradesAvailable = 0
+
     def addIndicatorsToStocksData(self, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
         newData: Union[str, Tuple[Contract, List[Event]]] = dict()
         for stockSymbol, (stock, bars) in stocksData.items():
@@ -90,6 +112,12 @@ class BacktestZigZagModule(BacktestModule):
             line_count += 1
         return contractEvents
 
+    def setupRunStrategy(self):
+        config = BacktestConfigs()
+        isForStockPerformance = True if config.action == BacktestAction.runStockPerformance else False
+        strategyConfig = StrategyConfigFactory.createZigZagStrategyFor(MarketManager.getMarketFor(config.country))
+        self.strategyModel = self.RunStrategyZigZagModel(StrategyZigZag(), strategyConfig, isForStockPerformance)
+
 # class BackTestSwing():
 #     results: Union[str, List[BackTestResult]]
 #     trades: Union[str, List[str]]
@@ -103,24 +131,6 @@ class BacktestZigZagModule(BacktestModule):
 #         self.cashAvailable = 10000
 #         self.countryConfig = getConfigFor(CountryKey.USA)
 #         self.strategyConfig= getStrategyConfigFor(key=self.countryConfig.key, timezone=self.countryConfig.timezone)
-
-# def createListOfBackTestModels(stock: Contract, bars: List[BarData], zigzags:List[int], rsi: List[float], dateFormat: str = "%Y-%m-%d %H:%M:%S") -> List[BackTestModel]:
-#     models = []
-#     i = 0
-#     for bar in bars:
-#         zigzag = True if zigzags[i] != 0 else False
-#         rsi_value = None
-#         if i > 0:
-#             rsi_value = rsi[i-1]
-#         dateString = bar.date.strftime("%Y-%m-%d %H:%M:%S").replace(" 00", " 12")
-#         model = BackTestModel(bar.open, bar.close, bar.low, bar.high, bar.close, 
-#                                 bar.volume, stock.symbol,
-#                                 zigzag, rsi_value,
-#                                 dateString, 
-#                                 None, None)
-#         models.append(model)
-#         i += 1
-#     return models
 
 # def showPlot(mBars: List[BarData], zigzags:List[int]):
 #     i = 0

@@ -90,3 +90,15 @@ class BracketOrder:
         self.parentOrder = parentOrder
         self.takeProfitOrder = takeProfitOrder
         self.stopLossOrder = stopLossOrder
+
+class Position:
+    contract: Contract
+    size: int
+
+    def __init__(self, contract: Contract, size: int) -> None:
+        self.contract = contract
+        self.size = size
+        
+    @property
+    def postionType(self) -> OrderAction:
+        return OrderAction.Buy if self.size > 0 else OrderAction.Sell

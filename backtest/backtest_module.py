@@ -1,8 +1,11 @@
 
 import csv
+from datetime import date
+from strategy.configs.models import StrategyConfig
+from strategy.strategy import Strategy
 from typing import Any, List, Tuple, Union
 from backtest.scanner.scanner_manager import BacktestScannerManager
-from models.base_models import Contract, Event
+from models.base_models import Contract, Event, Order, Position
 from backtest.models.base_models import BacktestAction, ContractSymbol
 from backtest.configs.models import BacktestConfigs
 from backtest.download_module.download_module import BacktestDownloadModule
@@ -10,6 +13,21 @@ from provider_factory.provider_module import ProviderModule
 from scanner import Scanner
 
 class BacktestModule:
+    class RunStrategyModel:
+        strategy: Strategy
+        positions: Union[str, Tuple[Order, Position, date]]
+        cashAvailable: float
+        isForStockPerformance: bool
+        strategyConfig: StrategyConfig
+
+        def __init__(self, strategy: Strategy, strategyConfig: StrategyConfig, isForStockPerformance: bool) -> None:
+            self.strategy = strategy
+            self.strategyConfig = strategyConfig
+            self.positions = dict()
+            self.isForStockPerformance = isForStockPerformance
+
+    strategyModel: RunStrategyModel
+
     def runBacktest(self):
         config = BacktestConfigs()
         if config.action == BacktestAction.downloadData:
@@ -34,7 +52,10 @@ class BacktestModule:
     def getStockFileDataRow(self) -> List[Any]:
         pass
 
-    def parseCSVFile(reader: csv.reader) -> List[Event]:
+    def parseCSVFile(self, reader: csv.reader) -> List[Event]:
+        pass
+
+    def setupRunStrategy(self):
         pass
 
     #### ACTIONS ####
@@ -50,6 +71,7 @@ class BacktestModule:
         allContractsEvents = BacktestScannerManager.loadStockFiles(config, self.parseCSVFile)
         print("🧙‍♀️ Sort all Events by date 🧙‍♀️")
         allContractsEvents.sort(key=lambda x: x.datetime, reverse=False)
+        self.runStrategy()
         
     def runStrategyPerformanceAction(self):
         pass
@@ -58,14 +80,33 @@ class BacktestModule:
         pass
 
     #### STRATEGIES ####
+# def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, models: List[BackTestModel], forPerformance: bool = False):
+#     strategy = StrategyZigZag()
+#     tempOrders: Union[str, Tuple[myOrder, Position, date]] = dict()
+#     isForStockPerformance = forPerformance
+#     dayChecked = None
+#     tradesAvailable = 0
+
+#     databaseModule = DatabaseModule()
+#     databaseModule.openDatabaseConnectionForBacktest()
+#     databaseModule.deleteFills(databaseModule.getFills())
+
+#     i = 0
+#     for model in models:
+#         ticker = model.ticker(backtestModel.countryConfig)
+#         stock = ticker.contract
+
 
     def runStrategy(self):
+        print("🧙‍♀️ Setup strategy 🧙‍♀️")
+        self.setupRunStrategy()
         print("🧙‍♀️ Start running strategy 🧙‍♀️")
-        model = BackTestSwing()
-        report = BackTestReport()
-        runStrategy(backtestModel=model, backtestReport=report, models=models)
-        path = ("backtest/Data/CSV/%s/ZigZag/Report" % (model.countryConfig.key.code))
-        report.showReport(path, True)
+        # model = BackTestSwing()
+        # report = BackTestReport()
+        # runStrategy(backtestModel=model, backtestReport=report, models=models)
+        # path = ("backtest/Data/CSV/%s/ZigZag/Report" % (model.countryConfig.key.code))
+        # report.showReport(path, True)
+
 
     #### SAVE IN CSV FILES ####
 
