@@ -1,21 +1,16 @@
 from enum import Enum
-from datetime import datetime, date, time
 from models.zigzag.models import EventZigZag
-from models.base_models import Event
+from models.base_models import BracketOrder, Contract, Event, Position
 from typing import List
-from models import Order
-from ib_insync import Ticker as ibTicker, Position as ibPosition, PriceIncrement
-from pytz import timezone
-from database import FillDB
 
 class StrategyResultType(Enum):
     def __str__(self):
         if self.value == 0: return "Ignore Event"
         elif self.value == 1: return "Do nothing"
-        elif self.value == 2: return "Buy Ticker"
-        elif self.value == 3: return "Sell Ticker"
-        elif self.value == 4: return "Time expired (12:30) Sell Ticker"
-        elif self.value == 5: return "Time expired (12:30) Buy Ticker"
+        elif self.value == 2: return "Buy Position"
+        elif self.value == 3: return "Sell Position"
+        elif self.value == 4: return "Time expired Sell Position"
+        elif self.value == 5: return "Time expired Buy Position"
         elif self.value == 6: return "Keep Position"
         elif self.value == 7: return "Keep Order"
         elif self.value == 8: return "Invalid Time for this Strategy"
@@ -35,51 +30,33 @@ class StrategyResultType(Enum):
     CancelOrder = 10
 
 class StrategyData:
-    ticker: ibTicker
-    priceRules: List[PriceIncrement]
-    averageVolume: float
-    volumeFirstMinute: float
-    position: ibPosition
-    order: Order
-    fill: FillDB
     totalCash: float
-    previousBars: List[EventZigZag]
-    currentBar: EventZigZag
+    contract: Contract
+    event: Event
+    position: Position
 
-    def __init__(self, ticker: ibTicker,
-                        position: ibPosition,
-                        order: Order,
+    def __init__(self, contract: Contract,
                         totalCash: float,
-                        averageVolume: float = None,
-                        volumeFirstMinute: float = None,
-                        priceRules: List[PriceIncrement] = None,
-                        previousBars: List[EventZigZag] = None,
-                        currentBar: EventZigZag = None,
-                        fill: FillDB = None):
-        self.ticker = ticker
+                        event: Event,
+                        position: Position = None):
+        self.contract = contract
         self.position = position
-        self.order = order
         self.totalCash = totalCash
-        self.averageVolume = averageVolume
-        self.volumeFirstMinute = volumeFirstMinute
-        self.priceRules = priceRules
-        self.previousBars = previousBars
-        self.currentBar = currentBar
-        self.fill = fill
+        self.event = event
 
 class StrategyResult:
-    ticker: ibTicker
+    contract: Contract
+    event: Event
     type: StrategyResultType
-    priority: int = None
-    order: Order = None
-    position: ibPosition = None
+    order: BracketOrder
+    position: Position
 
     def __str__(self):
-        return "Result for %s: %s %s\n" % (self.ticker.contract.symbol, self.ticker.time, self.type.name)
+        return "Result for %s: %s %s\n" % (self.contract.symbol, self.event.datetime, self.type.name)
 
-    def __init__(self, ticker: ibTicker, type, order: Order = None, position: ibPosition = None, priority: int = None):
-        self.ticker = ticker
+    def __init__(self, contract: Contract, event: Event, type: StrategyResultType, order: BracketOrder = None, position: Position = None):
+        self.contract = contract
+        self.event = event
         self.type = type
         self.order = order
         self.position = position
-        self.priority = priority

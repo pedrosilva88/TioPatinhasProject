@@ -1,6 +1,6 @@
-from backtest.models.base_models import ContractSymbol
 import sys
 from typing import List, Tuple, Union
+from backtest.models.base_models import ContractSymbol
 from models.base_models import Contract, Event
 from provider_factory.models import ProviderClient
 

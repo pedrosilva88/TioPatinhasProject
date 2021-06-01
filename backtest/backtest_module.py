@@ -1,11 +1,13 @@
 
 import csv
 from datetime import date
+from strategy.models import StrategyResult
+
 from strategy.configs.models import StrategyConfig
 from strategy.strategy import Strategy
 from typing import Any, List, Tuple, Union
 from backtest.scanner.scanner_manager import BacktestScannerManager
-from models.base_models import Contract, Event, Order, Position
+from models.base_models import BracketOrder, Contract, Event, Position
 from backtest.models.base_models import BacktestAction, ContractSymbol
 from backtest.configs.models import BacktestConfigs
 from backtest.download_module.download_module import BacktestDownloadModule
@@ -15,7 +17,7 @@ from scanner import Scanner
 class BacktestModule:
     class RunStrategyModel:
         strategy: Strategy
-        positions: Union[str, Tuple[Order, Position, date]]
+        positions: Union[str, Tuple[BracketOrder, Position, date]]
         cashAvailable: float
         isForStockPerformance: bool
         strategyConfig: StrategyConfig
@@ -58,6 +60,12 @@ class BacktestModule:
     def setupRunStrategy(self):
         pass
 
+    def getStrategyData(self):
+        pass
+
+    def handleStrategyResult(self, event: Event, events: List[Event], result: StrategyResult, currentPosition: int):
+        pass
+
     #### ACTIONS ####
 
     def runDownloadStocksAction(self):
@@ -80,33 +88,74 @@ class BacktestModule:
         pass
 
     #### STRATEGIES ####
-# def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, models: List[BackTestModel], forPerformance: bool = False):
-#     strategy = StrategyZigZag()
-#     tempOrders: Union[str, Tuple[myOrder, Position, date]] = dict()
-#     isForStockPerformance = forPerformance
-#     dayChecked = None
-#     tradesAvailable = 0
+            
+#             for bar in previousBars:
+#                 if getPercentageChange(currentBar.close, bar.close) < 5:
+#                     bar.zigzag = False
+            
+#             result = strategy.run(data, backtestModel.strategyConfig, backtestModel.countryConfig)
+#             if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and tradesAvailable > 0):
+#                 totalInPositions = calculatePriceInPositions(tempOrders)
+#                 balance = backtestModel.cashAvailable - totalInPositions
+#                 totalOrderCost = result.order.lmtPrice*result.order.totalQuantity
+#                 if (balance > totalOrderCost and result.order.totalQuantity > 0) or isForStockPerformance:
+#                     tempOrders[magicKey(ticker.contract.symbol, ticker.time)] = (result.order,
+#                                                                                     Position(account="",contract=stock, position=result.order.totalQuantity, avgCost=result.order.lmtPrice),
+#                                                                                     ticker.time,
+#                                                                                     ticker)
+#                     print(result)
+#                     tradesAvailable -= 1
+#                     newFill = FillDB(ticker.contract.symbol, ticker.time.date())
+#                     databaseModule.createFill(newFill)
+#             else:
+#                 for key, tupe in tempOrders.items():
+#                     if key.split("_")[0] == ticker.contract.symbol:
+#                         lista = list(tupe)
+#                         lista[3] = ticker
+#                         tempOrders[key] = tuple(lista)
 
-#     databaseModule = DatabaseModule()
-#     databaseModule.openDatabaseConnectionForBacktest()
-#     databaseModule.deleteFills(databaseModule.getFills())
+#             dayChecked = ticker.time
+#             if len(models) > i+1 and models[i+1].ticker(backtestModel.countryConfig).time != dayChecked:
+#                 handleProfitAndStop(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
+#                 handleExpiredFills(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
+#         i += 1
 
-#     i = 0
-#     for model in models:
-#         ticker = model.ticker(backtestModel.countryConfig)
-#         stock = ticker.contract
+    def getBalance(self):
+        balance = 0
+        if self.strategyModel.isForStockPerformance:
+            balance = 20000
+        else:
+            totalInPostions = self.calculateTotalInPositions()
+            balance = min(150000, (self.strategyModel.cashAvailable - totalInPostions))
+        return balance
 
-
-    def runStrategy(self):
+    def runStrategy(self, events: List[Event]):
         print("🧙‍♀️ Setup strategy 🧙‍♀️")
         self.setupRunStrategy()
         print("🧙‍♀️ Start running strategy 🧙‍♀️")
-        # model = BackTestSwing()
-        # report = BackTestReport()
-        # runStrategy(backtestModel=model, backtestReport=report, models=models)
-        # path = ("backtest/Data/CSV/%s/ZigZag/Report" % (model.countryConfig.key.code))
-        # report.showReport(path, True)
 
+        i = 0
+        for event in events:    
+            self.validateCurrentDay(event)
+            data = self.getStrategyData(event, events, i)
+            if data is not None:
+                result = self.strategyModel.strategy.run(data, self.strategyModel.strategyConfig)
+                self.handleStrategyResult(event, events, result, i)
+            i += 1
+        
+        print("🧙‍♀️ Saving Reports 🧙‍♀️")
+
+    def validateCurrentDay(self, event: Event):
+        pass
+
+    def calculateTotalInPositions(self):
+        total = 0
+        for key, (order, position, date) in self.strategyModel.items():
+            total += position.size * order.price
+        return total
+
+    def uniqueIdentifier(self, symbol: ContractSymbol, date: date) -> str:
+        return ("%s_%s" % (symbol, date.strftime("%y%m%d")))
 
     #### SAVE IN CSV FILES ####
 

@@ -2,7 +2,7 @@ from typing import Any, List, Tuple
 from pandas import DataFrame
 from zigzag import peak_valley_pivots_candlestick
 from strategy.configs.zigzag.models import StrategyZigZagConfig
-from models.zigzag.models import EventZigZag
+from models.zigzag.models import EventZigZag, ZigZagType
 from models.base_models import Event
 
 class HistoricalData:
@@ -17,6 +17,11 @@ class HistoricalData:
         i = 0
         for event in events:
             zigzag = True if zigzagValues[i] != 0 else False
+            zigzagType = None
+            if zigzagValues[i] == 1:
+                zigzagType = ZigZagType.high
+            elif zigzagValues[i] == -1:
+                zigzagType = ZigZagType.low
             rsi = None
             if i > 0:
                 rsi = rsiValues[i-1]
@@ -27,7 +32,7 @@ class HistoricalData:
                                         high=event.high,
                                         low=event.low,
                                         close=event.close,
-                                        volume=event.volume, zigzag=zigzag, rsi=rsi)
+                                        volume=event.volume, zigzag=zigzag, zigzagType=zigzagType, rsi=rsi)
             
             zigzagEvents.append(eventZigZag)
             i += 1
