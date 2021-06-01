@@ -76,3 +76,22 @@ order = MarketOrder("SELL", 10)
 profitOrder = LimitOrder("BUY", 10, 1)
 stopOrder = StopOrder("BUY", 10, 10)
 portfolio.createOrder(ib, contract, order, profitOrder, stopOrder)
+
+
+
+#Test handle Fill
+from ib_insync import Position, Contract, Ticker
+from country_config.country_config import CountryConfig, CountryKey, getConfigFor
+from strategy.strategy_data import StrategyData
+from strategy.zigzag.strategy_zigzag import StrategyZigZag
+from datetime import date, datetime
+from database import FillDB
+fill = FillDB('AAPL', date(2021,6,1))
+tick = Ticker(Contract('AAPL', 'SMART', 'USD'))
+position = Position('', Contract('AAPL', 'SMART', 'USD'), 100, 10)
+data = StrategyData(tick, position, None, None, None, None, None, None, None, fill, date(2021,6,1), datetime(2021,6,1,18,30))
+countryConfig = getConfigFor(CountryKey.USA)
+object = StrategyZigZag()
+object.strategyData = data
+object.countryConfig = countryConfig
+object.handleFill()

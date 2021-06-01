@@ -40,7 +40,7 @@ def getConfigFor(key: CountryKey) -> CountryConfig:
                             currency="USD",
                             startSetupData=datetime.combine(date.today(),time(9,31)),
                             exchangeOpenTime=datetime.combine(date.today(),time(9,30)),
-                            closeMarket=datetime.combine(date.today(),time(15,30)),
+                            closeMarket=datetime.combine(date.today(),time(16,00)),
                             nItems=0)
     if key == CountryKey.UK:
         return CountryConfig(key=CountryKey.UK,
