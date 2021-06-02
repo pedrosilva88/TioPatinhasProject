@@ -7,6 +7,9 @@ from models.base_models import Event
 
 class HistoricalData:
     def computeEventsForZigZagStrategy(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[EventZigZag]:
+        if len(events) <= 0:
+            return None
+
         zigzagValues = HistoricalData.calculateZigZag(events, strategyConfigs)
         rsiValues = HistoricalData.calculateRSI(events, strategyConfigs)
         

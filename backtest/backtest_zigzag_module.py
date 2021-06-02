@@ -43,7 +43,9 @@ class BacktestZigZagModule(BacktestModule):
     def addIndicatorsToStocksData(self, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
         newData: Union[str, Tuple[Contract, List[Event]]] = dict()
         for stockSymbol, (stock, bars) in stocksData.items():
-            newData[stockSymbol] = (stock, HistoricalData.computeEventsForZigZagStrategy(bars, config.strategy))
+            events = HistoricalData.computeEventsForZigZagStrategy(bars, config.strategy)
+            if events is not None:
+                newData[stockSymbol] = (stock, HistoricalData.computeEventsForZigZagStrategy(bars, config.strategy))
         return newData
 
     def getStockFileHeaderRow(self) -> List[str]:
@@ -206,6 +208,7 @@ class BacktestZigZagModule(BacktestModule):
                 model.databaseModule.createFill(newFill)
         model.currentDay = event.datetime.date
         if len(events) > currentPosition+1 and events[currentPosition+1].datetime.date != model.currentDay:
+            pass
 #                 handleProfitAndStop(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
 #                 handleExpiredFills(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
 

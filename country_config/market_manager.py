@@ -46,7 +46,7 @@ class Constants:
     class USA:
         timezone = timezone('America/New_York')
         openTime = datetime.combine(date.today(),time(9,30))
-        closeTime = datetime.combine(date.today(),time(15,30))
+        closeTime = datetime.combine(date.today(),time(16,00))
     class UK:
         timezone = timezone('Europe/London')
         openTime = datetime.combine(date.today(),time(8,0))

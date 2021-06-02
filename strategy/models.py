@@ -1,5 +1,5 @@
 from enum import Enum
-from models.zigzag.models import EventZigZag
+from datetime import date, datetime
 from models.base_models import BracketOrder, Contract, Event, Position
 from typing import List
 
@@ -35,14 +35,21 @@ class StrategyData:
     event: Event
     position: Position
 
+    today: date
+    now: datetime
+
     def __init__(self, contract: Contract,
                         totalCash: float,
                         event: Event,
-                        position: Position = None):
+                        position: Position = None,
+                        today: date = date.today(),
+                        now: datetime = datetime.now()):
         self.contract = contract
         self.position = position
         self.totalCash = totalCash
         self.event = event
+        self.today = today
+        self.now = now
 
 class StrategyResult:
     contract: Contract
