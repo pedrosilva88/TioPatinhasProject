@@ -10,6 +10,7 @@ class StrategyZigZagConfig(StrategyConfig):
     stopToLosePercentage: float
     profitPercentage: float
 
+    daysToHold: int
     runPositionsCheckTime: time
 
     # The number of days that you want to download. This is used to calculate the indicators.
@@ -23,6 +24,7 @@ class StrategyZigZagConfig(StrategyConfig):
                         maxToInvestPerStockPercentage: float, 
                         minRSI: float, maxRSI: float,
                         rsiOffsetDays: int, zigzagSpread:float,
+                        daysToHold: int,
                         runPositionsCheckTime: time,
                         daysBeforeToDownload: int,
                         daysBefore: int):
@@ -38,6 +40,7 @@ class StrategyZigZagConfig(StrategyConfig):
         self.rsiOffsetDays = rsiOffsetDays
         self.zigzagSpread = zigzagSpread
 
+        self.daysToHold = daysToHold
         self.runPositionsCheckTime = runPositionsCheckTime
 
         self.daysBeforeToDownload = daysBeforeToDownload

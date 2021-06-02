@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from models.base_models import BracketOrder, Contract, Event, Position
 from models.zigzag.models import EventZigZag
 from typing import List
@@ -12,8 +13,10 @@ class StrategyZigZagData(StrategyData):
                         totalCash: float, 
                         event: EventZigZag, 
                         previousEvents: List[EventZigZag],  
-                        position: Position = None, fill: FillDB = None):
-        super().__init__(contract, totalCash, event, position=position)
+                        position: Position = None, fill: FillDB = None,
+                        today: date = date.today(),
+                        now: datetime = datetime.now()):
+        super().__init__(contract, totalCash, event, position=position, today=today, now=now)
         self.previousEvents = previousEvents
         self.fill = fill
         

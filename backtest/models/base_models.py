@@ -5,9 +5,6 @@ from models.base_models import Contract, OrderAction
 
 ContractSymbol = NewType("ContractSymbol", str)
 
-# class BacktestItem:
-#     pass
-
 class BacktestResultType(Enum):
     takeProfit = 1
     profit = 2

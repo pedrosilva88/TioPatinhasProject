@@ -1,7 +1,8 @@
 
+from backtest.reports.report_module import ReportModule
 import csv
 from datetime import date
-from strategy.models import StrategyResult
+from strategy.models import StrategyData, StrategyResult
 
 from strategy.configs.models import StrategyConfig
 from strategy.strategy import Strategy
@@ -17,16 +18,20 @@ from scanner import Scanner
 class BacktestModule:
     class RunStrategyModel:
         strategy: Strategy
-        positions: Union[str, Tuple[BracketOrder, Position, date]]
+        positions: Union[str, Tuple[BracketOrder, Position, date, Event]]
         cashAvailable: float
         isForStockPerformance: bool
         strategyConfig: StrategyConfig
+        reportModule: ReportModule
 
         def __init__(self, strategy: Strategy, strategyConfig: StrategyConfig, isForStockPerformance: bool) -> None:
+            config = BacktestConfigs()
             self.strategy = strategy
             self.strategyConfig = strategyConfig
             self.positions = dict()
             self.isForStockPerformance = isForStockPerformance
+            self.reportModule = ReportModule()
+            self.cashAvailable = float(config.wallet)
 
     strategyModel: RunStrategyModel
 
@@ -60,11 +65,18 @@ class BacktestModule:
     def setupRunStrategy(self):
         pass
 
-    def getStrategyData(self):
+    def getStrategyData(self) -> StrategyData:
         pass
 
     def handleStrategyResult(self, event: Event, events: List[Event], result: StrategyResult, currentPosition: int):
         pass
+
+    def validateCurrentDay(self, event: Event):
+        pass
+
+    def handleEndOfDayIfNecessary(self, event: Event, events: List[Event], currentPosition: int):
+        pass
+
 
     #### ACTIONS ####
 
@@ -86,37 +98,6 @@ class BacktestModule:
         pass
 
     #### STRATEGIES ####
-            
-#             for bar in previousBars:
-#                 if getPercentageChange(currentBar.close, bar.close) < 5:
-#                     bar.zigzag = False
-            
-#             result = strategy.run(data, backtestModel.strategyConfig, backtestModel.countryConfig)
-#             if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and tradesAvailable > 0):
-#                 totalInPositions = calculatePriceInPositions(tempOrders)
-#                 balance = backtestModel.cashAvailable - totalInPositions
-#                 totalOrderCost = result.order.lmtPrice*result.order.totalQuantity
-#                 if (balance > totalOrderCost and result.order.totalQuantity > 0) or isForStockPerformance:
-#                     tempOrders[magicKey(ticker.contract.symbol, ticker.time)] = (result.order,
-#                                                                                     Position(account="",contract=stock, position=result.order.totalQuantity, avgCost=result.order.lmtPrice),
-#                                                                                     ticker.time,
-#                                                                                     ticker)
-#                     print(result)
-#                     tradesAvailable -= 1
-#                     newFill = FillDB(ticker.contract.symbol, ticker.time.date())
-#                     databaseModule.createFill(newFill)
-#             else:
-#                 for key, tupe in tempOrders.items():
-#                     if key.split("_")[0] == ticker.contract.symbol:
-#                         lista = list(tupe)
-#                         lista[3] = ticker
-#                         tempOrders[key] = tuple(lista)
-
-#             dayChecked = ticker.time
-#             if len(models) > i+1 and models[i+1].ticker(backtestModel.countryConfig).time != dayChecked:
-#                 handleProfitAndStop(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
-#                 handleExpiredFills(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
-#         i += 1
 
     def getBalance(self):
         balance = 0
@@ -139,12 +120,10 @@ class BacktestModule:
             if data is not None:
                 result = self.strategyModel.strategy.run(data, self.strategyModel.strategyConfig)
                 self.handleStrategyResult(event, events, result, i)
+            self.handleEndOfDayIfNecessary(event, events, i)
             i += 1
         
         print("🧙‍♀️ Saving Reports 🧙‍♀️")
-
-    def validateCurrentDay(self, event: Event):
-        pass
 
     def calculateTotalInPositions(self):
         total = 0

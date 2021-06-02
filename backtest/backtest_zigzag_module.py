@@ -1,10 +1,11 @@
+from strategy import main
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 import csv, math
 from distutils.util import strtobool
 from database.model import FillDB
 from datetime import date, timedelta
 from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
-from strategy.models import StrategyResult, StrategyResultType
+from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from typing import Any, List, Tuple, Union
 from country_config.market_manager import MarketManager
 
@@ -20,7 +21,7 @@ from strategy.historical_data import HistoricalData
 from strategy.zigzag.strategy_zigzag import StrategyZigZag
 
 from models.zigzag.models import EventZigZag, ZigZagType
-from models.base_models import Contract, Event, Position
+from models.base_models import BracketOrder, Contract, Event, Order, OrderAction, Position
 
 from database.database_module import DatabaseModule
 
@@ -88,7 +89,7 @@ class BacktestZigZagModule(BacktestModule):
                 zigzagType = None if not row[7] else ZigZagType(int(row[7]))
                 rsi = 0 if not row[8] else float(row[8])
 
-                event = EventZigZag(contract, datetime, open, close, high, low, zigzag, zigzagType, rsi)
+                event = EventZigZag(contract, datetime, open, close, high, low, zigzag, zigzagType, rsi, open)
                 contractEvents.append(event)
             line_count += 1
         return contractEvents
@@ -119,7 +120,7 @@ class BacktestZigZagModule(BacktestModule):
 
     def validateCurrentDay(self, event: Event):
         model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
-        if model.currentDay != event.datetime.date() or model.isForStockPerformance == True:
+        if model.currentDay != event.datetime.date():
             balance = self.getBalance()
             model.tradesAvailable = 0
             if model.isForStockPerformance:
@@ -134,7 +135,7 @@ class BacktestZigZagModule(BacktestModule):
             self.clearOldFills(event) 
             model.currentDay = None
     
-    def getStrategyData(self, event: Event, events: List[Event], index: int):
+    def getStrategyData(self, event: Event, events: List[Event], index: int) -> StrategyData:
         strategyConfig: StrategyZigZagConfig = self.strategyModel.strategyConfig
         event: EventZigZag = event
         events: List[EventZigZag] = events
@@ -142,13 +143,7 @@ class BacktestZigZagModule(BacktestModule):
         if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
             return None
         
-        previousEventsFiltered = previousEvents[:strategyConfig.daysBefore]
-        found = False
-        for event in previousEventsFiltered:
-            if found:
-                event.zigzag = False
-            elif event.zigzag == True:
-                found = True 
+        previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
         fill = self.getFill(event.contract)
         balance = self.getBalance()
 
@@ -157,7 +152,9 @@ class BacktestZigZagModule(BacktestModule):
                                     event= event,
                                     previousEvents= previousEventsFiltered,
                                     position= None,
-                                    fill= fill)
+                                    fill= fill,
+                                    today = event.datetime.date(),
+                                    now = event.datetime)
         
     def getPercentageChange(self, current, previous):
         if current == previous:
@@ -171,6 +168,13 @@ class BacktestZigZagModule(BacktestModule):
         strategyConfig: StrategyZigZagConfig = self.strategyModel.strategyConfig
         previousDays: List[EventZigZag] = []
         position = 0
+        cloneEvent = EventZigZag(event.contract, event.datetime, event.open, event.close, 
+                                 event.high, event.low, event.zigzag, event.zigzagType, 
+                                 event.rsi, event.lastPrice)
+        cloneEvent.close = event.open
+        cloneEvent.high = event.open
+        cloneEvent.low = event.open
+        previousDays.append(cloneEvent)
         for x in range(daysBefore):            
             while (len(previousDays) < daysBefore and currentPosition-position > 0):
                 position += 1
@@ -181,7 +185,7 @@ class BacktestZigZagModule(BacktestModule):
         if len(previousDays) == daysBefore:
             previousDays.reverse()
             previousEvents = HistoricalData.computeEventsForZigZagStrategy(previousDays, strategyConfig)
-            previousEvents.reverse()
+            previousEvents.pop()
             return previousEvents
         else:
             return None
@@ -192,36 +196,103 @@ class BacktestZigZagModule(BacktestModule):
         if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and model.tradesAvailable > 0):
             balance = self.getBalance()
             totalOrderCost = result.order.parentOrder.price*result.order.parentOrder.size
-            if (balance > totalOrderCost and result.order.totalQuantity > 0) or model.isForStockPerformance:
-                identifier = self.uniqueIdentifier(result.contract.symbol, result.event.datetime.date)
+            if (balance > totalOrderCost and result.order.parentOrder.size > 0) or model.isForStockPerformance:
+                identifier = self.uniqueIdentifier(result.contract.symbol, result.event.datetime.date())
                 model.positions[identifier] = (result.order,
                                                 Position(contract=result.contract, size= result.order.parentOrder.size),
-                                                result.event.datetime.date)
+                                                result.event.datetime.date(),
+                                                event)
                 print(result)
                 model.tradesAvailable -= 1
                 newFill = FillDB(result.contract.symbol, result.event.datetime.date())
                 model.databaseModule.createFill(newFill)
-        model.currentDay = event.datetime.date
-        if len(events) > currentPosition+1 and events[currentPosition+1].datetime.date != model.currentDay:
-            pass
-#                 handleProfitAndStop(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
-#                 handleExpiredFills(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
 
 
+    def handleEndOfDayIfNecessary(self, event: Event, events: List[Event], currentPosition: int):
+        model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
+        model.currentDay = event.datetime.date()
+        if len(events) > currentPosition+1 and events[currentPosition+1].datetime.date() != model.currentDay:
+            self.handleProfitAndStop()
+            self.handleExpiredFills()
 
-# class BackTestSwing():
-#     results: Union[str, List[BackTestResult]]
-#     trades: Union[str, List[str]]
-#     cashAvailable: float
-#     countryConfig: CountryConfig
-#     strategyConfig: StrategyConfig
+    def handleProfitAndStop(self):
+        model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
+        positions = model.positions.copy()
+        if (len(positions.values()) > 0):
+            for bracketOrder, position, positionDate, event in positions.values():
+                bracketOrder: BracketOrder = bracketOrder
+                if self.isStopLoss(event, bracketOrder):
+                    mainOrder: Order = bracketOrder.parentOrder
+                    stopOrder: Order = bracketOrder.stopLossOrder
+                    loss = abs(stopOrder.price*stopOrder.size-mainOrder.price*mainOrder.size)
 
-#     def __init__(self):
-#         self.results = dict()
-#         self.trades = dict()
-#         self.cashAvailable = 10000
-#         self.countryConfig = getConfigFor(CountryKey.USA)
-#         self.strategyConfig= getStrategyConfigFor(key=self.countryConfig.key, timezone=self.countryConfig.timezone)
+                    model.reportModule.createStopLossResult(event, bracketOrder, positionDate, loss, model.cashAvailable)
+
+                    identifier = self.uniqueIdentifier(event.contract.symbol, positionDate)
+                    model.positions.pop(identifier)
+
+                    if model.isForStockPerformance == False:
+                        model.cashAvailable -= loss
+                elif self.isTakeProfit(event, bracketOrder):
+                    mainOrder: Order = bracketOrder.parentOrder
+                    profitOrder: Order = bracketOrder.takeProfitOrder
+                    profit = abs(profitOrder.price*profitOrder.size-mainOrder.price*mainOrder.price)
+
+                    model.reportModule.createTakeProfitResult(event, bracketOrder, positionDate, profit, model.cashAvailable)
+
+                    identifier = self.uniqueIdentifier(event.contract.symbol, positionDate)
+                    model.positions.pop(identifier)
+
+                    if model.isForStockPerformance == False:
+                        model.cashAvailable += profit
+
+    def handleExpiredFills(self):
+        model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
+        positions = model.positions.copy()
+        if (len(positions.values()) > 0):
+            for bracketOrder, position, positionDate, event in positions.values():
+                bracketOrder: BracketOrder = bracketOrder
+                if self.isPositionExpired(event, positionDate):
+                    if self.isProfit(event, bracketOrder):
+                        mainOrder: Order = bracketOrder.parentOrder
+                        profit = abs(event.close*mainOrder.size-mainOrder.price*mainOrder.size)
+
+                        model.reportModule.createProfitResult(event, bracketOrder, positionDate, profit, model.cashAvailable)
+
+                        if model.isForStockPerformance == False:
+                            model.cashAvailable += profit
+                    else:
+                        mainOrder: Order = bracketOrder.parentOrder
+                        loss = abs(event.close*mainOrder.size-mainOrder.price*mainOrder.size)
+
+                        model.reportModule.createLossResult(event, bracketOrder, positionDate, loss, model.cashAvailable)
+
+                        if model.isForStockPerformance == False:
+                            model.cashAvailable -= loss
+
+                    identifier = self.uniqueIdentifier(event.contract.symbol, positionDate)
+                    model.positions.pop(identifier)
+
+    def isPositionExpired(self, event: EventZigZag, positionDate: date) -> bool:
+        config: StrategyZigZagConfig = self.strategyModel.strategyConfig
+        return event.datetime.date() >= (positionDate+timedelta(days=config.daysToHold))
+
+    def isStopLoss(self, event: EventZigZag, bracketOrder: BracketOrder) -> bool:
+        mainOrder = bracketOrder.parentOrder
+        stopOrder = bracketOrder.stopLossOrder
+        return ((mainOrder.action == OrderAction.Buy and stopOrder.price >= event.low) or
+                (mainOrder.action == OrderAction.Sell and stopOrder.price <= event.high))
+
+    def isTakeProfit(self, event: EventZigZag, bracketOrder: BracketOrder) -> bool:
+        mainOrder = bracketOrder.parentOrder
+        takeProfitOrder = bracketOrder.stopLossOrder
+        return ((mainOrder.action == OrderAction.Buy and  takeProfitOrder.price >= event.high) or
+                (mainOrder.action == OrderAction.Sell and takeProfitOrder.price <= event.low))
+
+    def isProfit(self, event: EventZigZag, bracketOrder: BracketOrder) -> bool:
+        mainOrder = bracketOrder.parentOrder
+        return ((mainOrder.action == OrderAction.Buy and mainOrder.price <= event.close) or
+                (mainOrder.action == OrderAction.Sell and mainOrder.price >= event.close))
 
 # def showPlot(mBars: List[BarData], zigzags:List[int]):
 #     i = 0
@@ -272,77 +343,6 @@ class BacktestZigZagModule(BacktestModule):
 #     fig.tight_layout()
 
 #     plt.show()
-
-
-# def runStockPerformance():
-#     models = loadStocks("scan_to_download.csv")
-#     print("Run Performance")
-#     model = BackTestSwing()
-#     report = BackTestReport()
-#     runStrategy(backtestModel=model, backtestReport=report, models=models, forPerformance=True)
-
-#     stocksPath = ("Scanner/ZigZag/%s/scan_to_download.csv" % CountryKey.USA.code)
-#     path = ("backtest/Data/CSV/%s/ZigZag/Report" % (CountryKey.USA.code))
-#     report.showPerformanceReport(path, stocksPath, model.countryConfig)
-
-# def handleProfitAndStop(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, tempOrders: Union[str, Tuple[myOrder, Position, date, Ticker]], isForStockPerformance: bool):
-#     orders = tempOrders.copy()
-#     if (len(orders.values()) > 0):
-#         for tempOrder, position, positionDate, ticker in orders.values():
-#             if ((tempOrder.action == "BUY" and tempOrder.stopLossOrder.auxPrice > ticker.bid) or
-#                     (tempOrder.action == "SELL" and tempOrder.stopLossOrder.auxPrice < ticker.ask)):
-#                 perda = abs(tempOrder.stopLossOrder.auxPrice*tempOrder.stopLossOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
-#                 print("[%s] ❌ ❌ (%s) -> %.2f Size(%.2f) [%.2f]\n" % (ticker.time.date(), ticker.contract.symbol, perda, tempOrder.totalQuantity, backtestModel.cashAvailable))
-#                 result = BackTestResult(symbol=ticker.contract.symbol, 
-#                                         date=ticker.time, 
-#                                         pnl=(-perda), 
-#                                         action="Long" if tempOrder.action == "BUY" else "Short", 
-#                                         type=BackTestResultType.stopLoss,
-#                                         priceCreateTrade= tempOrder.lmtPrice, 
-#                                         priceCloseTrade= tempOrder.stopLossOrder.auxPrice,
-#                                         size= tempOrder.totalQuantity, 
-#                                         averageVolume= model.averageVolume, 
-#                                         volumeFirstMinute= model.volumeInFirstMinuteBar, 
-#                                         totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
-#                                         openPrice= ticker.open, 
-#                                         ystdClosePrice= ticker.close,
-#                                         cash= backtestModel.cashAvailable,
-#                                         orderDate = positionDate.date())
-#                 if isForStockPerformance:
-#                     backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
-#                     backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
-#                 else:
-#                     backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
-#                     backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
-#                     backtestModel.cashAvailable -= perda
-#                 tempOrders.pop(magicKey(position.contract.symbol, positionDate))
-#             elif ((tempOrder.action == "BUY" and tempOrder.takeProfitOrder.lmtPrice <= ticker.ask) or
-#                     (tempOrder.action == "SELL" and tempOrder.takeProfitOrder.lmtPrice >= ticker.bid)):
-#                 ganho = abs(tempOrder.takeProfitOrder.lmtPrice*tempOrder.takeProfitOrder.totalQuantity-tempOrder.lmtPrice*tempOrder.totalQuantity)
-#                 print("[%s] ✅ ✅ (%s) -> %.2f Size(%.2f) high(%.2f) low(%.2f) [%.2f]\n" % (ticker.time.date(), ticker.contract.symbol, ganho, tempOrder.totalQuantity, ticker.ask, ticker.bid, backtestModel.cashAvailable))
-#                 result = BackTestResult(symbol=ticker.contract.symbol, 
-#                                         date=ticker.time, 
-#                                         pnl=(ganho), 
-#                                         action="Long" if tempOrder.action == "BUY" else "Short", 
-#                                         type=BackTestResultType.takeProfit,
-#                                         priceCreateTrade= tempOrder.lmtPrice, 
-#                                         priceCloseTrade= tempOrder.takeProfitOrder.lmtPrice,
-#                                         size= tempOrder.totalQuantity, 
-#                                         averageVolume= model.averageVolume, 
-#                                         volumeFirstMinute= model.volumeInFirstMinuteBar, 
-#                                         totalInvested= tempOrder.lmtPrice*tempOrder.totalQuantity,
-#                                         openPrice= ticker.open, 
-#                                         ystdClosePrice= ticker.close,
-#                                         cash= backtestModel.cashAvailable,
-#                                         orderDate = positionDate.date())
-#                 if isForStockPerformance:
-#                     backtestReport.updateStockPerformance(ticker=ticker, type=result.type)
-#                     backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
-#                 else:
-#                     backtestReport.updateResults(key=("%s" % ticker.time.date()), value=result)
-#                     backtestReport.updateTrades(key=("%s" % ticker.time.date()), ticker=ticker, result=result, zigzag=True)
-#                     backtestModel.cashAvailable += ganho
-#                 tempOrders.pop(magicKey(position.contract.symbol, positionDate))
 
 # def handleExpiredFills(backtestModel: BackTestSwing, backtestReport: BackTestReport, model: BackTestModel, tempOrders: Union[str, Tuple[myOrder, Position, date, Ticker]], isForStockPerformance: bool):
 #     orders = tempOrders.copy()
@@ -404,118 +404,6 @@ class BacktestZigZagModule(BacktestModule):
 #                     print("[%s] ❌ (%s) -> %.2f Size(%.2f) [%.2f]\n" % (ticker.time.date(), ticker.contract.symbol, perda, tempOrder.totalQuantity, backtestModel.cashAvailable))
 #                 tempOrders.pop(magicKey(position.contract.symbol, positionDate))
 
-# def runStrategy(backtestModel: BackTestSwing, backtestReport: BackTestReport, models: List[BackTestModel], forPerformance: bool = False):
-#     strategy = StrategyZigZag()
-#     tempOrders: Union[str, Tuple[myOrder, Position, date]] = dict()
-#     isForStockPerformance = forPerformance
-#     dayChecked = None
-#     tradesAvailable = 0
-
-#     databaseModule = DatabaseModule()
-#     databaseModule.openDatabaseConnectionForBacktest()
-#     databaseModule.deleteFills(databaseModule.getFills())
-
-#     i = 0
-#     for model in models:
-#         ticker = model.ticker(backtestModel.countryConfig)
-#         stock = ticker.contract
-
-#         if dayChecked != ticker.time or isForStockPerformance == True:
-#             totalInPositions = calculatePriceInPositions(tempOrders)
-#             balance = backtestModel.cashAvailable - totalInPositions
-
-#             tradesAvailable = 0
-#             if isForStockPerformance:
-#                 tradesAvailable = 2000
-#             # elif balance/2 >= 6000 and balance < 150000:
-#             #     tradesAvailable = 2
-#             else:
-#                 if backtestModel.cashAvailable > 150000:
-#                     backtestModel.strategyConfig.maxToInvestPerStockPercentage = 1
-#                 result = math.floor(balance/150000)
-#                 if balance - (150000*result) >= 6000:
-#                     tradesAvailable = result+1
-#                 else: 
-#                     tradesAvailable = result
-
-#             clearOldFills(ticker, databaseModule) 
-#             dayChecked = None
-
-#         result = None
-#         previousModels = getPreviousBarsData(model, models, i)
-#         if (previousModels[0] is not None and
-#             previousModels[1] is not None and
-#             previousModels[2] is not None and
-#             previousModels[3] is not None and
-#             previousModels[4] is not None and
-#             previousModels[5] is not None):
-#             previousBars = [createCustomBarData(previousModels[5], backtestModel.countryConfig),
-#                             createCustomBarData(previousModels[4], backtestModel.countryConfig),
-#                             createCustomBarData(previousModels[3], backtestModel.countryConfig),
-#                             createCustomBarData(previousModels[2], backtestModel.countryConfig),
-#                             createCustomBarData(previousModels[1], backtestModel.countryConfig),
-#                             createCustomBarData(previousModels[0], backtestModel.countryConfig)]
-#             currentBar = createCustomBarData(model, backtestModel.countryConfig)
-#             fill = getFill(ticker, databaseModule)
-#             if isForStockPerformance == False:
-#                 totalInPositions = calculatePriceInPositions(tempOrders)
-#                 balance = backtestModel.cashAvailable - totalInPositions
-#             else:
-#                 balance = 6000
-#             data = StrategyData(ticker=ticker, 
-#                                 position=None, 
-#                                 order=None, 
-#                                 totalCash=min(balance, 150000),
-#                                 previousBars=previousBars,
-#                                 currentBar=currentBar,
-#                                 fill=fill)
-            
-#             for bar in previousBars:
-#                 if getPercentageChange(currentBar.close, bar.close) < 5:
-#                     bar.zigzag = False
-            
-#             result = strategy.run(data, backtestModel.strategyConfig, backtestModel.countryConfig)
-#             if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and tradesAvailable > 0):
-#                 totalInPositions = calculatePriceInPositions(tempOrders)
-#                 balance = backtestModel.cashAvailable - totalInPositions
-#                 totalOrderCost = result.order.lmtPrice*result.order.totalQuantity
-#                 if (balance > totalOrderCost and result.order.totalQuantity > 0) or isForStockPerformance:
-#                     tempOrders[magicKey(ticker.contract.symbol, ticker.time)] = (result.order,
-#                                                                                     Position(account="",contract=stock, position=result.order.totalQuantity, avgCost=result.order.lmtPrice),
-#                                                                                     ticker.time,
-#                                                                                     ticker)
-#                     print(result)
-#                     tradesAvailable -= 1
-#                     newFill = FillDB(ticker.contract.symbol, ticker.time.date())
-#                     databaseModule.createFill(newFill)
-#             else:
-#                 for key, tupe in tempOrders.items():
-#                     if key.split("_")[0] == ticker.contract.symbol:
-#                         lista = list(tupe)
-#                         lista[3] = ticker
-#                         tempOrders[key] = tuple(lista)
-
-#             dayChecked = ticker.time
-#             if len(models) > i+1 and models[i+1].ticker(backtestModel.countryConfig).time != dayChecked:
-#                 handleProfitAndStop(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
-#                 handleExpiredFills(backtestModel, backtestReport, model, tempOrders, isForStockPerformance)
-#         i += 1
-
-
-
-# def createCustomBarData(model: BackTestModel, countryConfig: CountryConfig):
-#     barData = BarData(date=model.ticker(countryConfig).time,
-#                         open=model.openPrice,
-#                         high=model.ask,
-#                         low=model.bid,
-#                         close=model.close,
-#                         volume=model.volume)
-#     return CustomBarData(barData, model.zigzag, model.rsi, barData.open)
-
-
-# def magicKey(symbol: str, date: datetime):
-#     return ("%s_%s" % (symbol, date.strftime("%y%m%d")))
-
 # def showGraphFor(symbol: str):
 #     ib = IB()
 #     ib.connect('127.0.0.1', 7497, clientId=16)
@@ -529,47 +417,3 @@ class BacktestZigZagModule(BacktestModule):
 #     RSI = computeRSI(closes, 14)
 #     pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
 #     showPlot(bars, pivots)
-
-# # if __name__ == '__main__':
-#     try:
-#         #showGraphFor("AZPN")
-
-#         #downloadData()
-#         #runStockPerformance()
-#         run()
-        
-#     except (KeyboardInterrupt, SystemExit) as e:
-#         print(e)
-
-
-    # def getPreviousEvents(self, event: EventZigZag, events: List[EventZigZag], currentPosition: int, daysBefore: int = 5):
-    #     previousDays: List[EventZigZag] = []
-    #     position = 0
-    #     zigzagFound = False
-    #     for x in range(daysBefore):            
-    #         previousDataFound = False
-    #         while (previousDataFound == False and
-    #                 currentPosition-position > 0):
-    #             position += 1
-    #             item = events[currentPosition-position]
-    #             if item.symbol == event.contract.symbol:
-    #                 previousDataFound = True
-    #                 previousDays.append(item)
-    #                 if zigzagFound == True:
-    #                     item.zigzag = False
-    #                 elif item.zigzag == True:
-    #                     zigzagFound = True
-
-    #     for index, previousEvent in enumerate(previousDays, start=0):
-    #         if index > 0 and previousEvent is not None and previousEvent.zigzag == True:
-    #             shouldHaveZigZag = False
-    #             for j in range(0, index-1):
-    #                 item = previousDays[j]
-    #                 previousEventValue = previousEvent.high if previousEvent.zigzagType == ZigZagType.high else previousEvent.low
-    #                 itemEventValue = item.low if previousEvent.zigzagType == ZigZagType.high else item.high 
-    #                 perfentageGap = self.getPercentageChange(previousEventValue, itemEventValue)
-    #                 if perfentageGap >= 5:
-    #                     shouldHaveZigZag = True
-    #             previousEvent.zigzag = shouldHaveZigZag
-
-    #     return previousDays

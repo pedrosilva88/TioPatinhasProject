@@ -22,6 +22,7 @@ class StrategyConfigFactory:
                                         maxToInvestPerStockPercentage=Constants.ZigZag.maxToInvestPerStockPercentage,
                                         minRSI=Constants.ZigZag.minRSI, maxRSI=Constants.ZigZag.maxRSI, 
                                         rsiOffsetDays=Constants.ZigZag.rsiOffsetDays, zigzagSpread=Constants.ZigZag.zigzagSpread,
+                                        daysToHold= Constants.ZigZag.daysToHold,
                                         runPositionsCheckTime=market.closeTime-timedelta(hours=Constants.ZigZag.runPositionsCheckBeforeHours),
                                         daysBeforeToDownload=Constants.ZigZag.daysBeforeToDownload, daysBefore=Constants.ZigZag.daysBefore)
         else:
@@ -41,6 +42,7 @@ class Constants:
         zigzagSpread = 0.05
         daysBeforeToDownload = 50
         daysBefore = 4
+        daysToHold = 0
 
 
 

@@ -1,3 +1,6 @@
+from datetime import timedelta, timezone
+from io import SEEK_CUR
+from logging import setLoggerClass
 from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
 from typing import List, Tuple
 from ib_insync import Fill
@@ -5,7 +8,7 @@ from helpers import log
 from strategy import Strategy
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from strategy.configs.zigzag.models import StrategyZigZagConfig
-from models.base_models import Order, OrderAction, OrderType
+from models.base_models import BracketOrder, Order, OrderAction, OrderType
 from models.zigzag.models import EventZigZag
 
 class StrategyZigZag(Strategy):
@@ -36,13 +39,14 @@ class StrategyZigZag(Strategy):
         if result:
             return result
 
-        log("😁 %s 😁" % (self.strategyData.contract.symbol))
-        log("😁 [%s] Bar[-4]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-4].datetime.date(), self.previousBars[-4].rsi, self.previousBars[-4].zigzag))
-        log("😁 [%s] Bar[-3]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].datetime.date(), self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
-        log("😁 [%s] Bar[-2]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].datetime.date(), self.previousBars[-2].rsi, self.previousBars[-2].zigzag))
-        log("😁 [%s] Bar[-1]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].datetime.date(), self.previousBars[-1].rsi, self.previousBars[-1].zigzag))
-        log("😁 [%s] CurrentBar-> RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.datetime.date(), self.currentBar.rsi, self.currentBar.zigzag))
-        log("😁  😁")
+        if self.currentBar.datetime.year == 2020 and self.currentBar.datetime.month == 8 and self.currentBar.datetime.day > 10:
+            print("😁 %s 😁" % (self.strategyData.contract.symbol))
+            print("😁 [%s] Bar[-4]-> RSI(%.2f) ZigZag(%s) %s 😁" % (self.previousBars[-4].datetime.date(), self.previousBars[-4].rsi, self.previousBars[-4].zigzag, self.previousBars[-4].zigzagType))
+            print("😁 [%s] Bar[-3]-> RSI(%.2f) ZigZag(%s) %s 😁" % (self.previousBars[-3].datetime.date(), self.previousBars[-3].rsi, self.previousBars[-3].zigzag, self.previousBars[-3].zigzagType))
+            print("😁 [%s] Bar[-2]-> RSI(%.2f) ZigZag(%s) %s 😁" % (self.previousBars[-2].datetime.date(), self.previousBars[-2].rsi, self.previousBars[-2].zigzag, self.previousBars[-2].zigzagType))
+            print("😁 [%s] Bar[-1]-> RSI(%.2f) ZigZag(%s) %s 😁" % (self.previousBars[-1].datetime.date(), self.previousBars[-1].rsi, self.previousBars[-1].zigzag, self.previousBars[-1].zigzagType))
+            print("😁 [%s] CurrentBar-> RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.datetime.date(), self.currentBar.rsi, self.currentBar.zigzag))
+            print("😁  😁")
 
         zigzagBar, zigzagIndex = self.getZigZag()
         if (zigzagBar is not None):
@@ -67,7 +71,7 @@ class StrategyZigZag(Strategy):
         zigzagBar = None
         for bar in reversed(self.previousBars):
             if (bar.zigzag == True and (bar.rsi <= self.minRSI or bar.rsi >= self.maxRSI) and index < -1):
-                log("🎃 Bar Found %s: %d 🎃" % (self.strategyData.ticker.contract.symbol, index))
+                log("🎃 Bar Found %s: %d 🎃" % (self.strategyData.contract.symbol, index))
                 zigzagBar = bar
                 break
             index -= 1
@@ -111,7 +115,7 @@ class StrategyZigZag(Strategy):
     # Constructor
 
     def fetchInformation(self):
-        # Ticker Data
+        # Event Data
         self.currentBar = self.strategyData.event
         self.previousBars = self.strategyData.previousEvents
 
@@ -173,19 +177,19 @@ class StrategyZigZag(Strategy):
 
         if (self.strategyData.position is None and
             dateLimit <= executionDate):
-            log("🥵 Cant do nothing with Stock (%s) - You had a Fill for this stock in the last 6 days 🥵" % self.strategyData.ticker.contract.symbol)
-            return StrategyResult(self.strategyData.ticker, StrategyResultType.DoNothing)
+            log("🥵 Cant do nothing with Stock (%s) - You had a Fill for this stock in the last 6 days 🥵" % self.strategyData.contract.symbol)
+            return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.DoNothing)
 
         elif self.strategyData.position is not None:
             shares = self.strategyData.position.position
             closeMarketDate = self.countryConfig.closeMarket.astimezone(timezone('UTC'))
             if (now.hour == (closeMarketDate-timedelta(hours=2)).hour and today >= (executionDate+timedelta(days=0))):
                 if shares > 0:
-                    return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
+                    return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.PositionExpired_Sell, None, None, self.strategyData.position)    
                 elif shares < 0:
-                    return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Buy, None, self.strategyData.position)
-            log("🥵 Cant do nothing with Stock (%s) - You already have a position and it's not expired 🥵" % self.strategyData.ticker.contract.symbol)
-            return StrategyResult(self.strategyData.ticker, StrategyResultType.KeepPosition)
+                    return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.PositionExpired_Buy, None, None, self.strategyData.position)
+            log("🥵 Cant do nothing with Stock (%s) - You already have a position and it's not expired 🥵" % self.strategyData.contract.symbol)
+            return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.KeepPosition)
 
         return None
 
@@ -218,7 +222,7 @@ class StrategyZigZag(Strategy):
     # Final Operations
 
     def createOrder(self, type: StrategyResultType):
-        log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.ticker.contract.symbol, self.currentBar.lastPrice))
+        log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.contract.symbol, self.currentBar.lastPrice))
         action = OrderAction.Buy if type == StrategyResultType.Buy else OrderAction.Sell
         price = self.getOrderPrice(action)
         profitTarget = self.calculatePnl(action)
@@ -231,4 +235,5 @@ class StrategyZigZag(Strategy):
 
         profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(profitTarget, 2))
         stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, round(stopLossPrice, 2))
-        return Order(action=action, type=OrderType.MarketOrder, totalQuantity=size, price=price, takeProfitOrder=profitOrder, stopLossOrder=stopLossOrder)
+        parentOrder = Order(action, OrderType.MarketOrder, size, round(price, 2))
+        return BracketOrder(parentOrder, profitOrder, stopLossOrder)
