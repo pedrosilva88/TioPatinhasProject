@@ -21,7 +21,7 @@ class StrategyZigZagData(StrategyData):
 class StrategyZigZagResult(StrategyResult):
     priority: int
 
-    def __init__(self, contract: Contract, event: EventZigZag, type: StrategyResultType, priority: int, 
+    def __init__(self, contract: Contract, event: EventZigZag, type: StrategyResultType, priority: int = None, 
                 order: BracketOrder = None, position: Position = None):
         super().__init__(contract, event, type, order, position)
         self.priority = priority

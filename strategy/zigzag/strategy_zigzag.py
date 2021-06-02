@@ -1,3 +1,4 @@
+from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
 from typing import List, Tuple
 from ib_insync import Fill
 from helpers import log
@@ -10,7 +11,7 @@ from models.zigzag.models import EventZigZag
 class StrategyZigZag(Strategy):
     # Properties
 
-    strategyData: StrategyData = None
+    strategyData: StrategyZigZagData = None
     strategyConfig: StrategyZigZagConfig = None
 
     currentBar: EventZigZag = None
@@ -26,7 +27,7 @@ class StrategyZigZag(Strategy):
     minRSI: float = None
     maxRSI: float = None
 
-    def run(self, strategyData: StrategyData, strategyConfig: StrategyZigZagConfig):
+    def run(self, strategyData: StrategyZigZagData, strategyConfig: StrategyZigZagConfig):
         self.strategyData = strategyData
         self.strategyConfig = strategyConfig
         self.fetchInformation()
@@ -35,12 +36,12 @@ class StrategyZigZag(Strategy):
         if result:
             return result
 
-        log("😁 %s 😁" % (self.strategyData.ticker.contract.symbol))
-        log("😁 [%s] Bar[-4]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-4].date, self.previousBars[-4].rsi, self.previousBars[-4].zigzag))
-        log("😁 [%s] Bar[-3]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].date, self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
-        log("😁 [%s] Bar[-2]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].date, self.previousBars[-2].rsi, self.previousBars[-2].zigzag))
-        log("😁 [%s] Bar[-1]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].date, self.previousBars[-1].rsi, self.previousBars[-1].zigzag))
-        log("😁 [%s] CurrentBar-> RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.date, self.currentBar.rsi, self.currentBar.zigzag))
+        log("😁 %s 😁" % (self.strategyData.contract.symbol))
+        log("😁 [%s] Bar[-4]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-4].datetime.date(), self.previousBars[-4].rsi, self.previousBars[-4].zigzag))
+        log("😁 [%s] Bar[-3]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].datetime.date(), self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
+        log("😁 [%s] Bar[-2]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].datetime.date(), self.previousBars[-2].rsi, self.previousBars[-2].zigzag))
+        log("😁 [%s] Bar[-1]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].datetime.date(), self.previousBars[-1].rsi, self.previousBars[-1].zigzag))
+        log("😁 [%s] CurrentBar-> RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.datetime.date(), self.currentBar.rsi, self.currentBar.zigzag))
         log("😁  😁")
 
         zigzagBar, zigzagIndex = self.getZigZag()
@@ -49,16 +50,16 @@ class StrategyZigZag(Strategy):
                 if (zigzagBar.rsi <= self.minRSI and self.isLonging(zigzagIndex)):
                     type = StrategyResultType.Buy
                     order = self.createOrder(type)
-                    return StrategyResult(strategyData.ticker, type, order, None, zigzagIndex)
+                    return StrategyZigZagResult(strategyData.contract, self.currentBar, type, zigzagIndex, order, None)
                 elif (zigzagBar.rsi >= self.maxRSI and self.isShorting(zigzagIndex)):
                     type = StrategyResultType.Sell
                     order = self.createOrder(type)
-                    return StrategyResult(strategyData.ticker, type, order, None, zigzagIndex)
-                return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)   
+                    return StrategyZigZagResult(strategyData.contract, self.currentBar, type, zigzagIndex, order, None)
+                return StrategyZigZagResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)   
             else:
-                return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)   
+                return StrategyZigZagResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)   
         else:
-            return StrategyResult(strategyData.ticker, StrategyResultType.DoNothing, None)
+            return StrategyZigZagResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)
 
     def getZigZag(self) -> Tuple[EventZigZag, int]:
         totalBars = len(self.previousBars)
@@ -111,8 +112,8 @@ class StrategyZigZag(Strategy):
 
     def fetchInformation(self):
         # Ticker Data
-        self.currentBar = self.strategyData.currentBar
-        self.previousBars = self.strategyData.previousBars
+        self.currentBar = self.strategyData.event
+        self.previousBars = self.strategyData.previousEvents
 
         # Strategy Parameters
         self.willingToLose = self.strategyConfig.willingToLose
@@ -132,8 +133,7 @@ class StrategyZigZag(Strategy):
 
         if handleFillResult is None:
             if (not self.isConfigsValid() or not self.isStrategyDataValid()):
-                log("🙅‍♂️ Invalid data for %s: isConfigsValid(%s) isStrategyDataValid(%s) 🙅‍♂️" % (self.strategyData.ticker.contract.symbol, self.isConfigsValid(), self.isStrategyDataValid()))
-                return StrategyResult(self.strategyData.ticker, StrategyResultType.IgnoreEvent)
+                return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
             else: 
                 return None
         else:
@@ -150,7 +150,10 @@ class StrategyZigZag(Strategy):
                 (self.previousBars[-2].open is not None) and (self.previousBars[-2].close is not None) and
 
                 (self.previousBars[-3] is not None) and (self.previousBars[-3].zigzag is not None) and (self.previousBars[-3].rsi is not None) and
-                (self.previousBars[-3].open is not None) and (self.previousBars[-3].close is not None))
+                (self.previousBars[-3].open is not None) and (self.previousBars[-3].close is not None) and
+
+                (self.previousBars[-4] is not None) and (self.previousBars[-4].zigzag is not None) and (self.previousBars[-4].rsi is not None) and
+                (self.previousBars[-4].open is not None) and (self.previousBars[-4].close is not None))
 
 
     def isConfigsValid(self):

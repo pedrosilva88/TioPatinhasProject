@@ -48,7 +48,7 @@ class BacktestScannerManager:
             else:
                 print("")
 
-            filePathForStock =  BacktestScannerManager.getPathFileToReadStocksData(contract, provider, country, strategy, action)
+            filePathForStock =  BacktestScannerManager.getPathFileToReadStocksData(contract, provider, country, strategy)
             if not os.path.isfile(filePathForStock):
                 print("File not found ", filePathForStock)
                 continue

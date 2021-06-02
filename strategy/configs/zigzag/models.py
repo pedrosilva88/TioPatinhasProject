@@ -12,13 +12,20 @@ class StrategyZigZagConfig(StrategyConfig):
 
     runPositionsCheckTime: time
 
+    # The number of days that you want to download. This is used to calculate the indicators.
+    daysBeforeToDownload: int
+    # The number of days to send to the strategy module
+    daysBefore: int
+
     def __init__(self, market: Market,
                         runStrategyTime: time,
                         willingToLose: float, stopToLosePercentage: float, profitPercentage: float,
                         maxToInvestPerStockPercentage: float, 
                         minRSI: float, maxRSI: float,
                         rsiOffsetDays: int, zigzagSpread:float,
-                        runPositionsCheckTime: time):
+                        runPositionsCheckTime: time,
+                        daysBeforeToDownload: int,
+                        daysBefore: int):
 
         StrategyConfig.__init__(self, market= market, runStrategyTime=runStrategyTime, willingToLose=willingToLose, maxToInvestPerStockPercentage=maxToInvestPerStockPercentage)
         self.willingToLose = willingToLose
@@ -32,6 +39,9 @@ class StrategyZigZagConfig(StrategyConfig):
         self.zigzagSpread = zigzagSpread
 
         self.runPositionsCheckTime = runPositionsCheckTime
+
+        self.daysBeforeToDownload = daysBeforeToDownload
+        self.daysBefore = daysBefore
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
         currentTime = now.time

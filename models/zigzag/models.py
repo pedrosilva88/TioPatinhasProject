@@ -19,9 +19,9 @@ class EventZigZag(Event):
                         close: float, 
                         high: float, 
                         low: float, 
-                        volume: float, zigzag: bool, zigzagType: ZigZagType, rsi: float, lastPrice = None):
+                        zigzag: bool, zigzagType: ZigZagType, rsi: float, lastPrice = None):
         Event.__init__(self, contract= contract, datetime= datetime,
-                        open= open, close= close, high= high, low= low, volume= volume)
+                        open= open, close= close, high= high, low= low)
 
         self.lastPrice = lastPrice if lastPrice is not None else close
         self.zigzag = zigzag
@@ -34,3 +34,4 @@ class EventZigZag(Event):
         dict['zigzagType'] = self.zigzagType
         dict['rsi'] = self.rsi
         dict['lastPrice'] = self.lastPrice
+        return dict

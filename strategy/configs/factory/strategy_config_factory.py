@@ -22,7 +22,8 @@ class StrategyConfigFactory:
                                         maxToInvestPerStockPercentage=Constants.ZigZag.maxToInvestPerStockPercentage,
                                         minRSI=Constants.ZigZag.minRSI, maxRSI=Constants.ZigZag.maxRSI, 
                                         rsiOffsetDays=Constants.ZigZag.rsiOffsetDays, zigzagSpread=Constants.ZigZag.zigzagSpread,
-                                        runPositionsCheckTime=market.closeTime-timedelta(hours=Constants.ZigZag.runPositionsCheckBeforeHours))
+                                        runPositionsCheckTime=market.closeTime-timedelta(hours=Constants.ZigZag.runPositionsCheckBeforeHours),
+                                        daysBeforeToDownload=Constants.ZigZag.daysBeforeToDownload, daysBefore=Constants.ZigZag.daysBefore)
         else:
             print("🚨 Cant Create ZigZag Strategy for this country - %s 🚨" % market.country)
 
@@ -38,6 +39,9 @@ class Constants:
         maxRSI = 70
         rsiOffsetDays = 14
         zigzagSpread = 0.05
+        daysBeforeToDownload = 50
+        daysBefore = 4
+
 
 
 ## OPG UK ##

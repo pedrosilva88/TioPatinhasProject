@@ -1,9 +1,10 @@
-from country_config import models
-import csv, distutils, math
+from strategy.configs.zigzag.models import StrategyZigZagConfig
+import csv, math
+from distutils.util import strtobool
 from database.model import FillDB
 from datetime import date, timedelta
 from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
-from strategy.models import StrategyData, StrategyResult, StrategyResultType
+from strategy.models import StrategyResult, StrategyResultType
 from typing import Any, List, Tuple, Union
 from country_config.market_manager import MarketManager
 
@@ -66,16 +67,16 @@ class BacktestZigZagModule(BacktestModule):
 
         return [symbol, date, open, close, high, low, zigzag, zigzagType, rsi]
 
-    def parseCSVFile(reader: csv.reader) -> List[Event]:
+    def parseCSVFile(self, reader: csv.reader) -> List[Event]:
         configs = BacktestConfigs()
         line_count = 0
         contractEvents = []
         for row in reader:
             if line_count > 0:
-                symbol = None if not row[0] else float(row[0])
+                symbol = None if not row[0] else row[0]
                 contract = Contract(symbol, configs.country)
 
-                datetimeStr = None if not row[1] else float(row[1])
+                datetimeStr = None if not row[1] else row[1]
                 datetime = Helpers.stringToDate(datetimeStr)
 
                 open = 0 if not row[2] else float(row[2])
@@ -83,7 +84,7 @@ class BacktestZigZagModule(BacktestModule):
                 high = 0 if not row[4] else float(row[4])
                 low = 0 if not row[5] else float(row[5])
 
-                zigzag = False if not row[6] else bool(distutils.util.strtobool(row[6]))
+                zigzag = False if not row[6] else bool(strtobool(row[6]))
                 zigzagType = None if not row[7] else ZigZagType(int(row[7]))
                 rsi = 0 if not row[8] else float(row[8])
 
@@ -134,20 +135,27 @@ class BacktestZigZagModule(BacktestModule):
             model.currentDay = None
     
     def getStrategyData(self, event: Event, events: List[Event], index: int):
+        strategyConfig: StrategyZigZagConfig = self.strategyModel.strategyConfig
         event: EventZigZag = event
         events: List[EventZigZag] = events
-        daysBefore = 5
-        previousEvents = self.getPreviousEvents(event, events, index, daysBefore)
-        if len(previousEvents) < daysBefore:
+        previousEvents = self.getPreviousEvents(event, events, index, strategyConfig.daysBeforeToDownload)
+        if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
             return None
         
+        previousEventsFiltered = previousEvents[:strategyConfig.daysBefore]
+        found = False
+        for event in previousEventsFiltered:
+            if found:
+                event.zigzag = False
+            elif event.zigzag == True:
+                found = True 
         fill = self.getFill(event.contract)
         balance = self.getBalance()
 
         return StrategyZigZagData(contract= event.contract,
                                     totalCash= balance,
                                     event= event,
-                                    previousEvents= previousEvents,
+                                    previousEvents= previousEventsFiltered,
                                     position= None,
                                     fill= fill)
         
@@ -160,36 +168,23 @@ class BacktestZigZagModule(BacktestModule):
             return 0
 
     def getPreviousEvents(self, event: EventZigZag, events: List[EventZigZag], currentPosition: int, daysBefore: int = 5):
+        strategyConfig: StrategyZigZagConfig = self.strategyModel.strategyConfig
         previousDays: List[EventZigZag] = []
         position = 0
-        zigzagFound = False
         for x in range(daysBefore):            
-            previousDataFound = False
-            while (previousDataFound == False and
-                    currentPosition-position > 0):
+            while (len(previousDays) < daysBefore and currentPosition-position > 0):
                 position += 1
                 item = events[currentPosition-position]
-                if item.symbol == event.contract.symbol:
-                    previousDataFound = True
+                if item.contract.symbol == event.contract.symbol:
                     previousDays.append(item)
-                    if zigzagFound == True:
-                        item.zigzag = False
-                    elif item.zigzag == True:
-                        zigzagFound = True
 
-        for index, previousEvent in enumerate(previousDays, start=0):
-            if index > 0 and previousEvent is not None and previousEvent.zigzag == True:
-                shouldHaveZigZag = False
-                for j in range(0, index-1):
-                    item = previousDays[j]
-                    previousEventValue = previousEvent.high if previousEvent.zigzagType == ZigZagType.high else previousEvent.low
-                    itemEventValue = item.low if previousEvent.zigzagType == ZigZagType.high else item.high 
-                    perfentageGap = self.getPercentageChange(previousEventValue, itemEventValue)
-                    if perfentageGap >= 5:
-                        shouldHaveZigZag = True
-                previousEvent.zigzag = shouldHaveZigZag
-
-        return previousDays
+        if len(previousDays) == daysBefore:
+            previousDays.reverse()
+            previousEvents = HistoricalData.computeEventsForZigZagStrategy(previousDays, strategyConfig)
+            previousEvents.reverse()
+            return previousEvents
+        else:
+            return None
 
     def handleStrategyResult(self, event: Event, events: List[Event], result: StrategyResult, currentPosition: int):
         result: StrategyZigZagResult = result
@@ -545,3 +540,36 @@ class BacktestZigZagModule(BacktestModule):
         
 #     except (KeyboardInterrupt, SystemExit) as e:
 #         print(e)
+
+
+    # def getPreviousEvents(self, event: EventZigZag, events: List[EventZigZag], currentPosition: int, daysBefore: int = 5):
+    #     previousDays: List[EventZigZag] = []
+    #     position = 0
+    #     zigzagFound = False
+    #     for x in range(daysBefore):            
+    #         previousDataFound = False
+    #         while (previousDataFound == False and
+    #                 currentPosition-position > 0):
+    #             position += 1
+    #             item = events[currentPosition-position]
+    #             if item.symbol == event.contract.symbol:
+    #                 previousDataFound = True
+    #                 previousDays.append(item)
+    #                 if zigzagFound == True:
+    #                     item.zigzag = False
+    #                 elif item.zigzag == True:
+    #                     zigzagFound = True
+
+    #     for index, previousEvent in enumerate(previousDays, start=0):
+    #         if index > 0 and previousEvent is not None and previousEvent.zigzag == True:
+    #             shouldHaveZigZag = False
+    #             for j in range(0, index-1):
+    #                 item = previousDays[j]
+    #                 previousEventValue = previousEvent.high if previousEvent.zigzagType == ZigZagType.high else previousEvent.low
+    #                 itemEventValue = item.low if previousEvent.zigzagType == ZigZagType.high else item.high 
+    #                 perfentageGap = self.getPercentageChange(previousEventValue, itemEventValue)
+    #                 if perfentageGap >= 5:
+    #                     shouldHaveZigZag = True
+    #             previousEvent.zigzag = shouldHaveZigZag
+
+    #     return previousDays

@@ -35,7 +35,7 @@ class HistoricalData:
                                         high=event.high,
                                         low=event.low,
                                         close=event.close,
-                                        volume=event.volume, zigzag=zigzag, zigzagType=zigzagType, rsi=rsi)
+                                        zigzag=zigzag, zigzagType=zigzagType, rsi=rsi)
             
             zigzagEvents.append(eventZigZag)
             i += 1

@@ -24,22 +24,19 @@ class Event:
     close: float
     high: float
     low: float
-    volume: float
 
     def __init__(self, contract: Contract, 
                         datetime: dt.datetime, 
                         open: float, 
                         close: float, 
                         high: float, 
-                        low: float, 
-                        volume: float) -> None:
+                        low: float) -> None:
         self.contract = contract
         self.datetime = datetime
         self.open = open
         self.close = close
         self.high = high
         self.low = low
-        self.volume = volume
 
     def to_dict(self):
         return {
@@ -48,8 +45,7 @@ class Event:
             'open': self.open,
             'close': self.close,
             'high': self.high,
-            'low': self.low,
-            'volume': self.volume,
+            'low': self.low
         }
 
 class OrderAction(Enum):

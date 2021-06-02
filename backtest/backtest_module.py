@@ -37,7 +37,7 @@ class BacktestModule:
         elif config.action == BacktestAction.runStrategy:
             self.runStrategyAction()
         elif config.action == BacktestAction.runStockPerformance:
-            self.runShowGraphAction()
+            self.runStrategyAction()
         elif config.action == BacktestAction.showGraph:
             self.runShowGraphAction()
         else: 
@@ -75,14 +75,12 @@ class BacktestModule:
         self.saveDataInCSVFiles(config, strategyStocksData)
 
     def runStrategyAction(self):
+        print("🧙‍♀️ Lets Start 🧙‍♀️")
         config = BacktestConfigs()
-        allContractsEvents = BacktestScannerManager.loadStockFiles(config, self.parseCSVFile)
+        allContractsEvents = BacktestScannerManager.loadStockFiles(config.provider, config.country, config.strategyType, config.action, self.parseCSVFile)
         print("🧙‍♀️ Sort all Events by date 🧙‍♀️")
         allContractsEvents.sort(key=lambda x: x.datetime, reverse=False)
-        self.runStrategy()
-        
-    def runStrategyPerformanceAction(self):
-        pass
+        self.runStrategy(allContractsEvents)
 
     def runShowGraphAction(self):
         pass
