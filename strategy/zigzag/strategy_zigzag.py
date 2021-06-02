@@ -39,14 +39,13 @@ class StrategyZigZag(Strategy):
         if result:
             return result
 
-        if self.currentBar.datetime.year == 2020 and self.currentBar.datetime.month == 8 and self.currentBar.datetime.day > 10:
-            print("😁 %s 😁" % (self.strategyData.contract.symbol))
-            print("😁 [%s] Bar[-4]-> RSI(%.2f) ZigZag(%s) %s 😁" % (self.previousBars[-4].datetime.date(), self.previousBars[-4].rsi, self.previousBars[-4].zigzag, self.previousBars[-4].zigzagType))
-            print("😁 [%s] Bar[-3]-> RSI(%.2f) ZigZag(%s) %s 😁" % (self.previousBars[-3].datetime.date(), self.previousBars[-3].rsi, self.previousBars[-3].zigzag, self.previousBars[-3].zigzagType))
-            print("😁 [%s] Bar[-2]-> RSI(%.2f) ZigZag(%s) %s 😁" % (self.previousBars[-2].datetime.date(), self.previousBars[-2].rsi, self.previousBars[-2].zigzag, self.previousBars[-2].zigzagType))
-            print("😁 [%s] Bar[-1]-> RSI(%.2f) ZigZag(%s) %s 😁" % (self.previousBars[-1].datetime.date(), self.previousBars[-1].rsi, self.previousBars[-1].zigzag, self.previousBars[-1].zigzagType))
-            print("😁 [%s] CurrentBar-> RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.datetime.date(), self.currentBar.rsi, self.currentBar.zigzag))
-            print("😁  😁")
+        log("😁 %s 😁" % (self.strategyData.contract.symbol))
+        log("😁 [%s] Bar[-4]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-4].datetime.date(), self.previousBars[-4].rsi, self.previousBars[-4].zigzag))
+        log("😁 [%s] Bar[-3]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].datetime.date(), self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
+        log("😁 [%s] Bar[-2]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].datetime.date(), self.previousBars[-2].rsi, self.previousBars[-2].zigzag))
+        log("😁 [%s] Bar[-1]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].datetime.date(), self.previousBars[-1].rsi, self.previousBars[-1].zigzag))
+        log("😁 [%s] CurrentBar-> RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.datetime.date(), self.currentBar.rsi, self.currentBar.zigzag))
+        log("😁  😁")
 
         zigzagBar, zigzagIndex = self.getZigZag()
         if (zigzagBar is not None):
