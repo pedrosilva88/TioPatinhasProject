@@ -1,5 +1,4 @@
 
-from _typeshed import SupportsReadline
 from datetime import date
 from backtest.models.base_models import BacktestResultType
 from backtest.models.zigzag.zigzag_models import BacktestZigZagResult
@@ -8,7 +7,8 @@ from models.base_models import Event, BracketOrder, Order
 from models.zigzag.models import EventZigZag
 
 class ReportZigZagModule(ReportModule):
-    def createStopLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float):
+    def createStopLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float,
+                                zigzagDate: date):
         super().createStopLossResult(event, bracketOrder, positionDate, loss, cashAvailable)
 
         event: EventZigZag = event
@@ -21,10 +21,12 @@ class ReportZigZagModule(ReportModule):
                             event= event,
                             mainOrder=mainOrder,
                             positionDate= positionDate,
-                            cashAvailable= cashAvailable)
+                            cashAvailable= cashAvailable,
+                            zigzagDate= zigzagDate)
 
 
-    def createTakeProfitResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, profit: float, cashAvailable: float):
+    def createTakeProfitResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, profit: float, cashAvailable: float,
+                                zigzagDate: date):
         super().createTakeProfitResult(event, bracketOrder, positionDate, profit, cashAvailable)
 
         event: EventZigZag = event
@@ -37,9 +39,11 @@ class ReportZigZagModule(ReportModule):
                             event= event,
                             mainOrder=mainOrder,
                             positionDate= positionDate,
-                            cashAvailable= cashAvailable)
+                            cashAvailable= cashAvailable,
+                            zigzagDate= zigzagDate)
 
-    def createLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float):
+    def createLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float,
+                                zigzagDate: date):
         super().createLossResult(event, bracketOrder, positionDate, loss, cashAvailable)
 
         event: EventZigZag = event
@@ -50,9 +54,11 @@ class ReportZigZagModule(ReportModule):
                             event= event,
                             mainOrder=mainOrder,
                             positionDate= positionDate,
-                            cashAvailable= cashAvailable)
+                            cashAvailable= cashAvailable,
+                            zigzagDate= zigzagDate)
 
-    def createProfitResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, profit: float, cashAvailable: float):
+    def createProfitResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, profit: float, cashAvailable: float,
+                                zigzagDate: date):
         super().createProfitResult(event, bracketOrder, positionDate, profit, cashAvailable)
 
         event: EventZigZag = event
@@ -63,9 +69,11 @@ class ReportZigZagModule(ReportModule):
                             event= event,
                             mainOrder=mainOrder,
                             positionDate= positionDate,
-                            cashAvailable= cashAvailable)
+                            cashAvailable= cashAvailable,
+                            zigzagDate= zigzagDate)
 
-    def createResult(self, type: BacktestResultType, pnl: float, closePrice: float, event: EventZigZag, mainOrder: Order, positionDate: date, cashAvailable: float):
+    def createResult(self, type: BacktestResultType, pnl: float, closePrice: float, event: EventZigZag, mainOrder: Order, positionDate: date, cashAvailable: float,
+                                zigzagDate: date):
         result = BacktestZigZagResult(contract=event.contract.symbol, 
                                         action=mainOrder.action.code,
                                         type= type,
@@ -75,5 +83,6 @@ class ReportZigZagModule(ReportModule):
                                         priceCreateTrade=mainOrder.price,
                                         priceCloseTrade=closePrice,
                                         size=mainOrder.size,
-                                        cash=cashAvailable)
+                                        cash=cashAvailable,
+                                        zigzagDate=zigzagDate)
         self.results.append(result)

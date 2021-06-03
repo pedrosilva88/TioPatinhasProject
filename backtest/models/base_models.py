@@ -73,3 +73,4 @@ class BacktestAction(Enum):
     showGraph = 2
     runStockPerformance = 3
     runStrategy = 4
+    runStrategyWithDynamicParameters = 5

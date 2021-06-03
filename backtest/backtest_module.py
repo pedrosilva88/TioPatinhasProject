@@ -127,7 +127,7 @@ class BacktestModule:
 
     def calculateTotalInPositions(self):
         total = 0
-        for key, (order, position, date) in self.strategyModel.items():
+        for key, (order, position, date, event) in self.strategyModel.positions.items():
             total += position.size * order.price
         return total
 
