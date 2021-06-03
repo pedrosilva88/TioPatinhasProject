@@ -41,7 +41,7 @@ class BacktestModule:
             self.runDownloadStocksAction()
         elif config.action == BacktestAction.runStrategy:
             self.runStrategyAction()
-        elif config.action == BacktestAction.runStockPerformance:
+        elif config.action == BacktestAction.runStrategyPerformance:
             self.runStrategyAction()
         elif config.action == BacktestAction.showGraph:
             self.runShowGraphAction()
@@ -283,20 +283,3 @@ class BacktestModule:
 #         else:
 #             self.trades[key] = [resultArray]
 
-#     def updateStockPerformance(self, ticker: Ticker, type: BackTestResultType):
-#         array = []
-#         if ticker.contract.symbol in self.stockPerformance:
-#             array = self.stockPerformance[ticker.contract.symbol]
-#         else:
-#             array = [0,0,0,0]
-
-#         if type == BackTestResultType.takeProfit:
-#             array[0] += 1
-#         elif type == BackTestResultType.profit:
-#             array[1] += 1
-#         elif type == BackTestResultType.stopLoss:
-#             array[2] += 1
-#         elif type == BackTestResultType.loss:
-#             array[3] += 1
-
-#         self.stockPerformance[ticker.contract.symbol] = array

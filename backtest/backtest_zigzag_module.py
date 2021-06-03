@@ -103,7 +103,7 @@ class BacktestZigZagModule(BacktestModule):
 
     def setupRunStrategy(self):
         config = BacktestConfigs()
-        isForStockPerformance = True if config.action == BacktestAction.runStockPerformance else False
+        isForStockPerformance = True if config.action == BacktestAction.runStrategyPerformance else False
         strategyConfig = StrategyConfigFactory.createZigZagStrategyFor(MarketManager.getMarketFor(config.country))
         self.strategyModel = self.RunStrategyZigZagModel(StrategyZigZag(), strategyConfig, isForStockPerformance)
 

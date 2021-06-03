@@ -71,6 +71,6 @@ class BacktestDownloadModel:
 class BacktestAction(Enum):
     downloadData = 1
     showGraph = 2
-    runStockPerformance = 3
+    runStrategyPerformance = 3
     runStrategy = 4
     runStrategyWithDynamicParameters = 5
