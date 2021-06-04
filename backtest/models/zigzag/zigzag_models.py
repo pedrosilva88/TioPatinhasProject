@@ -6,7 +6,7 @@ class BacktestZigZagResult(BacktestResult):
     zigzagDate: date
     
     def __init__(self, contract: Contract, action: OrderAction, type: BacktestResultType, createTradeDate: datetime, closeTradeDate: datetime, 
-                        pnl: float, priceCreateTrade: float, priceCloseTrade: float, size: int, cash: float,
+                        pnl: float, priceCreateTrade: float, priceCloseTrade: float, size: int, totalInvested: float, cash: float,
                         zigzagDate: date):
-        super().__init__(contract, action, type, createTradeDate, closeTradeDate, pnl, priceCreateTrade, priceCloseTrade, size, cash)
+        super().__init__(contract, action, type, createTradeDate, closeTradeDate, pnl, priceCreateTrade, priceCloseTrade, size, totalInvested, cash)
         self.zigzagDate = zigzagDate

@@ -1,4 +1,5 @@
 import configparser, sys
+from typing import List
 from pytz import timezone
 from helpers import log
 
@@ -26,6 +27,7 @@ class BacktestConfigs:
     downloadModel: BacktestDownloadModel
 
     strategy: StrategyConfig
+    dynamicParameters: List[List[float]]
 
     def __init__(self) -> None:
         settingsConfig = configparser.ConfigParser()
@@ -53,6 +55,7 @@ class BacktestConfigs:
 
         market = MarketManager.getMarketFor(self.country)
         self.strategy = StrategyConfigFactory.createStrategyFor(strategyType=self.strategyType, market=market)
+        self.dynamicParameters = settingsConfig['Options']['startegyDynamicConfigs']
 
         if self.provider is None or self.action is None:
             log("🚨 Unable to get the initial backtest configs 🚨")

@@ -1,7 +1,7 @@
 
 from backtest.reports.report_module import ReportModule
 import csv
-from datetime import date
+from datetime import date, datetime
 from strategy.models import StrategyData, StrategyResult
 
 from strategy.configs.models import StrategyConfig
@@ -39,11 +39,11 @@ class BacktestModule:
         config = BacktestConfigs()
         if config.action == BacktestAction.downloadData:
             self.runDownloadStocksAction()
-        elif config.action == BacktestAction.runStrategy:
-            self.runStrategyAction()
-        elif config.action == BacktestAction.runStrategyPerformance:
+        elif config.action == BacktestAction.runStrategy or config.action == BacktestAction.runStrategyPerformance:
             self.runStrategyAction()
         elif config.action == BacktestAction.showGraph:
+            self.runShowGraphAction()
+        elif config.action == BacktestAction.runStrategyPerformanceWithDynamicParameters or config.action == BacktestAction.runStrategyWithDynamicParameters:
             self.runShowGraphAction()
         else: 
             print("🚨 Unkwon Action - nothing to do 🚨")
@@ -62,7 +62,7 @@ class BacktestModule:
     def parseCSVFile(self, reader: csv.reader) -> List[Event]:
         pass
 
-    def setupRunStrategy(self):
+    def setupRunStrategy(self, events: List[Event], dynamicParameters: List[List[float]]):
         pass
 
     def getStrategyData(self) -> StrategyData:
@@ -87,30 +87,49 @@ class BacktestModule:
         self.saveDataInCSVFiles(config, strategyStocksData)
 
     def runStrategyAction(self):
-        print("🧙‍♀️ Lets Start 🧙‍♀️")
+        print("🧙‍♀️ Lets Start running Strategy 🧙‍♀️")
+        events = self.contractsToRunStrategy()
+        self.runStrategy(events)
+
+        print("🧙‍♀️ Saving Reports 🧙‍♀️")
+        if self.strategyModel.isForStockPerformance:
+            self.strategyModel.reportModule.createReportPerformance()
+
+        self.strategyModel.reportModule.createReportTrades(self.strategyModel.isForStockPerformance)
+    
+    def runStrategyWithDynamicParametersAction(self):
+        print("🧙‍♀️ Lets Start running Strategy with dynamic parameters 🧙‍♀️")
+        events = self.contractsToRunStrategy()
         config = BacktestConfigs()
-        allContractsEvents = BacktestScannerManager.loadStockFiles(config.provider, config.country, config.strategyType, config.action, self.parseCSVFile)
-        print("🧙‍♀️ Sort all Events by date 🧙‍♀️")
-        allContractsEvents.sort(key=lambda x: x.datetime, reverse=False)
-        self.runStrategy(allContractsEvents)
+        for parameters in config.dynamicParameters:
+            self.runStrategy(events, parameters)
+            
 
     def runShowGraphAction(self):
         pass
 
     #### STRATEGIES ####
 
+    def contractsToRunStrategy(self) -> List[Event]:
+        print("🧙‍♀️ Lets Start 🧙‍♀️")
+        config = BacktestConfigs()
+        allContractsEvents = BacktestScannerManager.loadStockFiles(config.provider, config.country, config.strategyType, config.action, self.parseCSVFile)
+        print("🧙‍♀️ Sort all Events by date 🧙‍♀️")
+        allContractsEvents.sort(key=lambda x: x.datetime, reverse=False)
+        return allContractsEvents
+
     def getBalance(self):
         balance = 0
         if self.strategyModel.isForStockPerformance:
-            balance = 20000
+            balance = self.strategyModel.cashAvailable
         else:
             totalInPostions = self.calculateTotalInPositions()
             balance = min(150000, (self.strategyModel.cashAvailable - totalInPostions))
         return balance
 
-    def runStrategy(self, events: List[Event]):
+    def runStrategy(self, events: List[Event], dynamicParameters: List[List[float]] = None):
         print("🧙‍♀️ Setup strategy 🧙‍♀️")
-        self.setupRunStrategy()
+        self.setupRunStrategy(events, dynamicParameters)
         print("🧙‍♀️ Start running strategy 🧙‍♀️")
 
         i = 0
@@ -122,8 +141,6 @@ class BacktestModule:
                 self.handleStrategyResult(event, events, result, i)
             self.handleEndOfDayIfNecessary(event, events, i)
             i += 1
-        
-        print("🧙‍♀️ Saving Reports 🧙‍♀️")
 
     def calculateTotalInPositions(self):
         total = 0
@@ -186,41 +203,6 @@ class BacktestModule:
 #                 writer.writerow(["Date", "Symbol", "Result", "PnL", "Price CreateTrade", "Price CloseTrade", "Size", "Avg Volume",  "Volume 1st minute", "Total Invested", "Open Price", "YSTD Close Price", "Action", "Cash"])
 #             for model in data:
 #                 writer.writerow(model)
-
-#     def saveReportPerformance(self, path: str, stocksPath: str, data, countryConfig: CountryConfig):
-#         scanner = Scanner()
-#         scanner.fetchStocksFromCSVFile(path=stocksPath, nItems=0)
-#         stocks = scanner.stocks
-#         name = ("%s/ResultsStockPerformance.csv" % path)
-#         with open(name, 'w', newline='') as file:
-#             writer = csv.writer(file)
-#             writer.writerow(["Symbol", "Exchange", "Currency", "OPGs Found", "Take Profit", "Profit", "StopLoss", "Loss", "Wins", "%"])
-#             for key, item in data.items():
-#                 total = item[0]+item[1]+item[2]+item[3]
-#                 wins = item[0]+item[1]
-#                 writer.writerow([key,
-#                                 "SMART",
-#                                 countryConfig.currency,
-#                                 total,
-#                                 item[0],
-#                                 item[1],
-#                                 item[2],
-#                                 item[3],
-#                                 wins,
-#                                 (wins/total)*100])
-#                 item = list(filter(lambda x : x.symbol == key, stocks)).pop()
-#                 stocks.remove(item)
-#             for item in stocks:
-#                 writer.writerow([item.symbol,
-#                                 "SMART",
-#                                 countryConfig.currency,
-#                                 0,
-#                                 0,
-#                                 0,
-#                                 0,
-#                                 0,
-#                                 0,
-#                                 0])
 
 #     def showReport(self, path: str, zigzag: bool = False):
 #         items = [[]]

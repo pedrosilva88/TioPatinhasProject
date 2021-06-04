@@ -43,7 +43,7 @@ class BacktestResult:
                 action: OrderAction, type: BacktestResultType,
                 createTradeDate: datetime, closeTradeDate: datetime, 
                 pnl: float, priceCreateTrade: float, priceCloseTrade: float, size: int,
-                cash: float):
+                totalInvested: float, cash: float):
         self.contract = contract
         self.createTradeDate = createTradeDate
         self.closeTradeDate = closeTradeDate
@@ -56,6 +56,7 @@ class BacktestResult:
         self.priceCloseTrade = priceCloseTrade
 
         self.size = size
+        self.totalInvested = totalInvested
         self.cash = cash
 
 class BacktestDownloadModel:
@@ -73,4 +74,5 @@ class BacktestAction(Enum):
     showGraph = 2
     runStrategyPerformance = 3
     runStrategy = 4
-    runStrategyWithDynamicParameters = 5
+    runStrategyPerformanceWithDynamicParameters = 5
+    runStrategyWithDynamicParameters = 6

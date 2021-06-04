@@ -13,7 +13,14 @@ downloadFilename = "scan_to_download.csv"
 scannerPath = "backtest/scanner/Data/CSV/%s/%s/%s/%s"
 dataCSVStocksPath = "backtest/data/CSV/%s/%s/%s/Stocks"
 dataCSVStockFilePath = "backtest/data/CSV/%s/%s/%s/Stocks/%s.csv"
-dataCSVReportsPath = "backtest/data/CSV/%s/%s/%s/Report"
+dataCSVReportsPath = "backtest/data/CSV/%s/%s/%s/Report/%s"
+
+reportTradesFilename = "ResultTrades.csv"
+reportContractsPerformanceFilename = "ResultContractsPerformance.csv"
+reportTradesPerformanceFilename = "ResultTradesForPerformance.csv"
+
+reportStrategyResult = "ReportStrategyResult.csv"
+reportStrategyResultForPerformance = "ReportStrategyResultForPerformance.csv"
 
 class BacktestScannerManager:
     def getPathFileToScanStocks(provider: Provider, country: Country, strategy: StrategyType, action: BacktestAction) -> str:
@@ -29,9 +36,9 @@ class BacktestScannerManager:
         # backtest/Data/CSV/TWS/ZigZag/US/Stocks/APPL.csv
         return dataCSVStockFilePath % (provider.value, strategy.value, country.code, contract.symbol)
 
-    def getPathFolderToSaveReports(provider: Provider, country: Country, strategy: StrategyType) -> str:
+    def getPathFileToSaveReports(provider: Provider, country: Country, strategy: StrategyType, filename: str) -> str:
         # backtest/Data/CSV/TWS/ZigZag/US/Report
-        return dataCSVStocksPath % (provider.value, strategy.value, country.code)
+        return dataCSVReportsPath % (provider.value, strategy.value, country.code, filename)
 
     def loadStockFiles(provider: Provider, country: Country, strategy: StrategyType, action: BacktestAction,  parserBlock) -> List[Event]:
         filePathForStocks = BacktestScannerManager.getPathFileToScanStocks(provider, country, strategy, action)

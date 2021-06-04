@@ -1,12 +1,10 @@
 from datetime import timedelta, timezone
-from io import SEEK_CUR
-from logging import setLoggerClass
 from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
 from typing import List, Tuple
 from ib_insync import Fill
 from helpers import log
 from strategy import Strategy
-from strategy.models import StrategyData, StrategyResult, StrategyResultType
+from strategy.models import StrategyResultType
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from models.base_models import BracketOrder, Order, OrderAction, OrderType
 from models.zigzag.models import EventZigZag
