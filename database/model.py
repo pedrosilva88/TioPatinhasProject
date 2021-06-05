@@ -1,5 +1,5 @@
 import datetime
-from datetime import date
+from typing import Tuple
     
 def stringToDate(dateStr: str):
     return datetime.datetime.strptime(dateStr, '%y/%m/%d').date()
@@ -12,7 +12,7 @@ class FillDB:
         self.symbol = symbol
         self.date = date
 
-    def init_from_db(row: (int, str, str)):
+    def init_from_db(row: Tuple[int, str, str]):
         return FillDB(symbol=row[1], date=stringToDate(row[2]))
 
     @property

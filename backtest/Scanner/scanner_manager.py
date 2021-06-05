@@ -19,8 +19,8 @@ reportTradesFilename = "ResultTrades.csv"
 reportContractsPerformanceFilename = "ResultContractsPerformance.csv"
 reportTradesPerformanceFilename = "ResultTradesForPerformance.csv"
 
-reportStrategyResult = "ReportStrategyResult.csv"
-reportStrategyResultForPerformance = "ReportStrategyResultForPerformance.csv"
+reportStrategyResultFilename = "ReportStrategyResult.csv"
+reportStrategyResultForPerformanceFilename = "ReportStrategyResultForPerformance.csv"
 
 class BacktestScannerManager:
     def getPathFileToScanStocks(provider: Provider, country: Country, strategy: StrategyType, action: BacktestAction) -> str:

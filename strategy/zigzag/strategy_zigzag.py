@@ -64,10 +64,10 @@ class StrategyZigZag(Strategy):
 
     def getZigZag(self) -> Tuple[EventZigZag, int]:
         totalBars = len(self.previousBars)
-        index = -1 
+        index = -1
         zigzagBar = None
         for bar in reversed(self.previousBars):
-            if (bar.zigzag == True and (bar.rsi <= self.minRSI or bar.rsi >= self.maxRSI) and index < -1):
+            if (bar.zigzag == True and (bar.rsi <= self.minRSI or bar.rsi >= self.maxRSI) and index < -self.strategyConfig.daysAfterZigZag):
                 log("🎃 Bar Found %s: %d 🎃" % (self.strategyData.contract.symbol, index))
                 zigzagBar = bar
                 break

@@ -17,6 +17,8 @@ class StrategyZigZagConfig(StrategyConfig):
     daysBeforeToDownload: int
     # The number of days to send to the strategy module
     daysBefore: int
+    # The number of days after the Zigzag to start to analyze
+    daysAfterZigZag: int
 
     def __init__(self, market: Market,
                         runStrategyTime: time,
@@ -27,7 +29,8 @@ class StrategyZigZagConfig(StrategyConfig):
                         daysToHold: int,
                         runPositionsCheckTime: time,
                         daysBeforeToDownload: int,
-                        daysBefore: int):
+                        daysBefore: int,
+                        daysAfterZigZag: int):
 
         StrategyConfig.__init__(self, market= market, runStrategyTime=runStrategyTime, willingToLose=willingToLose, maxToInvestPerStockPercentage=maxToInvestPerStockPercentage)
         self.willingToLose = willingToLose
@@ -45,6 +48,8 @@ class StrategyZigZagConfig(StrategyConfig):
 
         self.daysBeforeToDownload = daysBeforeToDownload
         self.daysBefore = daysBefore
+
+        self.daysAfterZigZag = daysAfterZigZag
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
         currentTime = now.time

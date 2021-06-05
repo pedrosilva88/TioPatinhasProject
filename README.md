@@ -63,6 +63,7 @@ $ python main.py [PATH_TO_FILE]/[PROJECT_CONFIGS].ini [PATH_TO_FILE]/[PROVIDER_C
 ![Tio Patinhas](https://media.giphy.com/media/qzeCF4ymrgFXy/giphy.gif)
 
 ## Run Backtest
+> Before you run this command you should take a look to the Backtest configs file. In this file you tell to the backtest what you want to do.
 ```
 $ cd [PATH]/[PROJECT_FOLDER]/
 $ source [PATH]/[PROJECT_FOLDER]/.env/virtualenv/bin/activate

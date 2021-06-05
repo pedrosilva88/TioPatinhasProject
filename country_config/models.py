@@ -1,5 +1,4 @@
 import datetime
-from pytz import timezone
 from enum import Enum
 
 class Country(Enum):

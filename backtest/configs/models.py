@@ -55,7 +55,7 @@ class BacktestConfigs:
 
         market = MarketManager.getMarketFor(self.country)
         self.strategy = StrategyConfigFactory.createStrategyFor(strategyType=self.strategyType, market=market)
-        self.dynamicParameters = settingsConfig['Options']['startegyDynamicConfigs']
+        self.dynamicParameters = eval(settingsConfig.get("Options", "startegyDynamicConfigs"), {}, {})
 
         if self.provider is None or self.action is None:
             log("🚨 Unable to get the initial backtest configs 🚨")

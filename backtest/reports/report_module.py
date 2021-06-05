@@ -1,6 +1,6 @@
 import csv, statistics, math
 from scanner.scanner import Scanner
-from backtest.scanner.scanner_manager import BacktestScannerManager, reportContractsPerformanceFilename, reportTradesPerformanceFilename, reportTradesFilename
+from backtest.scanner.scanner_manager import BacktestScannerManager, reportContractsPerformanceFilename, reportTradesPerformanceFilename, reportTradesFilename, reportStrategyResultForPerformanceFilename, reportStrategyResultFilename 
 from datetime import date
 from models.base_models import BracketOrder, Event
 from typing import Any, List, Union
@@ -41,6 +41,12 @@ class ReportModule:
         pass
 
     def getRowForTradesReport(self, item: BacktestResult) -> List[Any]:
+        pass
+
+    def getHeaderRowForStrategyReport(self) -> List[str]:
+        pass
+
+    def getRowForStrategyReport(self, item: StrategyResultModel) -> List[Any]:
         pass
 
     def createStopLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float, *args):
@@ -153,19 +159,25 @@ class ReportModule:
                 negativeResultsCount +=1
                 totalNegativePercentage += percentage
                 standardDeviationData.append(-percentage)
+
         battingaAverage = battingAverageCount/len(self.results)
-        winLossRatio = (totalPositivePercentage/positiveResultsCount) / (totalNegativePercentage/negativeResultsCount)
+        winLossRatio = 0
+        if positiveResultsCount > 0 and negativeResultsCount > 0:
+            winLossRatio = (totalPositivePercentage/positiveResultsCount) / (totalNegativePercentage/negativeResultsCount)
         averageReturnPerTrade = totalReturn/len(self.results)
         standardDeviation = statistics.stdev(standardDeviationData)
         sharpRatio = (averageReturnPerTrade/standardDeviation)*math.sqrt(365)
         return StrategyResultModel(len(self.results), pnl, totalReturn, battingaAverage, winLossRatio, averageReturnPerTrade, standardDeviation, sharpRatio)
 
+    def createStrategyReport(self, isForPerformance: bool):
+        self.saveStrategyResultsReport(isForPerformance)
+
     def saveStrategyResultsReport(self, isForPerformance: bool):
         config = BacktestConfigs()
-        filename = reportTradesPerformanceFilename if isForPerformance else reportTradesFilename
+        filename = reportStrategyResultForPerformanceFilename if isForPerformance else reportStrategyResultFilename
         tradesFilename = BacktestScannerManager.getPathFileToSaveReports(config.provider, config.country, config.strategyType, filename)
         with open(tradesFilename, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(self.getHeaderRowForTradesReport())
-            for result in self.results:
-                writer.writerow(self.getRowForTradesReport(result))
+            writer.writerow(self.getHeaderRowForStrategyReport())
+            for result in self.strategyResults:
+                writer.writerow(self.getRowForStrategyReport(result))

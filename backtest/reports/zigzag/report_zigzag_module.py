@@ -12,15 +12,18 @@ class StrategyZigzagResultModel(StrategyResultModel):
     losePercentage: float
     daysToHold: float
     zigzagSpread: float
+    daysAfterZigZag: int
 
-    def __init__(self, pnl: float, totalReturn: float, battingAverage: float, winLossRatio: float, 
+    def __init__(self, numberOfTrades: int, pnl: float, totalReturn: float, battingAverage: float, winLossRatio: float, 
                 averageReturnPerTrade: float, standardDeviation: float, sharpRatio: float,
-                profitPercentage: float, losePercentage: float, daysToHold: float, zigzagSpread: float) -> None:
-        super().__init__(pnl, totalReturn, battingAverage, winLossRatio, averageReturnPerTrade, standardDeviation, sharpRatio)
+                profitPercentage: float, losePercentage: float, daysToHold: float, 
+                zigzagSpread: float, daysAfterZigZag: int) -> None:
+        super().__init__(numberOfTrades, pnl, totalReturn, battingAverage, winLossRatio, averageReturnPerTrade, standardDeviation, sharpRatio)
         self.profitPercentage = profitPercentage
         self.losePercentage = losePercentage
         self.daysToHold = daysToHold
         self.zigzagSpread = zigzagSpread
+        self.daysAfterZigZag = daysAfterZigZag
 
 class ReportZigZagModule(ReportModule):
     def getHeaderRowForTradesReport(self) -> List[str]:
@@ -32,6 +35,16 @@ class ReportZigZagModule(ReportModule):
         item: BacktestZigZagResult = item 
         return[item.closeTradeDate, item.createTradeDate, item.contract.symbol, item.type.emoji, item.action.code, 
                 item.pnl, item.priceCreateTrade, item.priceCloseTrade, item.size, item.zigzagDate, item.totalInvested, item.cash]
+
+    def getHeaderRowForStrategyReport(self) -> List[str]:
+        return["Take Profit", "Stop Loss", "PnL", "Total Return", "Batting Average", "Win/Loss Ratio", 
+                "Avg. return Per Trade", "Stand Deviation", "Sharp Ratio", "Number Of Trades","Days to hold", 
+                "Zigzag Spread, Days After Zigzag"]
+
+    def getRowForStrategyReport(self, item: StrategyResultModel) -> List[Any]:
+        item: StrategyZigzagResultModel = item
+        return [item.profitPercentage, item.losePercentage, item.pnl, item.totalReturn, item.battingAverage, item.winLossRatio,
+                item.averageReturnPerTrade, item.standardDeviation, item.sharpRatio, item.numberOfTrades, item.daysToHold, item.zigzagSpread, item.daysAfterZigZag]
 
     def createStopLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float,
                                 zigzagDate: date):
@@ -114,9 +127,16 @@ class ReportZigZagModule(ReportModule):
         self.results.append(result)
 
     def createStrategyResult(self, dynamicParameters: List[List[float]]) -> StrategyResultModel:
-        result: StrategyResultModel = super().createStrategyResult()
-        item = StrategyZigzagResultModel(result.numberOfTrades ,result.pnl, result.totalReturn, result.battingAverage, result.winLossRatio,
-                                        result.averageReturnPerTrade, result.standardDeviation, result.sharpRatio, 
-                                        dynamicParameters[0], dynamicParameters[1], dynamicParameters[3], dynamicParameters[2])
+        result: StrategyResultModel = super().createStrategyResult(dynamicParameters)
+        item = StrategyZigzagResultModel(result.numberOfTrades,
+                                        round(result.pnl, 2), 
+                                        round(result.totalReturn, 2), 
+                                        round(result.battingAverage, 2), 
+                                        round(result.winLossRatio, 2),
+                                        round(result.averageReturnPerTrade, 4), 
+                                        round(result.standardDeviation, 2), 
+                                        round(result.sharpRatio, 2), 
+                                        dynamicParameters[0], dynamicParameters[1], dynamicParameters[3], 
+                                        dynamicParameters[2], dynamicParameters[4])
         self.strategyResults.append(item)
         return item

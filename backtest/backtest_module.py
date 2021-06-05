@@ -22,7 +22,6 @@ class BacktestModule:
         cashAvailable: float
         isForStockPerformance: bool
         strategyConfig: StrategyConfig
-        reportModule: ReportModule
 
         def __init__(self, strategy: Strategy, strategyConfig: StrategyConfig, isForStockPerformance: bool) -> None:
             config = BacktestConfigs()
@@ -30,10 +29,13 @@ class BacktestModule:
             self.strategyConfig = strategyConfig
             self.positions = dict()
             self.isForStockPerformance = isForStockPerformance
-            self.reportModule = ReportModule()
             self.cashAvailable = float(config.wallet)
 
     strategyModel: RunStrategyModel
+    reportModule = ReportModule
+
+    def __init__(self) -> None:
+        self.reportModule = ReportModule()
 
     def runBacktest(self):
         config = BacktestConfigs()
@@ -44,7 +46,7 @@ class BacktestModule:
         elif config.action == BacktestAction.showGraph:
             self.runShowGraphAction()
         elif config.action == BacktestAction.runStrategyPerformanceWithDynamicParameters or config.action == BacktestAction.runStrategyWithDynamicParameters:
-            self.runShowGraphAction()
+            self.runStrategyWithDynamicParametersAction()
         else: 
             print("🚨 Unkwon Action - nothing to do 🚨")
 
@@ -93,9 +95,9 @@ class BacktestModule:
 
         print("🧙‍♀️ Saving Reports 🧙‍♀️")
         if self.strategyModel.isForStockPerformance:
-            self.strategyModel.reportModule.createReportPerformance()
+            self.reportModule.createReportPerformance()
 
-        self.strategyModel.reportModule.createReportTrades(self.strategyModel.isForStockPerformance)
+        self.reportModule.createReportTrades(self.strategyModel.isForStockPerformance)
     
     def runStrategyWithDynamicParametersAction(self):
         print("🧙‍♀️ Lets Start running Strategy with dynamic parameters 🧙‍♀️")
@@ -103,6 +105,10 @@ class BacktestModule:
         config = BacktestConfigs()
         for parameters in config.dynamicParameters:
             self.runStrategy(events, parameters)
+            self.reportModule.createStrategyResult(parameters)
+            self.reportModule.results = []
+        
+        self.reportModule.createStrategyReport(self.strategyModel.isForStockPerformance)
             
 
     def runShowGraphAction(self):
@@ -145,7 +151,7 @@ class BacktestModule:
     def calculateTotalInPositions(self):
         total = 0
         for key, (order, position, date, event) in self.strategyModel.positions.items():
-            total += position.size * order.price
+            total += position.size * order.parentOrder.price
         return total
 
     def uniqueIdentifier(self, symbol: ContractSymbol, date: date) -> str:

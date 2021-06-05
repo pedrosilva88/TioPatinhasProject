@@ -8,7 +8,6 @@ class Helpers(object):
         return datetime.astimezone(timezone)
 
     def dateToString(date: datetime) -> str:
-        #dateString = bar.date.strftime("%Y-%m-%d %H:%M:%S").replace(" 00", " 12") Faço este hack antes de gravar no ficheiro?? Não sei porqê!!
         return date.strftime(DateSystemFormat)
 
     def stringToDate(dateStr: str) -> datetime:

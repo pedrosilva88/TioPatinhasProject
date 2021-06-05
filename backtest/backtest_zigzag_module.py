@@ -46,7 +46,9 @@ class BacktestZigZagModule(BacktestModule):
             self.positionZigZagDates = dict()
             self.eventsMapper = dict()
 
-            self.reportModule = ReportZigZagModule()
+    def __init__(self) -> None:
+        super().__init__()
+        self.reportModule = ReportZigZagModule()
 
     #### READ/WRITE IN CSV FILES ####
 
@@ -106,13 +108,14 @@ class BacktestZigZagModule(BacktestModule):
 
     def setupRunStrategy(self, events: List[Event], dynamicParameters: List[List[float]]):
         config = BacktestConfigs()
-        isForStockPerformance = True if config.action == BacktestAction.runStrategyPerformance else False
+        isForStockPerformance = True if config.action == BacktestAction.runStrategyPerformance or config.action == BacktestAction.runStrategyPerformanceWithDynamicParameters else False
         strategyConfig: StrategyZigZagConfig = StrategyConfigFactory.createZigZagStrategyFor(MarketManager.getMarketFor(config.country))
         if dynamicParameters is not None:
             strategyConfig.profitPercentage = float(dynamicParameters[0])
             strategyConfig.stopToLosePercentage = float(dynamicParameters[1])
-            strategyConfig.zigzagSpread = float(dynamicParameters[3])
-            strategyConfig.daysToHold = float(dynamicParameters[4])
+            strategyConfig.zigzagSpread = float(dynamicParameters[2])
+            strategyConfig.daysToHold = float(dynamicParameters[3])
+            strategyConfig.daysAfterZigZag = int(dynamicParameters[4])
         self.strategyModel = self.RunStrategyZigZagModel(StrategyZigZag(), strategyConfig, isForStockPerformance)
         for event in events:
             identifier = self.uniqueIdentifier(event.contract.symbol, event.datetime.date())
@@ -229,7 +232,7 @@ class BacktestZigZagModule(BacktestModule):
 
     def handleProfitAndStop(self):
         model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
-        reportModule: ReportZigZagModule = model.reportModule
+        reportModule: ReportZigZagModule = self.reportModule
         positions = model.positions.copy()
         if (len(positions.values()) > 0):
             for key, (bracketOrder, position, positionDate, event) in positions.items():
@@ -263,7 +266,7 @@ class BacktestZigZagModule(BacktestModule):
 
     def handleExpiredFills(self):
         model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
-        reportModule: ReportZigZagModule = model.reportModule
+        reportModule: ReportZigZagModule = self.reportModule
         positions = model.positions.copy()
         if (len(positions.values()) > 0):
             for key, (bracketOrder, position, positionDate, event) in positions.items():
