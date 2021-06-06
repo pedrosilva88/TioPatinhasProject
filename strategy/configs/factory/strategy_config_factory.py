@@ -41,7 +41,7 @@ class Constants:
         maxRSI = 70
         rsiOffsetDays = 14
         zigzagSpread = 0.05
-        daysBeforeToDownload = 50
+        daysBeforeToDownload = 90
         daysBefore = 4
         daysToHold = 0
         daysAfterZigZag = 1

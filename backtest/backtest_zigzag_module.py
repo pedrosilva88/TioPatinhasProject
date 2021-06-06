@@ -156,7 +156,7 @@ class BacktestZigZagModule(BacktestModule):
         strategyConfig: StrategyZigZagConfig = self.strategyModel.strategyConfig
         event: EventZigZag = event
         events: List[EventZigZag] = events
-        previousEvents = self.getPreviousEvents(event, 90)#strategyConfig.daysBeforeToDownload)
+        previousEvents = self.getPreviousEvents(event, strategyConfig.daysBeforeToDownload)
         if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
             return None
         

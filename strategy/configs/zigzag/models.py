@@ -7,8 +7,6 @@ class StrategyZigZagConfig(StrategyConfig):
     maxRSI: float
     rsiOffsetDays: int
     zigzagSpread: float
-    stopToLosePercentage: float
-    profitPercentage: float
 
     daysToHold: int
     runPositionsCheckTime: time
@@ -32,12 +30,9 @@ class StrategyZigZagConfig(StrategyConfig):
                         daysBefore: int,
                         daysAfterZigZag: int):
 
-        StrategyConfig.__init__(self, market= market, runStrategyTime=runStrategyTime, willingToLose=willingToLose, maxToInvestPerStockPercentage=maxToInvestPerStockPercentage)
-        self.willingToLose = willingToLose
-        self.stopToLosePercentage = stopToLosePercentage
-        self.maxToInvestPerStockPercentage = maxToInvestPerStockPercentage
-        self.profitPercentage = profitPercentage
-
+        StrategyConfig.__init__(self, market= market, runStrategyTime=runStrategyTime, 
+                                willingToLose=willingToLose, stopToLosePercentage= stopToLosePercentage, profitPercentage= profitPercentage, 
+                                maxToInvestPerStockPercentage=maxToInvestPerStockPercentage)
         self.minRSI = minRSI
         self.maxRSI = maxRSI
         self.rsiOffsetDays = rsiOffsetDays

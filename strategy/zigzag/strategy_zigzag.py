@@ -1,20 +1,17 @@
 from datetime import timedelta, timezone
+from strategy.configs.models import StrategyConfig
 from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
 from typing import List, Tuple
 from ib_insync import Fill
 from helpers import log
 from strategy import Strategy
-from strategy.models import StrategyResultType
+from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from models.base_models import BracketOrder, Order, OrderAction, OrderType
 from models.zigzag.models import EventZigZag
 
 class StrategyZigZag(Strategy):
     # Properties
-
-    strategyData: StrategyZigZagData = None
-    strategyConfig: StrategyZigZagConfig = None
-
     currentBar: EventZigZag = None
     previousBars: List[EventZigZag] = None
     fill: Fill = None
@@ -28,7 +25,7 @@ class StrategyZigZag(Strategy):
     minRSI: float = None
     maxRSI: float = None
 
-    def run(self, strategyData: StrategyZigZagData, strategyConfig: StrategyZigZagConfig):
+    def run(self, strategyData: StrategyData, strategyConfig: StrategyConfig) -> StrategyResult:
         self.strategyData = strategyData
         self.strategyConfig = strategyConfig
         self.fetchInformation()
@@ -108,22 +105,24 @@ class StrategyZigZag(Strategy):
             index += 1
         return True
 
-
     # Constructor
 
     def fetchInformation(self):
+        strategyData: StrategyZigZagData = self.strategyData
+        strategyConfig: StrategyZigZagConfig = self.strategyConfig
+
         # Event Data
-        self.currentBar = self.strategyData.event
-        self.previousBars = self.strategyData.previousEvents
+        self.currentBar = strategyData.event
+        self.previousBars = strategyData.previousEvents
 
         # Strategy Parameters
-        self.willingToLose = self.strategyConfig.willingToLose
-        self.stopToLosePercentage = self.strategyConfig.stopToLosePercentage
-        self.profitPercentage = self.strategyConfig.profitPercentage
-        self.maxToInvestPerStockPercentage = self.strategyConfig.maxToInvestPerStockPercentage
+        self.willingToLose = strategyConfig.willingToLose
+        self.stopToLosePercentage = strategyConfig.stopToLosePercentage
+        self.profitPercentage = strategyConfig.profitPercentage
+        self.maxToInvestPerStockPercentage = strategyConfig.maxToInvestPerStockPercentage
 
-        self.minRSI = self.strategyConfig.minRSI
-        self.maxRSI = self.strategyConfig.maxRSI
+        self.minRSI = strategyConfig.minRSI
+        self.maxRSI = strategyConfig.maxRSI
     
     # Validations
 
@@ -155,7 +154,6 @@ class StrategyZigZag(Strategy):
 
                 (self.previousBars[-4] is not None) and (self.previousBars[-4].zigzag is not None) and (self.previousBars[-4].rsi is not None) and
                 (self.previousBars[-4].open is not None) and (self.previousBars[-4].close is not None))
-
 
     def isConfigsValid(self):
         return (self.profitPercentage > 0 and
@@ -191,6 +189,7 @@ class StrategyZigZag(Strategy):
         return None
 
     # Calculations
+
     def getOrderPrice(self, action: OrderAction):
         return self.currentBar.lastPrice #(self.currentBar.high+self.currentBar.low)/2  #self.currentBar.low if action == OrderAction.Buy else self.currentBar.high
 
@@ -215,22 +214,3 @@ class StrategyZigZag(Strategy):
         stopLossPriceRatio = price*self.stopToLosePercentage
 
         return int(min(portfolioLoss/stopLossPriceRatio, (totalCash*self.maxToInvestPerStockPercentage)/price))
-
-    # Final Operations
-
-    def createOrder(self, type: StrategyResultType):
-        log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.contract.symbol, self.currentBar.lastPrice))
-        action = OrderAction.Buy if type == StrategyResultType.Buy else OrderAction.Sell
-        price = self.getOrderPrice(action)
-        profitTarget = self.calculatePnl(action)
-        stopLossPrice = self.getStopLossPrice(action)
-        size = self.getSize(action)
-        # minTickProfit = self.priceIncrement(profitTarget)
-        # minTickLoss = self.priceIncrement(stopLossPrice)
-
-        log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
-
-        profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(profitTarget, 2))
-        stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, round(stopLossPrice, 2))
-        parentOrder = Order(action, OrderType.MarketOrder, size, round(price, 2))
-        return BracketOrder(parentOrder, profitOrder, stopLossOrder)
