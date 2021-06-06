@@ -1,6 +1,4 @@
 from backtest.reports.zigzag.report_zigzag_module import ReportZigZagModule
-from backtest.reports.report_module import ReportModule
-from strategy import main
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 import csv, math
 from distutils.util import strtobool

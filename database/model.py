@@ -1,8 +1,8 @@
-import datetime
+from datetime import date, datetime
 from typing import Tuple
     
 def stringToDate(dateStr: str):
-    return datetime.datetime.strptime(dateStr, '%y/%m/%d').date()
+    return datetime.strptime(dateStr, '%y/%m/%d').date()
 
 class FillDB:
     symbol: str

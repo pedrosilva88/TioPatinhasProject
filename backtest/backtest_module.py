@@ -79,7 +79,6 @@ class BacktestModule:
     def handleEndOfDayIfNecessary(self, event: Event, events: List[Event], currentPosition: int):
         pass
 
-
     #### ACTIONS ####
 
     def runDownloadStocksAction(self):
@@ -110,7 +109,6 @@ class BacktestModule:
         
         self.reportModule.createStrategyReport(self.strategyModel.isForStockPerformance)
             
-
     def runShowGraphAction(self):
         pass
 
@@ -183,91 +181,3 @@ class BacktestModule:
         stocksData = BacktestDownloadModule.downloadStocks(client, stocks, config.downloadModel.numberOfDays, config.downloadModel.barSize)
 
         return stocksData
-
-
-# # Reports
-# class BackTestReport():
-#     results: [str, [BackTestResult]] = dict()
-#     trades: [str, [str]] = dict()
-#     stockPerformance = dict()
-
-#     def saveReportResultInFile(self, path: str, data:[[]]):
-#         name = ("%s/ResultsPnL.csv" % path)
-#         with open(name, 'w', newline='') as file:
-#             writer = csv.writer(file)
-#             writer.writerow(["Date", "PnL", "Trades"])
-#             for model in data:
-#                 writer.writerow(model)
-
-#     def saveReportTradesInFile(self, path: str, data:[[]], zigzag: bool = False, fileName: str = "ResultsTrades.csv"):
-#         name = ("%s/%s" % (path, fileName))
-#         with open(name, 'w', newline='') as file:
-#             writer = csv.writer(file)
-#             if zigzag:
-#                 writer.writerow(["Date", "Symbol", "Result", "PnL", "Price CreateTrade", "Price CloseTrade", "Size", "Order Date", "Total Invested", "Open Price", "YSTD Close Price", "Action", "Cash"])
-#             else:
-#                 writer.writerow(["Date", "Symbol", "Result", "PnL", "Price CreateTrade", "Price CloseTrade", "Size", "Avg Volume",  "Volume 1st minute", "Total Invested", "Open Price", "YSTD Close Price", "Action", "Cash"])
-#             for model in data:
-#                 writer.writerow(model)
-
-#     def showReport(self, path: str, zigzag: bool = False):
-#         items = [[]]
-#         for key, array in self.results.items():
-#             total = 0
-#             for item in array:
-#                 total += item.pnl
-#             items.append([key, total, len(array)])
-#             print("%s: %.2f€ %d" % (key, total, len(array)))
-
-#         self.saveReportResultInFile(path, items)
-
-#         items = [[]]
-#         for key, array in self.trades.items():
-#             for item in array:
-#                 items.append(item)
-
-#         self.saveReportTradesInFile(path, items, zigzag)
-
-#     def showPerformanceReport(self, path: str, stocksPath: str, countryConfig: CountryConfig):
-#         self.saveReportPerformance(path, stocksPath, self.stockPerformance, countryConfig)
-
-#         items = [[]]
-#         for key, array in self.trades.items():
-#             for item in array:
-#                 items.append(item)
-
-#         self.saveReportTradesInFile(path, items, True, "ResultsTradesForPerformance.csv")
-
-#     def updateResults(self, key: str, value: BackTestResult):
-#         if key in self.results:
-#             self.results[key].append(value)
-#         else:
-#             self.results[key] = [value]
-
-#     def updateTrades(self, key: str, ticker: Ticker, result: BackTestResult, zigzag: bool = False):
-#         resultArray = []
-#         resultArray.append(key) # date
-#         resultArray.append(ticker.contract.symbol) # symbol
-#         resultArray.append(result.type.emoji()) # ✅ or ✅ ✅ or ❌  or ❌ ❌
-#         resultArray.append(result.pnl) # PnL
-#         resultArray.append(result.priceCreateTrade) # Price CreateTrade
-#         resultArray.append(result.priceCloseTrade) # Price CloseTrade
-#         resultArray.append(result.size) # Size
-        
-#         if zigzag:
-#             resultArray.append(result.orderDate) # Order Date
-#         else:
-#             resultArray.append(result.volumeFirstMinute) # VolumeFirstMinute
-#             resultArray.append(result.averageVolume) # AverageVolume
-            
-#         resultArray.append(result.totalInvested) # Total Invested
-#         resultArray.append(result.openPrice) # Open Price
-#         resultArray.append(result.ystdClosePrice) # YSTD Close Price
-#         resultArray.append(result.action) # Action Long or Short
-#         resultArray.append(result.cash) # Cash
-        
-#         if key in self.trades:
-#             self.trades[key].append(resultArray)
-#         else:
-#             self.trades[key] = [resultArray]
-

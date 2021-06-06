@@ -1,4 +1,5 @@
 import datetime
+from datetime import timezone as tz
 from enum import Enum
 
 class Country(Enum):
@@ -23,11 +24,11 @@ class Country(Enum):
 
 class Market():
     country: Country
-    timezone: timezone
+    timezone: tz
     openTime: datetime
     closeTime: datetime
 
-    def __init__(self, country: Country, timezone: timezone, openTime: datetime, closeTime: datetime):
+    def __init__(self, country: Country, timezone: tz, openTime: datetime, closeTime: datetime):
         self.country = country
         self.timezone = timezone
         self.openTime = timezone.localize(openTime, is_dst=None)

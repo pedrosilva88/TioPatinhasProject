@@ -34,8 +34,8 @@ class Constants:
         runStrategyAfterMinutes = 1
         runPositionsCheckBeforeHours = 1
         willingToLose = 0.04
-        stopToLosePercentage = 0.01
-        profitPercentage = 0.02
+        stopToLosePercentage = 0.02
+        profitPercentage = 0.04
         maxToInvestPerStockPercentage = 1
         minRSI = 30
         maxRSI = 70
@@ -45,7 +45,6 @@ class Constants:
         daysBefore = 4
         daysToHold = 0
         daysAfterZigZag = 1
-
 
 ## OPG UK ##
 #     if key == CountryKey.UK:
