@@ -15,8 +15,13 @@ class StrategyType(Enum):
         elif code == 'stochi':
             return StrategyType.stochi
 
+class StrategyAction(Enum):
+    runStrategy = 0
+    checkPositions = 1
+
 class StrategyConfig:
     market: Market
+    type: StrategyType
     runStrategyTime: time
 
     stopToLosePercentage: float
@@ -35,4 +40,7 @@ class StrategyConfig:
         self.maxToInvestPerStockPercentage = maxToInvestPerStockPercentage
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
+        pass
+
+    def nextAction(self, now: datetime) -> StrategyAction:
         pass

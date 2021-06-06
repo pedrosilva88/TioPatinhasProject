@@ -1,6 +1,6 @@
 from datetime import time, datetime, timedelta
 from country_config.models import Market
-from strategy.configs.models import StrategyConfig
+from strategy.configs.models import StrategyAction, StrategyConfig, StrategyType
 
 class StrategyZigZagConfig(StrategyConfig):
     minRSI: float
@@ -33,6 +33,8 @@ class StrategyZigZagConfig(StrategyConfig):
         StrategyConfig.__init__(self, market= market, runStrategyTime=runStrategyTime, 
                                 willingToLose=willingToLose, stopToLosePercentage= stopToLosePercentage, profitPercentage= profitPercentage, 
                                 maxToInvestPerStockPercentage=maxToInvestPerStockPercentage)
+                                
+        self.type = StrategyType.zigzag
         self.minRSI = minRSI
         self.maxRSI = maxRSI
         self.rsiOffsetDays = rsiOffsetDays
@@ -55,3 +57,6 @@ class StrategyZigZagConfig(StrategyConfig):
         else:
             nextDay = now.date+timedelta(days=1)
             return datetime.combine(nextDay, self.runStrategyTime)
+
+    def nextAction(self, now: datetime) -> StrategyAction:
+        pass

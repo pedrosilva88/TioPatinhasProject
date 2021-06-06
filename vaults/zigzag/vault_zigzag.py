@@ -1,8 +1,10 @@
 import asyncio
 from enum import Enum
-from typing import Protocol
+from strategy.configs.models import StrategyAction
+from typing import Callable, Protocol
 from itertools import zip_longest
 from datetime import datetime
+from vaults.models import Vault
 from ib_insync import IB, Ticker as ibTicker, Contract as ibContract, Order as ibOrder, LimitOrder, StopOrder, Position as ibPosition, BarData, Stock as ibStock
 from helpers import logExecutionZigZag, log, utcToLocal, logCounter
 from models import Order, OrderAction, CustomBarData
@@ -22,7 +24,7 @@ class IslandProtocol(Protocol):
     def unsubscribeStrategyEvents(self, ib: IB):
         """Subscribe Events"""
 
-class VaultZigZag:
+class VaultZigZag(Vault):
     ib: IB
     databaseModule: DatabaseModule
     countryConfig: CountryConfig
@@ -337,3 +339,10 @@ class VaultZigZag:
     @property
     def stocks(self):
         return self.scanner.stocks
+
+
+    def nextOperationBlock(self, now: datetime) -> Callable:
+        if self.strategyConfig.nextAction(now) == StrategyAction.runStrategy:
+            return self.runStrategy() # Aqui tem que ser o runMarket, porque primeiro preciso de atualizar toda a info do IB
+        elif self.strategyConfig.nextAction(now) == StrategyAction.checkPositions:
+            return self.runStrategyForPositions()
