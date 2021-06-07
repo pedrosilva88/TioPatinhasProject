@@ -24,7 +24,7 @@ reportStrategyResultForPerformanceFilename = "ReportStrategyResultForPerformance
 
 class BacktestScannerManager:
     def getPathFileToScanStocks(provider: Provider, country: Country, strategy: StrategyType, action: BacktestAction) -> str:
-        filename = runStartegyFilename if action == BacktestAction.runStrategy else downloadFilename
+        filename = runStartegyFilename if action == BacktestAction.runStrategy or action == BacktestAction.runStrategyWithDynamicParameters else downloadFilename
         # backtest/scanner/Data/CSV/TWS/ZigZag/US/scan_to_download.csv
         return scannerPath % (provider.value, strategy.value, country.code, filename)
 

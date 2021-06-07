@@ -128,7 +128,7 @@ class BacktestModule:
             balance = self.strategyModel.cashAvailable
         else:
             totalInPostions = self.calculateTotalInPositions()
-            balance = min(150000, (self.strategyModel.cashAvailable - totalInPostions))
+            balance = self.strategyModel.cashAvailable - totalInPostions
         return balance
 
     def runStrategy(self, events: List[Event], dynamicParameters: List[List[float]] = None):
