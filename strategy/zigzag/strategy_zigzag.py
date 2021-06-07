@@ -178,7 +178,7 @@ class StrategyZigZag(Strategy):
         elif self.strategyData.position is not None:
             shares = self.strategyData.position.position
             closeMarketDate = self.countryConfig.closeMarket.astimezone(timezone('UTC'))
-            if (now.hour == (closeMarketDate-timedelta(hours=2)).hour and today >= (executionDate+timedelta(days=0))):
+            if (now.hour == (closeMarketDate-timedelta(hours=1)).hour and today >= (executionDate+timedelta(days=0))):
                 if shares > 0:
                     return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.PositionExpired_Sell, None, None, self.strategyData.position)    
                 elif shares < 0:
