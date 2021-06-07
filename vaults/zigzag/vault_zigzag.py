@@ -160,13 +160,14 @@ class VaultZigZag(Vault):
         return (bar, found)
 
     async def runStrategyForPositions(self):
-        time = self.countryConfig.closeMarket-timedelta(hours=2)
+        time = self.countryConfig.closeMarket-timedelta(hours=1)
         marketTime = time.astimezone(timezone('UTC'))
         nowTime = datetime.now().astimezone(timezone('UTC'))
         localMarketTime = marketTime.astimezone(timezone('Europe/Lisbon'))
         log("🕐 Validate current Positions scheduled for %d/%d %d:%d 🕐" % (localMarketTime.day, localMarketTime.month, localMarketTime.hour, localMarketTime.minute))
         difference = (marketTime - nowTime)
-        coro = asyncio.sleep(difference.total_seconds())
+        safe_margin = 5
+        coro = asyncio.sleep(difference.total_seconds()+safe_margin)
         self.delegate.marketWaiter = asyncio.ensure_future(coro)
         await asyncio.wait([self.delegate.marketWaiter])
         self.delegate.marketWaiter = None
