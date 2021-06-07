@@ -38,7 +38,7 @@ def getConfigFor(key: CountryKey) -> CountryConfig:
         return CountryConfig(key=CountryKey.USA,
                             timezone=timezone('America/New_York'),
                             currency="USD",
-                            startSetupData=datetime.combine(date.today(),time(9,31)),
+                            startSetupData=datetime.combine(date.today(),time(9,30,30)),
                             exchangeOpenTime=datetime.combine(date.today(),time(9,30)),
                             closeMarket=datetime.combine(date.today(),time(16,00)),
                             nItems=0)

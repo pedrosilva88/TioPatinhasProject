@@ -89,7 +89,8 @@ from database import FillDB
 fill = FillDB('AAPL', date(2021,6,1))
 tick = Ticker(Contract('AAPL', 'SMART', 'USD'))
 position = Position('', Contract('AAPL', 'SMART', 'USD'), 100, 10)
-data = StrategyData(tick, position, None, None, None, None, None, None, None, fill, date(2021,6,1), datetime(2021,6,1,18,30))
+data = StrategyData(tick, position, None, None, None, None, None, None, None, fill, date(2021,6,1), datetime(2021,6,1,18,59,59))
+#data = StrategyData(tick, position, None, None, None, None, None, None, None, fill, date(2021,6,1), datetime(2021,6,1,18,30))
 countryConfig = getConfigFor(CountryKey.USA)
 object = StrategyZigZag()
 object.strategyData = data
