@@ -163,7 +163,7 @@ class BacktestZigZagModule(BacktestModule):
         
         previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
         fill = self.getFill(event.contract)
-        balance = self.getBalance()
+        balance = min(150000, self.getBalance())
 
         return StrategyZigZagData(contract= event.contract,
                                     totalCash= balance,
