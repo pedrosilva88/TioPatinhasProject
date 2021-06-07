@@ -132,7 +132,7 @@ def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
                                 strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(14,0)), is_dst=None), 
                                 minGap= 2, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
                                 willingToLose= 0.04,
-                                stopToLosePercentage= 0.02, 
+                                stopToLosePercentage= 0.03,
                                 maxToInvestPerStockPercentage= 1, 
                                 averageVolumePercentage= 1.8,
                                 profitPercentage = 0.04,

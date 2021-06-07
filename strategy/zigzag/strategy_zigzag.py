@@ -67,7 +67,7 @@ class StrategyZigZag(Strategy):
         index = -1 
         zigzagBar = None
         for bar in reversed(self.previousBars):
-            if (bar.zigzag == True and (bar.rsi <= self.minRSI or bar.rsi >= self.maxRSI) and index < -1):
+            if (bar.zigzag == True and (bar.rsi <= self.minRSI or bar.rsi >= self.maxRSI) and index < -2):
                 log("🎃 Bar Found %s: %d 🎃" % (self.strategyData.ticker.contract.symbol, index))
                 zigzagBar = bar
                 break

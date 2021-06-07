@@ -231,7 +231,7 @@ class VaultZigZag:
         chunks = self.grouper(self.stocks, 50)
         all_bars = []
         for stocks in chunks:
-            all_bars += await asyncio.gather(*[self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 50, "1 day") for stock in stocks ])
+            all_bars += await asyncio.gather(*[self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 90, "1 day") for stock in stocks ])
         for stock, bars in zip(self.stocks, all_bars):
             if stock.symbol not in self.customBarsDataDict:
                 self.customBarsDataDict[stock.symbol] = []
