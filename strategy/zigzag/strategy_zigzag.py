@@ -178,13 +178,18 @@ class StrategyZigZag(Strategy):
         elif self.strategyData.position is not None:
             shares = self.strategyData.position.position
             closeMarketDate = self.countryConfig.closeMarket.astimezone(timezone('UTC'))
-            if (now.hour == (closeMarketDate-timedelta(hours=2)).hour and today >= (executionDate+timedelta(days=0))):
+            if (now.hour == (closeMarketDate-timedelta(hours=1)).hour and today >= (executionDate+timedelta(days=0))):
                 if shares > 0:
                     return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Sell, None, self.strategyData.position)    
                 elif shares < 0:
                     return StrategyResult(self.strategyData.ticker, StrategyResultType.PositionExpired_Buy, None, self.strategyData.position)
-            log("🥵 Cant do nothing with Stock (%s) - You already have a position and it's not expired 🥵" % self.strategyData.ticker.contract.symbol)
-            return StrategyResult(self.strategyData.ticker, StrategyResultType.KeepPosition)
+            log("🥵 Cant do nothing with Stock (%s) - You already have a position and it's not expired 🥵" % self.strategyData.contract.symbol)
+            log("🥵 shares: %d" % shares)
+            log("🥵 now.hour: %d" % now.hour)
+            log("🥵 (closeMarketDate-timedelta(hours=1)).hour: %d" % (closeMarketDate-timedelta(hours=1)).hour)
+            log("🥵 today: %s" % today)
+            log("🥵 (executionDate+timedelta(days=0)): %s" % (executionDate+timedelta(days=0)))
+            return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.KeepPosition)
 
         return None
 
