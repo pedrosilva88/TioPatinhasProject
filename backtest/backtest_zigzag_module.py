@@ -1,3 +1,4 @@
+from statistics import mode
 from backtest.reports.zigzag.report_zigzag_module import ReportZigZagModule
 from strategy import models
 from strategy.configs.zigzag.models import StrategyZigZagConfig
@@ -221,10 +222,17 @@ class BacktestZigZagModule(BacktestModule):
                 model.tradesAvailable -= 1
                 newFill = FillDB(result.contract.symbol, result.event.datetime.date())
                 model.databaseModule.createFill(newFill)
+        else:
+            for key, position in model.positions.items():
+                if key.split("_")[0] == event.contract.symbol:
+                    lista = list(position)
+                    lista[3] = event
+                    model.positions[key] = tuple(lista)
 
     def handleEndOfDayIfNecessary(self, event: Event, events: List[Event], currentPosition: int):
         model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
         model.currentDay = event.datetime.date()
+        
         if len(events) > currentPosition+1 and events[currentPosition+1].datetime.date() != model.currentDay:
             self.handleProfitAndStop()
             self.handleExpiredFills()
