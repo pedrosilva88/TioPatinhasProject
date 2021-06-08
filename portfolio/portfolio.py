@@ -100,7 +100,7 @@ class Portfolio:
                 assert order.action in ('BUY', 'SELL')
                 reverseAction = 'BUY' if order.action == 'SELL' else 'SELL'
                 parent = Order(
-                    order.action, order.totalQuantity,
+                    action=order.action, totalQuantity=order.totalQuantity,
                     orderId=ib.client.getReqId(),
                     orderType="MIDPRICE",
                     transmit=False)

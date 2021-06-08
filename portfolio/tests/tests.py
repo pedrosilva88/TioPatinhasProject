@@ -71,11 +71,14 @@ from portfolio import *
 ib = IB()
 ib.connect('127.0.0.1', 7497, clientId=3)
 portfolio = Portfolio()
-contract = ibStock("SAN1", "SMART", "EUR")
+contract = ibStock("AAPL", "SMART", "USD")
 order = MarketOrder("SELL", 10)
-profitOrder = LimitOrder("BUY", 10, 1)
-stopOrder = StopOrder("BUY", 10, 10)
+
+profitOrder = LimitOrder("BUY", 10, 10)
+stopOrder = StopOrder("BUY", 10, 180)
 portfolio.createOrder(ib, contract, order, profitOrder, stopOrder)
+
+#order = ibOrder(action="SELL", orderType="MIDPRICE", totalQuantity=10)
 
 
 
