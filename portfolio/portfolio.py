@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder, Fill, OrderStatus, BracketOrder
+from ib_insync.order import Order
 from models import OrderType, OrderAction
 from helpers import log
 
@@ -95,12 +96,13 @@ class Portfolio:
             limitOrder = LimitOrder(order.action, order.totalQuantity, order.lmtPrice)
             ib.placeOrder(contract, limitOrder)
         else:
-            if order.orderType == "MKT":
+            if order.orderType == "MKT" or order.orderType == "MIDPRICE":
                 assert order.action in ('BUY', 'SELL')
                 reverseAction = 'BUY' if order.action == 'SELL' else 'SELL'
-                parent = MarketOrder(
+                parent = Order(
                     order.action, order.totalQuantity,
                     orderId=ib.client.getReqId(),
+                    orderType="MIDPRICE",
                     transmit=False)
                 takeProfit = LimitOrder(reverseAction, profitOrder.totalQuantity, profitOrder.lmtPrice,
                                         orderId=ib.client.getReqId(),
@@ -115,7 +117,6 @@ class Portfolio:
                     parentId=parent.orderId)
 
                 bracket = BracketOrder(parent, takeProfit, stopLoss)
-                print(bracket)
                 for o in bracket:
                     ib.placeOrder(contract, o)
             else:

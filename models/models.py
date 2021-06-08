@@ -39,6 +39,7 @@ class OrderType(Enum):
     LimitOrder = "LMT"
     MarketOrder = "MKT"
     StopOrder = "STP"
+    MidPrice = "MIDPRICE"
 
 class Order(ibOrder):
     takeProfitOrder = None
