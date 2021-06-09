@@ -314,7 +314,8 @@ class BacktestZigZagModule(BacktestModule):
         return ((mainOrder.action == OrderAction.Buy and mainOrder.price <= event.close) or
                 (mainOrder.action == OrderAction.Sell and mainOrder.price >= event.close))
 
-    def addIndicatorsToGraph(self, events: List[Event]) -> List[Any]:
+    def addIndicatorsToGraph(self, events: List[Event]) -> List[float]:
+        import numpy as np
         events: List[EventZigZag] = events
         dates = []
         items = []
@@ -325,4 +326,7 @@ class BacktestZigZagModule(BacktestModule):
                     items.append(event.high)
                 else:
                     items.append(event.low)
-        graph.plot(dates, items, color='blue', label='ZigZag')
+            else:
+                items.append(np.nan)
+        return items
+        #graph.plot(dates, items, color='blue', label='ZigZag')

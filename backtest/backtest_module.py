@@ -3,7 +3,7 @@ from strategy.historical_data import HistoricalData
 
 from matplotlib import pyplot
 from matplotlib.axes import Axes
-from mplfinance import plot
+from mplfinance import plot, make_addplot
 import matplotlib.dates as mpl_dates
 import pandas as pd
 from pandas.core.frame import DataFrame
@@ -218,8 +218,7 @@ class BacktestModule:
         plot(ohlc, type='candlestick', style='charles',
             title='Chart',
             ylabel='Price',
-            xlabel='Date',
-            addplot)
+            addplot=[make_addplot(data, type='line', scatter=True, linestyle='dashdot')])
         #candlestick_ohlc(ax, ohlc.values, width=0.6, colorup='green', colordown='red', alpha=0.8)
 
         # Setting labels & titles
@@ -239,5 +238,5 @@ class BacktestModule:
 
         #pyplot.show()
 
-    def addIndicatorsToGraph(self, events: List[Event]) -> List[Any]:
+    def addIndicatorsToGraph(self, events: List[Event]) -> List[float]:
         pass
