@@ -235,4 +235,4 @@ class StrategyZigZag(Strategy):
 
         profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(profitTarget, 2))
         stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, round(stopLossPrice, 2))
-        return Order(action=action, type=OrderType.MidPrice, totalQuantity=size, price=price, takeProfitOrder=profitOrder, stopLossOrder=stopLossOrder)
+        return Order(action=action, type=OrderType.MarketOrder, totalQuantity=size, price=price, takeProfitOrder=profitOrder, stopLossOrder=stopLossOrder)
