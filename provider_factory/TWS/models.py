@@ -30,14 +30,14 @@ class TWSClient(ProviderClient):
     async def connectAsync(self):
         await self.client.connectAsync(self.providerConfigs.endpoint, self.providerConfigs.port, self.providerConfigs.clientID)
 
-    def downloadHistoricalData(self, contract: Contract, days: int, barSize: str) -> List[Event]:
+    def downloadHistoricalData(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         if contract is None:
             return []
 
-        configs = TWSClient.HistoricalRequestConfigs(contract, days, barSize)
+        configs = TWSClient.HistoricalRequestConfigs(contract, days, barSize, endDate)
         allBars: List[BarData] = []
 
-        while configs.startDate <= configs.today:
+        while configs.startDate <= configs.endDate:
             endtime = configs.startDate+timedelta(days=1) if barSize.endswith('min') else ''
             bars: List[BarData] = self.client.reqHistoricalData(configs.stock, endDateTime=endtime, 
                                                 durationStr=configs.durationStr, 
@@ -53,14 +53,14 @@ class TWSClient(ProviderClient):
             events.append(Event(contract, bar.date, bar.open, bar.close, bar.high, bar.low, bar.volume))
         return events
 
-    async def downloadHistoricalDataAsync(self, contract: Contract, days: int, barSize: str) -> List[Event]:
+    async def downloadHistoricalDataAsync(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         if contract is None:
             return []
 
-        configs = TWSClient.HistoricalRequestConfigs(contract, days, barSize)
+        configs = TWSClient.HistoricalRequestConfigs(contract, days, barSize, endDate)
         allBars: List[BarData] = []
 
-        while configs.startDate <= configs.today:
+        while configs.startDate <= configs.endDate:
             endtime = configs.startDate+timedelta(days=1) if barSize.endswith('min') else ''
             bars: List[BarData] = await self.client.reqHistoricalDataAsync(configs.stock, endDateTime=endtime, 
                                                     durationStr=configs.durationStr, 
@@ -80,18 +80,18 @@ class TWSClient(ProviderClient):
         nDays: int
         nYears: int
         durationsDays: str
-        today: date
+        endDate: date
         startDate: date
         stock: Stock
         durationStr: str
 
-        def __init__(self, contract: Contract, days: int, barSize: str) -> None:
+        def __init__(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> None:
             super().__init__()
             self.nDays = days
             self.nYears = int(self.nDays/365)
             self.durationDays = ("%d D" % (self.nDays+10)) if self.nDays < 365 else ("%d Y" % self.nYears)
-            self.today = datetime.now().replace(microsecond=0, tzinfo=None).date()
-            self.startDate = self.today-timedelta(days=self.nDays+1) if barSize.endswith('min') else self.today
+            self.endDate = endDate
+            self.startDate = self.endDate-timedelta(days=self.nDays+1) if barSize.endswith('min') else self.endDate
             self.stock = Stock(contract.symbol, contract.exchange, contract.currency)
             self.durationStr = '5 D' if barSize.endswith('min') else self.durationDays
 

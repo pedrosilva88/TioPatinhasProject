@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from enum import Enum
 from typing import Any, List
 from models.base_models import Contract, Event
@@ -58,10 +59,10 @@ class ProviderClient:
     async def connectAsync(self):
         pass
 
-    def downloadHistoricalData(self, stock: Contract, days: int, barSize: str) -> List[Event]:
+    def downloadHistoricalData(self, stock: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         pass
 
-    async def downloadHistoricalDataAsync(self, stock: Contract, days: int, barSize: str) -> List[Event]:
+    async def downloadHistoricalDataAsync(self, stock: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         pass
 
 class ProviderController:

@@ -1,4 +1,5 @@
 import configparser, sys
+from datetime import date
 from typing import List
 from pytz import timezone
 from helpers import log
@@ -23,7 +24,9 @@ class BacktestConfigs:
     wallet: float
 
     action: BacktestAction
-    contract: Contract
+    graphContract: Contract
+    graphStartDate: date
+    graphEndDate: date
     downloadModel: BacktestDownloadModel
 
     strategy: StrategyConfig
@@ -46,16 +49,16 @@ class BacktestConfigs:
         self.wallet = settingsConfig['Default']['wallet']
 
         self.action = BacktestAction(int(settingsConfig['Options']['action']))
-        self.contract = Contract(settingsConfig['Options']['symbol'], self.country)
+        self.graphContract = Contract(settingsConfig['Options_Action_2']['symbol'], self.country)
 
         path  = BacktestScannerManager.getPathFileToScanStocks(self.provider, self.country, self.strategyType, self.action)
-        nDays = int(settingsConfig['Options']['nDays'])
-        barSize = settingsConfig['Options']['barSize']
+        nDays = int(settingsConfig['Options_Action_1']['nDays'])
+        barSize = settingsConfig['Options_Action_1']['barSize']
         self.downloadModel = BacktestDownloadModel(path, nDays, barSize)
 
         market = MarketManager.getMarketFor(self.country)
         self.strategy = StrategyConfigFactory.createStrategyFor(strategyType=self.strategyType, market=market)
-        self.dynamicParameters = eval(settingsConfig.get("Options", "startegyDynamicConfigs"), {}, {})
+        self.dynamicParameters = eval(settingsConfig.get("Options_Action_5", "startegyDynamicConfigs"), {}, {})
 
         if self.provider is None or self.action is None:
             log("🚨 Unable to get the initial backtest configs 🚨")

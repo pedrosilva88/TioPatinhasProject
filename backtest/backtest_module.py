@@ -110,7 +110,7 @@ class BacktestModule:
         self.reportModule.createStrategyReport(self.strategyModel.isForStockPerformance)
             
     def runShowGraphAction(self):
-        pass
+        self.showGraph()
 
     #### STRATEGIES ####
 
@@ -181,3 +181,12 @@ class BacktestModule:
         stocksData = BacktestDownloadModule.downloadStocks(client, stocks, config.downloadModel.numberOfDays, config.downloadModel.barSize)
 
         return stocksData
+
+    #### Graph ####
+
+    def showGraph(self):
+        config = BacktestConfigs()
+        client = ProviderModule.createClient(config.provider, config.providerConfigs)
+        client.connect()
+        days = config.endDate - config.startDate
+        stockData = BacktestDownloadModule.downloadStock(client, config.contract, days, config.downloadModel.barSize)

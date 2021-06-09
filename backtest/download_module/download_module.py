@@ -1,3 +1,4 @@
+from datetime import date, datetime
 import sys
 from typing import List, Tuple, Union
 from backtest.models.base_models import ContractSymbol
@@ -20,4 +21,7 @@ class BacktestDownloadModule:
             bars = client.downloadHistoricalData(stock, days, barSize)
             dic[stock.symbol] = (stock, bars)
         return dic
+
+    def downloadStock(client: ProviderClient, stock: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
+        return client.downloadHistoricalData(stock, days, barSize, endDate)
         
