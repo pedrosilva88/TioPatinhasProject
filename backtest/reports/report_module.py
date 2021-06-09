@@ -146,7 +146,7 @@ class ReportModule:
         standardDeviationData = []
         for result in self.results:
             pnl += result.pnl
-            percentage = abs(result.priceCreateTrade-result.priceCloseTrade)/result.priceCreateTrade
+            percentage = abs(pnl/result.cash)
 
             if result.type == BacktestResultType.profit or result.type == BacktestResultType.takeProfit:
                 totalReturn += percentage

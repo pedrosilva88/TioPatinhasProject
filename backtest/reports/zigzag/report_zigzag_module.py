@@ -39,7 +39,7 @@ class ReportZigZagModule(ReportModule):
     def getHeaderRowForStrategyReport(self) -> List[str]:
         return["Take Profit", "Stop Loss", "PnL", "Total Return", "Batting Average", "Win/Loss Ratio", 
                 "Avg. return Per Trade", "Stand Deviation", "Sharp Ratio", "Number Of Trades","Days to hold", 
-                "Zigzag Spread, Days After Zigzag"]
+                "Zigzag Spread", "Days After Zigzag"]
 
     def getRowForStrategyReport(self, item: StrategyResultModel) -> List[Any]:
         item: StrategyZigzagResultModel = item

@@ -175,14 +175,6 @@ class BacktestZigZagModule(BacktestModule):
                                     today = event.datetime.date(),
                                     now = event.datetime)
         
-    def getPercentageChange(self, current, previous):
-        if current == previous:
-            return 100.0
-        try:
-            return (abs(current - previous) / previous) * 100.0
-        except ZeroDivisionError:
-            return 0
-
     def getPreviousEvents(self, event: EventZigZag, daysBefore: int = 5):
         model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
         previousDays: List[EventZigZag] = []
