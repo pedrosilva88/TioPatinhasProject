@@ -2,6 +2,7 @@ from pytz import timezone
 from datetime import datetime
 
 DateSystemFormat = "%Y-%m-%d %H:%M:%S"
+DateMiniFormat = "%Y%m%d"
 
 class Helpers(object):
     def utcToLocal(datetime: datetime, timezone:timezone):
@@ -10,8 +11,8 @@ class Helpers(object):
     def dateToString(date: datetime) -> str:
         return date.strftime(DateSystemFormat)
 
-    def stringToDate(dateStr: str) -> datetime:
-        return datetime.strptime(dateStr, DateSystemFormat)
+    def stringToDate(dateStr: str, format: str = DateSystemFormat) -> datetime:
+        return datetime.strptime(dateStr, format)
 
 # local = pytz.timezone('America/New_York')
 # naive_1 = datetime(2021, 3, 12, 9, 30, 0, 0)

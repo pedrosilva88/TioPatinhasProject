@@ -1,4 +1,13 @@
 
+from strategy.historical_data import HistoricalData
+
+from matplotlib import pyplot
+from matplotlib.axes import Axes
+from mplfinance import plot
+import matplotlib.dates as mpl_dates
+import pandas as pd
+from pandas.core.frame import DataFrame
+
 from backtest.reports.report_module import ReportModule
 import csv
 from datetime import date, datetime
@@ -188,5 +197,47 @@ class BacktestModule:
         config = BacktestConfigs()
         client = ProviderModule.createClient(config.provider, config.providerConfigs)
         client.connect()
-        days = config.endDate - config.startDate
-        stockData = BacktestDownloadModule.downloadStock(client, config.contract, days, config.downloadModel.barSize)
+        days = (config.graphEndDate - config.graphStartDate).days
+        stockData = BacktestDownloadModule.downloadStock(client, config.graphContract, days, config.downloadModel.barSize, config.graphEndDate)
+        events = HistoricalData.computeEventsForZigZagStrategy(stockData, config.strategy)
+        self.showPlot(config.graphContract, events)
+    
+    def showPlot(self, contract: Contract, events: List[Event]):
+        #pyplot.style.use('ggplot')
+
+        # Extracting Data for plotting
+        ohlc = DataFrame.from_records([event.to_dict() for event in events], columns=['datetime', 'open', 'high', 'low', 'close'])
+        ohlc.index = pd.DatetimeIndex(ohlc['datetime'])
+        ohlc['datetime'] = pd.to_datetime(ohlc['datetime'])
+        ohlc['datetime'] = ohlc['datetime'].apply(mpl_dates.date2num)
+        ohlc = ohlc.astype(float)
+
+        # Creating Subplots
+        #fig, ax = pyplot.subplots()
+        data = self.addIndicatorsToGraph(events)
+        plot(ohlc, type='candlestick', style='charles',
+            title='Chart',
+            ylabel='Price',
+            xlabel='Date',
+            addplot)
+        #candlestick_ohlc(ax, ohlc.values, width=0.6, colorup='green', colordown='red', alpha=0.8)
+
+        # Setting labels & titles
+        #ax.set_xlabel('Date')
+        #ax.set_ylabel('Price')
+        #fig.suptitle('Chart for %s' % contract.symbol)
+
+        #
+        #pyplot.legend()
+
+        # Formatting Date
+        #date_format = mpl_dates.DateFormatter('%d-%m-%Y')
+        #ax.xaxis.set_major_formatter(date_format)
+        #fig.autofmt_xdate()
+
+        #fig.tight_layout()
+
+        #pyplot.show()
+
+    def addIndicatorsToGraph(self, events: List[Event]) -> List[Any]:
+        pass

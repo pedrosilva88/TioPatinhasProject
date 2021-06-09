@@ -1,6 +1,5 @@
-from statistics import mode
+from matplotlib.axes import Axes
 from backtest.reports.zigzag.report_zigzag_module import ReportZigZagModule
-from strategy import models
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 import csv, math
 from distutils.util import strtobool
@@ -315,66 +314,15 @@ class BacktestZigZagModule(BacktestModule):
         return ((mainOrder.action == OrderAction.Buy and mainOrder.price <= event.close) or
                 (mainOrder.action == OrderAction.Sell and mainOrder.price >= event.close))
 
-# def showPlot(mBars: List[BarData], zigzags:List[int]):
-#     i = 0
-#     dates = []
-#     items = []
-#     isForLow = True
-#     for bar in mBars:
-#         zigzag = zigzags[i]
-#         if zigzag != 0:
-#             dates.append(bar.date)
-#             if isForLow:
-#                 items.append(bar.low)
-#                 isForLow = False
-#             else:
-#                 items.append(bar.high)
-#                 isForLow = True
-
-#         i += 1
-#     plt.style.use('ggplot')
-
-#     # Extracting Data for plotting
-#     ohlc = util.df(mBars, ['date', 'open', 'high', 'low', 'close'])
-#     ohlc['date'] = pd.to_datetime(ohlc['date'])
-#     ohlc['date'] = ohlc['date'].apply(mpl_dates.date2num)
-#     ohlc = ohlc.astype(float)
-
-#     # Creating Subplots
-#     fig, ax = plt.subplots()
-
-#     candlestick_ohlc(ax, ohlc.values, width=0.6, colorup='green', colordown='red', alpha=0.8)
-
-#     # Setting labels & titles
-#     ax.set_xlabel('Date')
-#     ax.set_ylabel('Price')
-#     fig.suptitle('Daily Candlestick Chart of NIFTY50')
-
-#     ax.plot(dates, items, color='blue', label='ZigZag')
-
-#     fig.suptitle('Daily Candlestick Chart of PG with ZigZag')
-
-#     plt.legend()
-
-#     # Formatting Date
-#     date_format = mpl_dates.DateFormatter('%d-%m-%Y')
-#     ax.xaxis.set_major_formatter(date_format)
-#     fig.autofmt_xdate()
-
-#     fig.tight_layout()
-
-#     plt.show()
-
-# def showGraphFor(symbol: str):
-#     ib = IB()
-#     ib.connect('127.0.0.1', 7497, clientId=16)
-#     stock = Stock(symbol, "SMART", "USD")
-#     model = BackTestDownloadModel(path="", numberOfDays=225, barSize="1 day") # 5Years = 1825 days
-#     bars = downloadHistoricDataFromIB(ib, stock, model)
-    
-#     closes = util.df(bars)['close']
-#     lows = util.df(bars)['low']
-#     highs = util.df(bars)['high']
-#     RSI = computeRSI(closes, 14)
-#     pivots = peak_valley_pivots_candlestick(closes.values, highs.values, lows.values, 0.05, -0.05)
-#     showPlot(bars, pivots)
+    def addIndicatorsToGraph(self, events: List[Event]) -> List[Any]:
+        events: List[EventZigZag] = events
+        dates = []
+        items = []
+        for event in events:
+            if event.zigzag == True:
+                dates.append(event.datetime)
+                if event.zigzagType == ZigZagType.high:
+                    items.append(event.high)
+                else:
+                    items.append(event.low)
+        graph.plot(dates, items, color='blue', label='ZigZag')

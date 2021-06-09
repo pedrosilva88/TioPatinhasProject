@@ -1,4 +1,7 @@
 import configparser, sys
+from io import SEEK_CUR
+from time import perf_counter
+from helpers.date_timezone import DateMiniFormat, Helpers
 from datetime import date
 from typing import List
 from pytz import timezone
@@ -50,6 +53,12 @@ class BacktestConfigs:
 
         self.action = BacktestAction(int(settingsConfig['Options']['action']))
         self.graphContract = Contract(settingsConfig['Options_Action_2']['symbol'], self.country)
+        self.graphStartDate = Helpers.stringToDate(settingsConfig['Options_Action_2']['graphStartData'], DateMiniFormat).date()
+        endDate = settingsConfig['Options_Action_2']['graphEndDate']
+        if endDate != '':
+            self.graphEndDate = Helpers.stringToDate(endDate, DateMiniFormat).date()
+        else:
+            self.graphEndDate = date.today()
 
         path  = BacktestScannerManager.getPathFileToScanStocks(self.provider, self.country, self.strategyType, self.action)
         nDays = int(settingsConfig['Options_Action_1']['nDays'])

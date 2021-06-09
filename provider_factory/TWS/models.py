@@ -36,21 +36,26 @@ class TWSClient(ProviderClient):
 
         configs = TWSClient.HistoricalRequestConfigs(contract, days, barSize, endDate)
         allBars: List[BarData] = []
+        startDate = configs.startDate
 
-        while configs.startDate <= configs.endDate:
-            endtime = configs.startDate+timedelta(days=1) if barSize.endswith('min') else ''
+        while startDate <= configs.endDate:
+            endtime = '' 
+            if barSize.endswith('min'):
+                endtime = configs.startDate+timedelta(days=1)
+            else:
+                endtime = configs.endDate
             bars: List[BarData] = self.client.reqHistoricalData(configs.stock, endDateTime=endtime, 
                                                 durationStr=configs.durationStr, 
                                                 barSizeSetting=barSize, 
                                                 whatToShow='TRADES',
                                                 useRTH=True,
                                                 formatDate=1)
-            configs.startDate = configs.startDate+timedelta(days=6)
+            startDate = startDate+timedelta(days=6)
             allBars += bars
 
         events = []
         for bar in allBars:
-            events.append(Event(contract, bar.date, bar.open, bar.close, bar.high, bar.low, bar.volume))
+            events.append(Event(contract, bar.date, bar.open, bar.close, bar.high, bar.low))
         return events
 
     async def downloadHistoricalDataAsync(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
@@ -59,16 +64,17 @@ class TWSClient(ProviderClient):
 
         configs = TWSClient.HistoricalRequestConfigs(contract, days, barSize, endDate)
         allBars: List[BarData] = []
+        startDate = configs.startDate
 
-        while configs.startDate <= configs.endDate:
-            endtime = configs.startDate+timedelta(days=1) if barSize.endswith('min') else ''
+        while startDate <= configs.endDate:
+            endtime = startDate+timedelta(days=1) if barSize.endswith('min') else ''
             bars: List[BarData] = await self.client.reqHistoricalDataAsync(configs.stock, endDateTime=endtime, 
                                                     durationStr=configs.durationStr, 
                                                     barSizeSetting=barSize, 
                                                     whatToShow='TRADES',
                                                     useRTH=True,
                                                     formatDate=1)
-            configs.startDate = configs.startDate+timedelta(days=6)
+            startDate = startDate+timedelta(days=6)
             allBars += bars
 
         events = []
