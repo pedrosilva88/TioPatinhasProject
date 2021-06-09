@@ -146,7 +146,7 @@ class BacktestZigZagModule(BacktestModule):
                 model.tradesAvailable = 9999
             else:
                 result = math.floor(balance/150000)
-                if balance - (150000*result) >= 6000:
+                if balance - (150000*result) >= 2000:
                     model.tradesAvailable = result+1
                 else: 
                     model.tradesAvailable = result
