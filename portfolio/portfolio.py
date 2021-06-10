@@ -102,7 +102,6 @@ class Portfolio:
                 parent = Order(
                     action=order.action, totalQuantity=order.totalQuantity,
                     orderId=ib.client.getReqId(),
-                    orderType="MIDPRICE",
                     transmit=False)
                 takeProfit = LimitOrder(reverseAction, profitOrder.totalQuantity, profitOrder.lmtPrice,
                                         orderId=ib.client.getReqId(),
