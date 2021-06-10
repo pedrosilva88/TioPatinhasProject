@@ -57,8 +57,8 @@ class StrategyData:
                         previousBars: List[CustomBarData] = None,
                         currentBar: CustomBarData = None,
                         fill: FillDB = None,
-                        today: date = date.today(),
-                        now: datetime = datetime.now()):
+                        today: date = None,
+                        now: datetime = None):
         self.ticker = ticker
         self.position = position
         self.order = order
@@ -69,8 +69,8 @@ class StrategyData:
         self.previousBars = previousBars
         self.currentBar = currentBar
         self.fill = fill
-        self.today = today
-        self.now = now
+        self.today = today if today is not None else date.today()
+        self.now = now if now is not None else datetime.now()
 
 class StrategyResult:
     ticker: ibTicker
