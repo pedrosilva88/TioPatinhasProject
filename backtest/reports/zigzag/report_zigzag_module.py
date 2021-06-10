@@ -129,13 +129,13 @@ class ReportZigZagModule(ReportModule):
     def createStrategyResult(self, dynamicParameters: List[List[float]]) -> StrategyResultModel:
         result: StrategyResultModel = super().createStrategyResult(dynamicParameters)
         item = StrategyZigzagResultModel(result.numberOfTrades,
-                                        round(result.pnl, 2), 
-                                        round(result.totalReturn, 2), 
-                                        round(result.battingAverage, 2), 
-                                        round(result.winLossRatio, 2),
+                                        round(result.pnl, 4), 
+                                        round(result.totalReturn, 4), 
+                                        round(result.battingAverage, 4), 
+                                        round(result.winLossRatio, 4),
                                         round(result.averageReturnPerTrade, 4), 
-                                        round(result.standardDeviation, 2), 
-                                        round(result.sharpRatio, 2), 
+                                        round(result.standardDeviation, 4), 
+                                        round(result.sharpRatio, 4), 
                                         dynamicParameters[0], dynamicParameters[1], dynamicParameters[3], 
                                         dynamicParameters[2], dynamicParameters[4])
         self.strategyResults.append(item)

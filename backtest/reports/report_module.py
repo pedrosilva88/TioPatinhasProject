@@ -136,7 +136,7 @@ class ReportModule:
                                 0])
 
     def createStrategyResult(self, dynamicParameters: List[List[float]]) -> StrategyResultModel:
-        pnl = 0
+        totalPnL = 0
         totalReturn = 0
         battingAverageCount = 0
         totalPositivePercentage = 0
@@ -145,20 +145,19 @@ class ReportModule:
         negativeResultsCount = 0
         standardDeviationData = []
         for result in self.results:
-            pnl += result.pnl
-            percentage = abs(pnl/result.cash)
+            totalPnL += result.pnl
+            percentage = result.pnl/result.cash
+            totalReturn += percentage
 
             if result.type == BacktestResultType.profit or result.type == BacktestResultType.takeProfit:
-                totalReturn += percentage
                 battingAverageCount +=1
                 positiveResultsCount +=1
-                totalPositivePercentage += percentage
+                totalPositivePercentage += abs(percentage)
                 standardDeviationData.append(percentage)
             else:
-                totalReturn -= percentage
                 negativeResultsCount +=1
-                totalNegativePercentage += percentage
-                standardDeviationData.append(-percentage)
+                totalNegativePercentage += abs(percentage)
+                standardDeviationData.append(percentage)
 
         battingaAverage = battingAverageCount/len(self.results)
         winLossRatio = 0
@@ -167,7 +166,7 @@ class ReportModule:
         averageReturnPerTrade = totalReturn/len(self.results)
         standardDeviation = statistics.stdev(standardDeviationData)
         sharpRatio = (averageReturnPerTrade/standardDeviation)*math.sqrt(365)
-        return StrategyResultModel(len(self.results), pnl, totalReturn, battingaAverage, winLossRatio, averageReturnPerTrade, standardDeviation, sharpRatio)
+        return StrategyResultModel(len(self.results), totalPnL, totalReturn, battingaAverage, winLossRatio, averageReturnPerTrade, standardDeviation, sharpRatio)
 
     def createStrategyReport(self, isForPerformance: bool):
         self.saveStrategyResultsReport(isForPerformance)
