@@ -138,32 +138,48 @@ class ReportModule:
     def createStrategyResult(self, dynamicParameters: List[List[float]]) -> StrategyResultModel:
         totalPnL = 0
         totalReturn = 0
+        totalDailyReturn = 0
         battingAverageCount = 0
         totalPositivePercentage = 0
         totalNegativePercentage = 0
         positiveResultsCount = 0
         negativeResultsCount = 0
         standardDeviationData = []
+
+        dailyReturnSum = 0
+        dailyDeviationData = 0
+        numberOfDays = 0
+        currentDay = None
         for result in self.results:
+            if currentDay != result.closeTradeDate:
+                numberOfDays += 1
+                currentDay = result.closeTradeDate
+                totalDailyReturn += dailyReturnSum
+                standardDeviationData.append(dailyDeviationData)
+                dailyDeviationData = 0
+                dailyReturnSum = 0
+
             totalPnL += result.pnl
             percentage = result.pnl/result.cash
             totalReturn += percentage
+            dailyReturnSum += percentage
+            dailyDeviationData += percentage
 
             if result.type == BacktestResultType.profit or result.type == BacktestResultType.takeProfit:
-                battingAverageCount +=1
+                if result.pnl > 0:
+                    battingAverageCount +=1
                 positiveResultsCount +=1
                 totalPositivePercentage += abs(percentage)
-                standardDeviationData.append(percentage)
+                
             else:
                 negativeResultsCount +=1
                 totalNegativePercentage += abs(percentage)
-                standardDeviationData.append(percentage)
 
         battingaAverage = battingAverageCount/len(self.results)
         winLossRatio = 0
         if positiveResultsCount > 0 and negativeResultsCount > 0:
             winLossRatio = (totalPositivePercentage/positiveResultsCount) / (totalNegativePercentage/negativeResultsCount)
-        averageReturnPerTrade = totalReturn/len(self.results)
+        averageReturnPerTrade = totalDailyReturn/numberOfDays
         standardDeviation = statistics.stdev(standardDeviationData)
         sharpRatio = (averageReturnPerTrade/standardDeviation)*math.sqrt(365)
         return StrategyResultModel(len(self.results), totalPnL, totalReturn, battingaAverage, winLossRatio, averageReturnPerTrade, standardDeviation, sharpRatio)
