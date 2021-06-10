@@ -145,6 +145,7 @@ class ReportModule:
         positiveResultsCount = 0
         negativeResultsCount = 0
         standardDeviationData = []
+        dates = []
 
         dailyReturnSum = 0
         dailyDeviationData = 0
@@ -152,12 +153,15 @@ class ReportModule:
         currentDay = None
         for result in self.results:
             if currentDay != result.closeTradeDate:
-                numberOfDays += 1
-                currentDay = result.closeTradeDate
                 totalDailyReturn += dailyReturnSum
-                standardDeviationData.append(dailyDeviationData)
+                if dailyDeviationData != 0:
+                    standardDeviationData.append(dailyDeviationData)
+                    dates.append(currentDay)
                 dailyDeviationData = 0
                 dailyReturnSum = 0
+                numberOfDays += 1
+                currentDay = result.closeTradeDate
+
 
             totalPnL += result.pnl
             percentage = result.pnl/result.cash
@@ -174,6 +178,9 @@ class ReportModule:
             else:
                 negativeResultsCount +=1
                 totalNegativePercentage += abs(percentage)
+
+        totalDailyReturn += dailyReturnSum
+        standardDeviationData.append(dailyDeviationData)
 
         battingaAverage = battingAverageCount/len(self.results)
         winLossRatio = 0
