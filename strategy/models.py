@@ -42,14 +42,14 @@ class StrategyData:
                         totalCash: float,
                         event: Event,
                         position: Position = None,
-                        today: date = date.today(),
-                        now: datetime = datetime.now()):
+                        today: date = None,
+                        now: datetime = None):
         self.contract = contract
         self.position = position
         self.totalCash = totalCash
         self.event = event
-        self.today = today
-        self.now = now
+        self.today = today if today is not None else date.today()
+        self.now = now if now is not None else datetime.now()
 
 class StrategyResult:
     contract: Contract
