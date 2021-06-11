@@ -182,6 +182,7 @@ class BacktestZigZagModule(BacktestModule):
                                  event.high, event.low, event.zigzag, event.zigzagType, 
                                  event.rsi, event.lastPrice)
         cloneEvent.close = event.open
+        cloneEvent.lastPrice = event.open
         cloneEvent.high = event.open
         cloneEvent.low = event.open
         previousDays.append(cloneEvent)
