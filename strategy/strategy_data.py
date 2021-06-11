@@ -127,7 +127,7 @@ class StrategyConfig():
 
 def getStrategyConfigFor(key: CountryKey, timezone: timezone) -> StrategyConfig:
     if key == CountryKey.USA:
-        return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(9,30,45)), is_dst=None), 
+        return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(9,30,30)), is_dst=None), 
                                 strategyValidPeriod=timezone.localize(datetime.combine(date.today(),time(9,45)), is_dst=None),
                                 strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(14,0)), is_dst=None), 
                                 minGap= 2, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
