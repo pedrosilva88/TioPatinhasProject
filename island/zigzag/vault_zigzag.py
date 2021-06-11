@@ -81,7 +81,7 @@ class VaultZigZag:
         self.delegate.subscribeStrategyEvents(self.ib)
         await self.fetchHistoricalData()
         self.runStrategy()
-        self.handleResultsToTrade()
+        await self.handleResultsToTrade()
         await self.ib.reqPositionsAsync()
         await self.runStrategyForPositions()
         await self.closeMarketAt(self.countryConfig.closeMarket)
@@ -211,12 +211,12 @@ class VaultZigZag:
         else:
             return True
 
-    def handleResultsToTrade(self):
+    async def handleResultsToTrade(self):
         self.resultsToTrade.sort(key=lambda x: x.priority, reverse=True)
         for result in self.resultsToTrade:
             if self.canCreateOrder(result.ticker.contract, result.order):
                 if result.order.totalQuantity > 1:
-                    self.createOrder(result.ticker.contract, result.order)
+                    await self.createOrder(result.ticker.contract, result.order)
                     self.saveFill(result.ticker)
                 else:
                     log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
@@ -319,11 +319,11 @@ class VaultZigZag:
                         takeProfitOrder=profit,
                         stopLossOrder=stopLoss)
 
-    def createOrder(self, contract: ibContract, order: Order):
+    async def createOrder(self, contract: ibContract, order: Order):
         newOrder = order
         profitOrder = order.takeProfitOrder
         stopLossOrder = order.stopLossOrder
-        return self.portfolio.createOrder(self.ib, contract, newOrder, profitOrder, stopLossOrder)
+        await self.portfolio.createOrder(self.ib, contract, newOrder, profitOrder, stopLossOrder)
 
     def cancelOrder(self, contract: ibContract):
         return self.portfolio.cancelOrder(self.ib, contract)
