@@ -4,7 +4,7 @@ from strategy.configs.zigzag.models import StrategyZigZagConfig
 import csv, math
 from distutils.util import strtobool
 from database.model import FillDB
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from typing import Any, List, Tuple, Union
@@ -314,19 +314,14 @@ class BacktestZigZagModule(BacktestModule):
         return ((mainOrder.action == OrderAction.Buy and mainOrder.price <= event.close) or
                 (mainOrder.action == OrderAction.Sell and mainOrder.price >= event.close))
 
-    def addIndicatorsToGraph(self, events: List[Event]) -> List[float]:
+    def addIndicatorsToGraph(self, events: List[Event]) -> Union[str, Any]:
         import numpy as np
         events: List[EventZigZag] = events
-        dates = []
         items = []
         for event in events:
             if event.zigzag == True:
-                dates.append(event.datetime)
                 if event.zigzagType == ZigZagType.high:
-                    items.append(event.high)
+                    items.append([event.datetime, event.high])
                 else:
-                    items.append(event.low)
-            else:
-                items.append(np.nan)
-        return items
-        #graph.plot(dates, items, color='blue', label='ZigZag')
+                    items.append([event.datetime, event.low])
+        return dict(alines=items, colors=['b'])

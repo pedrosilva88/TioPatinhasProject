@@ -43,5 +43,5 @@ class Strategy:
 
         profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(profitTarget, 2))
         stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, round(stopLossPrice, 2))
-        parentOrder = Order(action, OrderType.MarketOrder, size, round(price, 2))
+        parentOrder = Order(action, OrderType.LimitOrder, size, round(price, 2))
         return BracketOrder(parentOrder, profitOrder, stopLossOrder)
