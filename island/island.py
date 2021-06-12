@@ -1,71 +1,61 @@
 import asyncio
-import logging
-from ib_insync import IB, IBC
-
+from vaults.vaults_controller import VaultsController
+from provider_factory.provider_module import ProviderModule
+from provider_factory.models import ProviderController
 from helpers import log
-from .zigzag.vault_zigzag import VaultZigZag
-from ._events import *
 from configs.models import TioPatinhasConfigs
-    
-class Island(IslandEvents):
-    controller: IBC
-    ib: IB
 
-    vault: VaultZigZag
-    marketWaiter: asyncio.Future
+class IslandProtocol:
+    controller: ProviderController
+    vaultWaiter: asyncio.Future
+
+class Island(IslandProtocol):
+    vaultsController: VaultsController
+    waiter: asyncio.Future
 
     def __init__(self):
-        self.ib = IB()
-        self.createIBController()
-        self.vault = None
-        self._runner = None
+        config = TioPatinhasConfigs()
+        if config.providerConfigs.useController:
+            self.initController()
+    
         self.waiter = None
-        self.marketWaiter = None
-        self._logger = logging.getLogger('Tio Patinhas')
+        self.vaultWaiter = None
 
     def __post_init__(self):
-        if not self.controller:
+        if not self.controller.sessionController:
             raise ValueError('No controller supplied')
-        if not self.ib:
-            raise ValueError('No IB instance supplied')
-        if self.ib.isConnected():
-            raise ValueError('IB instance must not be connected')
+        if not self.controller.provider:
+            raise ValueError('No Provider instance supplied')
+        if self.controller.isConnected():
+            raise ValueError('Provider instance must not be connected')
 
-    def start(self, vault: VaultZigZag):
-        self._logger.info('Starting')
-        self.vault = vault
-        self.vault.ib = self.ib
-        self._runner = asyncio.ensure_future(self.runAsync())
-        self.ib.run()
+    def start(self):
+        self.vaultsController = VaultsController(self)
+        self.controller.runner = asyncio.ensure_future(self.runAsync())
+        self.controller.run()
 
     def stop(self):
-        self._logger.info('Stopping')
-        self.ib.disconnect()
-        self._runner = None
+        self.controller.disconnect()
 
-    def createIBController(self):
+    def initController(self):
         config = TioPatinhasConfigs()
-        self.controller = IBC(version= config.providerConfigs.version, 
-                                tradingMode= config.providerConfigs.tradingMode, 
-                                userid= config.providerConfigs.user, 
-                                password= config.providerConfigs.password)
+        self.controller = ProviderModule.createController(config.provider, config.providerConfigs)
     
     async def runAsync(self):
-        while self._runner:
+        config = TioPatinhasConfigs()
+        while self.controller.runner:
             try:
                 await self.controller.startAsync()
-                await asyncio.sleep(self.appStartupTime)
-                await self.ib.connectAsync(self.host, self.port, self.clientId, self.connectTimeout,
-                    self.readonly, self.account)
+                await asyncio.sleep(config.providerConfigs.appStartupTime)
+                await self.controller.provider.connectAsync()
 
-                self.ib.setTimeout(self.appTimeout)
-                self.subscribeSystemEvents(self.ib)
+                self.controller.provider.setTimeout()
+                # self.subscribeSystemEvents(self.ib)
 
-                while self._runner:
+                while self.controller.runner:
                     self.waiter = asyncio.Future()
                     await self.waiter
-                    self._logger.debug('Soft timeout')
-                    await self.vault.runMarket()
+                    await self.vaultsController.start()
 
             except ConnectionRefusedError:
                 log("🚨 Connection Refused error 🚨 ")
@@ -76,11 +66,10 @@ class Island(IslandEvents):
                 self._logger.exception(e)
                 log(e)
             finally:
-                self._logger.debug("Finishing")
                 log("🥺 Finishing 🥺")
-                self.unsubscribeEvents(self.ib)
-                self.vault.databaseModule.closeDatabaseConnection()
+                # self.unsubscribeEvents(self.ib)
+                # self.vault.databaseModule.closeDatabaseConnection()
                 await self.controller.terminateAsync()
 
-                if self._runner:
-                    await asyncio.sleep(self.retryDelay)
+                if self.controller.runner:
+                    await asyncio.sleep(self.controller.provider.providerConfigs.appTimeout)

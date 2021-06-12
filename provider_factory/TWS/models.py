@@ -1,9 +1,10 @@
 from datetime import date, datetime, timedelta
 from os import name
 from typing import List
+from asyncio.unix_events import SelectorEventLoop
 
 from ib_insync.objects import BarData
-from ib_insync import IB, IBC, Stock
+from ib_insync import IB, IBC, Stock, client
 
 from models.base_models import Contract, Event
 from configs.models import Provider, ProviderConfigs
@@ -11,12 +12,12 @@ from provider_factory.models import ProviderClient, ProviderController
 
 class TWSClient(ProviderClient):
     @property
-    def client(self) -> IB :
+    def client(self) -> IB:
         return self.session
 
     def __init__(self, providerConfigs: ProviderConfigs) -> None:
         super().__init__()
-        self.provider = Provider.TWS
+        self.type = Provider.TWS
         self.providerConfigs = providerConfigs
         ib = IB()
         self.session = ib
@@ -24,11 +25,17 @@ class TWSClient(ProviderClient):
     def run(self):
         self.client.run()
 
+    def setTimeout(self):
+        self.client.setTimeout(self.providerConfigs.appTimeout)
+
     def connect(self):
         self.client.connect(self.providerConfigs.endpoint, self.providerConfigs.port, self.providerConfigs.clientID)
     
+    def disconnect(self):
+        self.client.disconnect()
+
     async def connectAsync(self):
-        await self.client.connectAsync(self.providerConfigs.endpoint, self.providerConfigs.port, self.providerConfigs.clientID)
+        await self.client.connectAsync(self.providerConfigs.endpoint, self.providerConfigs.port, self.providerConfigs.clientID, self.providerConfigs.connectTimeout)
 
     def downloadHistoricalData(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         if contract is None:
@@ -102,11 +109,28 @@ class TWSClient(ProviderClient):
             self.durationStr = '5 D' if barSize.endswith('min') else self.durationDays
 
 class TWSController(ProviderController):
+    @property
+    def client(self) -> IB:
+        return self.provider.session
+
+    @property
+    def controller(self) -> IBC:
+        return self.sessionController
+
     def __init__(self, providerConfigs: ProviderConfigs) -> None:
         super().__init__()
-        self.provider = Provider.TWS
+        self.type = Provider.TWS
+        self.session = IB()
+        self.sessionController = IBC(version= providerConfigs.version, 
+                                    tradingMode= providerConfigs.tradingMode, 
+                                    userid= providerConfigs.user, 
+                                    password= providerConfigs.password)
 
-        self.runner = IBC(version= providerConfigs.version, 
-                            tradingMode= providerConfigs.tradingMode, 
-                            userid= providerConfigs.user, 
-                            password= providerConfigs.password)
+    def isConnected(self) -> bool:
+        return self.client.isConnected()
+
+    async def startAsync(self):
+        await self.controller.startAsync()
+
+    async def terminateAsync(self):
+        await self.controller.terminateAsync()

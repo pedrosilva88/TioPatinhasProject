@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime, timezone
+from island.island import IslandProtocol
 from vaults.zigzag.vault_zigzag import VaultZigZag
 from strategy.configs.models import StrategyType
 from typing import List
@@ -10,8 +11,11 @@ class VaultsController:
     vaults: List[Vault]
     nextVaultToRun: Vault = None
 
-    def __init__(self) -> None:
+    delegate: IslandProtocol
+
+    def __init__(self, delegate: IslandProtocol = None) -> None:
         self.vaults = []
+        self.delegate = delegate
         config = TioPatinhasConfigs()
         for strategyConfig in config.strategies:
             if strategyConfig.type == StrategyType.zigzag:
@@ -24,9 +28,9 @@ class VaultsController:
         nowTime = datetime.now()
         difference = (targetDatetime - nowTime)
         coro = asyncio.sleep(difference.total_seconds())
-        self.delegate.marketWaiter = asyncio.ensure_future(coro)
-        await asyncio.wait([self.delegate.marketWaiter])
-        self.delegate.marketWaiter = None
+        self.delegate.vaultWaiter = asyncio.ensure_future(coro)
+        await asyncio.wait([self.delegate.vaultWaiter])
+        self.delegate.vaultWaiter = None
 
     async def scheduleNextOperation(self):
         config = TioPatinhasConfigs()

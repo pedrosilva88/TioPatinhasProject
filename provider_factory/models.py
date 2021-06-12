@@ -46,7 +46,7 @@ class ProviderConfigs:
         
 
 class ProviderClient:
-    provider: Provider
+    type: Provider
     providerConfigs = ProviderConfigs
     session: Any
 
@@ -54,6 +54,12 @@ class ProviderClient:
         pass
 
     def connect(self):
+        pass
+
+    def disconnect(self):
+        pass
+
+    def setTimeout(self):
         pass
 
     async def connectAsync(self):
@@ -66,5 +72,23 @@ class ProviderClient:
         pass
 
 class ProviderController:
-    provider: Provider
+    type: Provider
+    provider: ProviderClient
+    sessionController: Any
     runner: Any
+
+    def isConnected(self) -> bool:
+        pass
+
+    def run(self):
+        self.provider.run()
+
+    def disconnect(self):
+        self.provider.disconnect()
+        self.runner = None
+
+    async def terminateAsync(self):
+        pass
+
+    async def startAsync(self):
+        pass
