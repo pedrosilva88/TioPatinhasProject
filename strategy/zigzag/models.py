@@ -14,13 +14,12 @@ class StrategyZigZagData(StrategyData):
                         event: EventZigZag, 
                         previousEvents: List[EventZigZag],  
                         position: Position = None, fill: FillDB = None,
-                        today: date = date.today(),
-                        now: datetime = datetime.now()):
+                        today: date = None,
+                        now: datetime = None):
         super().__init__(contract, totalCash, event, position=position, today=today, now=now)
         self.previousEvents = previousEvents
         self.fill = fill
         
-
 class StrategyZigZagResult(StrategyResult):
     priority: int
 

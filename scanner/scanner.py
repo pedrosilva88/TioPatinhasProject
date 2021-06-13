@@ -1,3 +1,4 @@
+from country_config.market_manager import Constants
 from country_config.country_manager import getCountryFromCurrency
 import os, sys
 import csv
@@ -23,3 +24,12 @@ class Scanner:
     def removeTicker(self, symbol: str):
         ticker = [d for d in self.stocks if d.symbol == symbol].pop()
         self.stocks.remove(ticker)
+
+    def getPathFor(provider: str, 
+                    strategy: str, 
+                    country: str, 
+                    filename: str = "scan_to_run_startegy.csv") -> str:
+        return ("%s/%s/%s/%s/%s" % (Constants.rootPath, provider, strategy, country, filename))
+
+    class Constants:
+        rootPath = "scanner/Data/CSV"
