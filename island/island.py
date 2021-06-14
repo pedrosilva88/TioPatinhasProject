@@ -1,13 +1,9 @@
 import asyncio
+from island.island_protocol import IslandProtocol
 from vaults.vaults_controller import VaultsController
 from provider_factory.provider_module import ProviderModule
-from provider_factory.models import ProviderController
 from helpers import log
 from configs.models import TioPatinhasConfigs
-
-class IslandProtocol:
-    controller: ProviderController
-    vaultWaiter: asyncio.Future
 
 class Island(IslandProtocol):
     vaultsController: VaultsController

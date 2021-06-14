@@ -25,7 +25,8 @@ class StrategyConfigFactory:
                                         daysToHold= Constants.ZigZag.daysToHold,
                                         runPositionsCheckTime=market.closeTime-timedelta(hours=Constants.ZigZag.runPositionsCheckBeforeHours),
                                         daysBeforeToDownload=Constants.ZigZag.daysBeforeToDownload, daysBefore=Constants.ZigZag.daysBefore,
-                                        daysAfterZigZag=Constants.ZigZag.daysAfterZigZag)
+                                        daysAfterZigZag=Constants.ZigZag.daysAfterZigZag,
+                                        barSize=Constants.ZigZag.barSize)
         else:
             print("🚨 Cant Create ZigZag Strategy for this country - %s 🚨" % market.country)
 
@@ -45,6 +46,7 @@ class Constants:
         daysBefore = 4
         daysToHold = 0
         daysAfterZigZag = 2
+        barSize = "1 day"
 
 ## OPG UK ##
 #     if key == CountryKey.UK:

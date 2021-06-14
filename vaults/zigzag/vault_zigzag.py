@@ -1,20 +1,19 @@
 import asyncio
-from enum import Enum
+from strategy.configs.zigzag.models import StrategyZigZagConfig
+from helpers.array_helper import Helpers
+from vaults.vaults_controller import VaultsControllerProtocol
 from models.base_models import Contract, Position
 from strategy.zigzag.models import StrategyZigZagData
 from models.zigzag.models import EventZigZag
 from strategy.configs.models import StrategyAction
-from typing import Protocol, Union
-from itertools import zip_longest
+from typing import Union
 from datetime import datetime
 from vaults.models import Vault
-from helpers import logExecutionZigZag, log, utcToLocal, logCounter
-from models import Order, OrderAction, CustomBarData
-from scanner import Scanner
-from strategy import Strategy, StrategyZigZag, StrategyData, StrategyResult, StrategyResultType, HistoricalData, StrategyConfig, getStrategyConfigFor
+from helpers import logExecutionZigZag, log
+from models import Order, OrderAction
+from strategy import StrategyZigZag, StrategyResult, StrategyResultType, HistoricalData, StrategyConfig
 from country_config import *
 from portfolio import Portfolio
-from earnings_calendar import EarningsCalendar
 from database import DatabaseModule, FillDB
 
 class VaultZigZag(Vault):
@@ -25,8 +24,8 @@ class VaultZigZag(Vault):
     resultsToTrade: List[StrategyResult] = []
     currentFills: List[FillDB] = []
 
-    def __init__(self, strategyConfig: StrategyConfig, portfolio: Portfolio) -> None:
-        super().__init__(strategyConfig, portfolio)
+    def __init__(self, strategyConfig: StrategyConfig, portfolio: Portfolio, delegate: VaultsControllerProtocol) -> None:
+        super().__init__(strategyConfig, portfolio, delegate)
         
         self.databaseModule = DatabaseModule()
         self.historicalData = HistoricalData()
@@ -59,12 +58,6 @@ class VaultZigZag(Vault):
 
     # Strategy
 
-    async def syncProviderData(self):
-        log("📣 Sync Provider Data 📣")
-        await self.ib.accountSummaryAsync()
-        await self.ib.reqPositionsAsync()
-        await self.ib.reqAllOpenOrdersAsync()
-
     async def runMainStrategy(self):
         log("🕐 Run ZigZag Strategy for %s market now 🕐" % self.countryConfig.key.code)
         self.setupVault()
@@ -82,8 +75,8 @@ class VaultZigZag(Vault):
                 previousEvents = [] 
                 index = -2
                 while index >= -5:
-                    bar, zigzagFound = self.getEvent(events[index], zigzagFound)
-                    previousEvents.insert(0, bar)
+                    event = events[index]
+                    previousEvents.insert(0, event)
                     index -= 1
                 position = self.getPosition(contract)
                 fill = self.getFill(contract)
@@ -119,6 +112,8 @@ class VaultZigZag(Vault):
         logExecutionZigZag(data, result)
         self.handleStrategyResult(result, contract)
 
+    # Strategy Handle Results
+
     def handleStrategyResult(self, result: StrategyResult, contract: Contract):
         if (result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell):
             self.resultsToTrade.append(result)
@@ -143,41 +138,26 @@ class VaultZigZag(Vault):
                     log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
                     None
 
-    def getEvent(self, event: EventZigZag, found: bool):
-        if found:
-            event.zigzag = False
-        elif event.zigzag == True:
-            found = True
-        return (event, found)
-
     # Historical Data
 
-    def grouper(self, iterable, n, fillvalue=None):
-        args = [iter(iterable)] * n
-        return list(zip_longest(*args, fillvalue=fillvalue))
-
     async def fetchHistoricalData(self):
-        chunks = self.grouper(self.stocks, 50)
-        all_bars = []
-        for stocks in chunks:
-            all_bars += await asyncio.gather(*[self.historicalData.downloadHistoricDataFromIB(self.ib, stock, 90, "1 day") for stock in stocks ])
-        for stock, bars in zip(self.stocks, all_bars):
-            if stock.symbol not in self.allContractsEvents:
-                self.allContractsEvents[stock.symbol] = []
-            histData = self.historicalData.createListOfCustomBarsData(bars)
-            if len(histData) > 0:
-                self.allContractsEvents[stock.symbol] = histData
-                log("🧶 Historical Data for %s 🧶" % (stock.symbol))
-            else:
-                log("🧶 ❗️ Invalid Historical Data for %s ❗️ 🧶" % (stock.symbol))
+        config: StrategyZigZagConfig = self.strategyConfig
+        provider = self.delegate.controller.provider
+        chunks = Helpers.grouper(self.contracts, 50)
+        allEvents = []
 
-    def getPercentageChange(self, current, previous):
-        if current == previous:
-            return 100.0
-        try:
-            return (abs(current - previous) / previous) * 100.0
-        except ZeroDivisionError:
-            return 0
+        for contracts in chunks:
+            allEvents += await asyncio.gather(*[provider.downloadHistoricalDataAsync(contract, config.daysBeforeToDownload, config.barSize) for contract in contracts ])
+
+        for contract, events in zip(self.contracts, allEvents):
+            if contract.symbol not in self.allContractsEvents:
+                self.allContractsEvents[contract.symbol] = []
+            histData = HistoricalData.computeEventsForZigZagStrategy(events)
+            if len(histData) > 0:
+                self.allContractsEvents[contract.symbol] = histData
+                log("🧶 Historical Data for %s 🧶" % (contract.symbol))
+            else:
+                log("🧶 ❗️ Invalid Historical Data for %s ❗️ 🧶" % (contract.symbol))
 
     # Database
 
@@ -200,6 +180,8 @@ class VaultZigZag(Vault):
         limitDate = date.today()-timedelta(days=40)
         filteredFills = list(filter(lambda x: x.date < limitDate, fills))
         self.databaseModule.deleteFills(filteredFills)
+
+########################################################
 
     # Portfolio
 

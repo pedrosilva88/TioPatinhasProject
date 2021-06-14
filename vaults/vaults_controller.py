@@ -1,4 +1,7 @@
 import asyncio
+from vaults.vaults_protocol import VaultsControllerProtocol
+from provider_factory.models import ProviderController
+from portfolio.portfolio import Portfolio
 from country_config.market_manager import Constants
 from datetime import datetime
 from island.island import IslandProtocol
@@ -17,11 +20,12 @@ from configs.models import TioPatinhasConfigs
 #     def unsubscribeStrategyEvents(self, ib: IB):
 #         """Subscribe Events"""    
 
-
-class VaultsController:
+class VaultsController(VaultsControllerProtocol):
     config: TioPatinhasConfigs
     vaults: List[Vault]
     nextVaultToRun: Vault = None
+
+    portfolio: Portfolio
 
     delegate: IslandProtocol
 
@@ -29,9 +33,10 @@ class VaultsController:
         self.vaults = []
         self.delegate = delegate
         self.config = TioPatinhasConfigs()
+        self.portfolio = Portfolio()
         for strategyConfig in self.config.strategies:
             if strategyConfig.type == StrategyType.zigzag:
-                self.vaults.append(VaultZigZag())
+                self.vaults.append(VaultZigZag(strategyConfig, self.portfolio, self))
 
     async def start(self):
         await self.scheduleNextOperation()
@@ -67,3 +72,8 @@ class VaultsController:
 
     class Constants:
         safeMarginSeconds: int = 3
+
+    ## VaultsControllerProtocol
+
+    def controller(self) -> ProviderController:
+        return self.delegate.controller

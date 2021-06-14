@@ -11,6 +11,7 @@ class StrategyZigZagConfig(StrategyConfig):
     daysToHold: int
     runPositionsCheckTime: time
 
+    barSize: str
     # The number of days that you want to download. This is used to calculate the indicators.
     daysBeforeToDownload: int
     # The number of days to send to the strategy module

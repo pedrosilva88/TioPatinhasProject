@@ -37,6 +37,11 @@ class TWSClient(ProviderClient):
     async def connectAsync(self):
         await self.client.connectAsync(self.providerConfigs.endpoint, self.providerConfigs.port, self.providerConfigs.clientID, self.providerConfigs.connectTimeout)
 
+    async def syncData(self):
+        await self.client.accountSummaryAsync()
+        await self.client.reqPositionsAsync()
+        await self.client.reqAllOpenOrdersAsync()
+
     def downloadHistoricalData(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         if contract is None:
             return []

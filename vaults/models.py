@@ -1,3 +1,4 @@
+from vaults.vaults_controller import VaultsControllerProtocol
 from configs.models import TioPatinhasConfigs
 from datetime import datetime
 from logging import log
@@ -14,10 +15,13 @@ class Vault:
     portfolio: Portfolio
 
     contracts: List[Contract]
+
+    delegate: VaultsControllerProtocol
     
-    def __init__(self, strategyConfig: StrategyConfig, portfolio: Portfolio) -> None:
+    def __init__(self, strategyConfig: StrategyConfig, portfolio: Portfolio, delegate: VaultsControllerProtocol) -> None:
         self.portfolio = portfolio
         self.strategyConfig = strategyConfig
+        self.delegate = delegate
 
     def setupVault(self):
         log("🏃‍ Setup Vault for %s Market 🏃‍" % self.strategyConfig.market.country.code)
@@ -40,4 +44,5 @@ class Vault:
         pass
 
     async def syncProviderData(self):
-        pass
+        log("📣 Sync Provider Data 📣")
+        await self.delegate.controller.provider.syncData()

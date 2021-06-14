@@ -71,6 +71,9 @@ class ProviderClient:
     async def downloadHistoricalDataAsync(self, stock: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         pass
 
+    async def syncData(self):
+        pass
+
 class ProviderController:
     type: Provider
     provider: ProviderClient
