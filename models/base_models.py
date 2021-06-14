@@ -71,7 +71,7 @@ class Order:
     size: float
     price: float
 
-    def __init__(self, action: OrderAction, type: OrderType, size: int, price: float = None, takeProfitOrder = None, stopLossOrder = None):
+    def __init__(self, action: OrderAction, type: OrderType, size: int, price: float = None):
         self.action = action
         self.type = type
         self.size = size

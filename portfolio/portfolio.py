@@ -1,27 +1,24 @@
+from asyncio.unix_events import SelectorEventLoop
+from country_config.models import Market
 from datetime import datetime
+from provider_factory.models import ProviderClient
+from models.base_models import Contract, Order, Position
 from typing import List
-from ib_insync import IB, Stock, Order as ibOrder, Position as ibPosition, Trade as ibTrade, Contract as ibContract, LimitOrder, StopOrder, MarketOrder, Fill, OrderStatus, BracketOrder
-from ib_insync.order import Order
 from models import OrderType, OrderAction
 from helpers import log
 
 class Portfolio:
     cashBalance: float
-    grossPositionsValue: float
     pendingOrdersMarketValue: float
-    pendingOrdersMarketNumber: float
-
-    totalCashBalance: float
-    totalCashBalanceLastUpdate: datetime
 
     exchangeUSDRate: float = 1
 
-    positions: List[ibPosition]
-    trades: List[ibTrade]
+    positions: List[Position]
+    orders: List[Order]
 
     @property
     def cashAvailable(self):
-        return max(self.cashBalance - self.pendingOrdersMarketValue - self.grossPositionsValue, 0)
+        return max(self.cashBalance - self.pendingOrdersMarketValue, 0)
 
     def __init__(self):
         self.positions = []
@@ -32,15 +29,16 @@ class Portfolio:
 
     # Account
 
-    def updatePortfolio(self, ib: IB):
-        self.positions = ib.positions()
-        self.trades = ib.openTrades()
+    def updatePortfolio(self, client: ProviderClient, market: Market):
+        self.positions = client.positions()
+        self.orders = client.orders()
+
+        self.cashBalance = client.cashBalance()
+        self.exchangeUSDRate = client.currencyRateFor(market.country.currency)
 
         for account in ib.accountValues():
             if account.tag == "AvailableFunds":
                 self.cashBalance = float(account.value)
-            elif account.tag == "GrossPositionValue":
-                self.grossPositionsValue = float(account.value)
             elif (account.tag == "ExchangeRate" and account.currency == "USD"):
                 self.exchangeUSDRate = float(account.value)
 
@@ -73,23 +71,6 @@ class Portfolio:
             not hasOrder):
             log("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: %.2f❗️\n" % self.cashAvailable) 
         return canCreate
-
-    def getTradeOrders(self, contract: ibContract):
-        mainOrder = None
-        profitOrder = None
-        stopLossOrder = None
-
-        for trade in self.trades:
-            if trade.contract.symbol == contract.symbol:
-                order = trade.order
-                if (isinstance(order, LimitOrder) or (isinstance(order, ibOrder) and order.lmtPrice > 0)) and order.parentId == 0:
-                    mainOrder = order
-                elif (isinstance(order, LimitOrder) or (isinstance(order, ibOrder) and order.orderType ==
-                OrderType.LimitOrder.value)) and order.parentId > 0:
-                    profitOrder = order
-                elif (isinstance(order, StopOrder) or (isinstance(order, ibOrder) and order.orderType == OrderType.StopOrder.value)) and order.parentId > 0:
-                    stopLossOrder = order
-        return mainOrder, profitOrder, stopLossOrder
 
     def createOrder(self, ib: IB, contract: ibContract, order: ibOrder, profitOrder: LimitOrder = None, stopLossOrder: StopOrder = None):
         if (not profitOrder and not stopLossOrder):

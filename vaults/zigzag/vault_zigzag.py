@@ -2,17 +2,16 @@ import asyncio
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from helpers.array_helper import Helpers
 from vaults.vaults_controller import VaultsControllerProtocol
-from models.base_models import Contract, Position
+from models.base_models import BracketOrder, Contract, Position
 from strategy.zigzag.models import StrategyZigZagData
 from models.zigzag.models import EventZigZag
 from strategy.configs.models import StrategyAction
-from typing import Union
-from datetime import datetime
+from typing import List, Union
+from datetime import date, datetime, timedelta
 from vaults.models import Vault
 from helpers import logExecutionZigZag, log
 from models import Order, OrderAction
 from strategy import StrategyZigZag, StrategyResult, StrategyResultType, HistoricalData, StrategyConfig
-from country_config import *
 from portfolio import Portfolio
 from database import DatabaseModule, FillDB
 
@@ -186,59 +185,23 @@ class VaultZigZag(Vault):
     # Portfolio
 
     def updatePortfolio(self):
-        return self.portfolio.updatePortfolio(self.ib)
+        return self.portfolio.updatePortfolio()
 
     def getPosition(self, contract: Contract):
         return self.portfolio.getPosition(contract)
 
     # Portfolio - Manage Orders
 
-    def canCreateOrder(self, contract: ibContract, order: Order):
+    def canCreateOrder(self, contract: Contract, order: Order):
         return self.portfolio.canCreateOrder(self.ib, contract, order)
 
-    def getOrder(self, ticker: ibTicker):
-        mainOrder, profitOrder, stopLossOrder = self.portfolio.getTradeOrders(ticker.contract)
+    def createOrder(self, contract: Contract, bracketOrder: BracketOrder):
+        return self.portfolio.createOrder(self.ib, contract, bracketOrder)
 
-        if not mainOrder:
-            return None
-
-        profit = None
-        stopLoss = None
-
-        if profitOrder is not None:
-            profit = Order(orderId=profitOrder.orderId, 
-                            action=profitOrder.action, 
-                            type=profitOrder.orderType,
-                            totalQuantity=profitOrder.totalQuantity,
-                            price=profitOrder.lmtPrice,
-                            parentId=mainOrder.parentId)
-
-        if stopLossOrder is not None:
-            stopLoss = Order(orderId=stopLossOrder.orderId, 
-                            action=stopLossOrder.action, 
-                            type=stopLossOrder.orderType,
-                            totalQuantity=stopLossOrder.totalQuantity,
-                            price=stopLossOrder.auxPrice,
-                            parentId=mainOrder.parentId)
-
-        return Order(orderId=mainOrder.orderId, 
-                        action=mainOrder.action, 
-                        type=mainOrder.orderType,
-                        totalQuantity=mainOrder.totalQuantity,
-                        price=mainOrder.lmtPrice,
-                        takeProfitOrder=profit,
-                        stopLossOrder=stopLoss)
-
-    def createOrder(self, contract: ibContract, order: Order):
-        newOrder = order
-        profitOrder = order.takeProfitOrder
-        stopLossOrder = order.stopLossOrder
-        return self.portfolio.createOrder(self.ib, contract, newOrder, profitOrder, stopLossOrder)
-
-    def cancelOrder(self, contract: ibContract):
+    def cancelOrder(self, contract: Contract):
         return self.portfolio.cancelOrder(self.ib, contract)
 
     # Portfolio - Manage Positions
 
-    def cancelPosition(self, orderAction: OrderAction, position: ibPosition):
+    def cancelPosition(self, orderAction: OrderAction, position: Position):
         return self.portfolio.cancelPosition(self.ib, orderAction, position)

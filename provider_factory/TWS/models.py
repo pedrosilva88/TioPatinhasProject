@@ -42,6 +42,18 @@ class TWSClient(ProviderClient):
         await self.client.reqPositionsAsync()
         await self.client.reqAllOpenOrdersAsync()
 
+    def positions(self) -> List[Position]:
+        self.client.positions()
+
+    def orders(self) -> List[Order]:
+        self.client.openOrders()
+
+    def cashBalance(self) -> float:
+        pass
+
+    def currencyRateFor(currency: str) -> float:
+        pass
+
     def downloadHistoricalData(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         if contract is None:
             return []
