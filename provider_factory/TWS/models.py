@@ -1,3 +1,4 @@
+from country_config.country_manager import getCountryFromCode, getCountryFromCurrency
 from datetime import date, datetime, timedelta
 from os import name
 from typing import List
@@ -6,7 +7,7 @@ from asyncio.unix_events import SelectorEventLoop
 from ib_insync.objects import BarData
 from ib_insync import IB, IBC, Stock, client
 
-from models.base_models import Contract, Event
+from models.base_models import Contract, Event, Order, OrderAction, OrderType, Position, Trade
 from configs.models import Provider, ProviderConfigs
 from provider_factory.models import ProviderClient, ProviderController
 
@@ -43,16 +44,32 @@ class TWSClient(ProviderClient):
         await self.client.reqAllOpenOrdersAsync()
 
     def positions(self) -> List[Position]:
-        self.client.positions()
+        items = self.client.positions()
+        positions = []
+        for item in items:
+            positions.append(Position(item.contract, item.position))
+        return positions
 
-    def orders(self) -> List[Order]:
-        self.client.openOrders()
+    def trades(self) -> List[Trade]:
+        items = self.client.openTrades()
+        trades = []
+        for item in items:
+            price = item.order.auxPrice if item.order.orderType == OrderType.StopOrder else item.order.lmtPrice
+            order = Order(OrderAction(item.order.action), OrderType(item.order.orderType), item.order.totalQuantity, price, item.order.parentId)
+            country = getCountryFromCurrency(item.contract.currency)
+            contract = Contract(item.contract.symbol, country, item.contract.exchange)
+            trades.append(Trade(contract, order))
+        return trades
 
     def cashBalance(self) -> float:
-        pass
+        for account in self.client.accountValues():
+            if account.tag == "AvailableFunds":
+                self.cashBalance = float(account.value)
 
-    def currencyRateFor(currency: str) -> float:
-        pass
+    def currencyRateFor(self, currency: str) -> float:
+        for account in self.client.accountValues():
+            if (account.tag == "ExchangeRate" and account.currency == currency):
+                return float(account.value)
 
     def downloadHistoricalData(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         if contract is None:

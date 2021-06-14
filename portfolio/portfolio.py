@@ -1,10 +1,8 @@
-from asyncio.unix_events import SelectorEventLoop
 from country_config.models import Market
-from datetime import datetime
 from provider_factory.models import ProviderClient
-from models.base_models import Contract, Order, Position
+from models.base_models import BracketOrder, Contract, Order, Position, Trade
 from typing import List
-from models import OrderType, OrderAction
+from models import OrderAction
 from helpers import log
 
 class Portfolio:
@@ -14,7 +12,7 @@ class Portfolio:
     exchangeUSDRate: float = 1
 
     positions: List[Position]
-    orders: List[Order]
+    trades: List[Trade]
 
     @property
     def cashAvailable(self):
@@ -31,42 +29,26 @@ class Portfolio:
 
     def updatePortfolio(self, client: ProviderClient, market: Market):
         self.positions = client.positions()
-        self.orders = client.orders()
-
+        self.trades = client.orders()
         self.cashBalance = client.cashBalance()
         self.exchangeUSDRate = client.currencyRateFor(market.country.currency)
 
-        for account in ib.accountValues():
-            if account.tag == "AvailableFunds":
-                self.cashBalance = float(account.value)
-            elif (account.tag == "ExchangeRate" and account.currency == "USD"):
-                self.exchangeUSDRate = float(account.value)
-
         self.calcOpenTradesValue()
-        currentDatetime = datetime.now().replace(microsecond=0)
-        if (not self.totalCashBalanceLastUpdate or currentDatetime.date() != self.totalCashBalanceLastUpdate.date()):
-            self.totalCashBalance = float(self.cashBalance)
-            self.totalCashBalanceLastUpdate = currentDatetime
-        log("💵 \nTotal Cash: %s \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.totalCashBalance, self.cashBalance, self.cashAvailable))
+        log("💵 \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.cashBalance, self.cashAvailable))
 
     def calcOpenTradesValue(self):
         totalValue = 0
-        self.pendingOrdersMarketNumber = 0
-        for item in self.trades:
-            if (item.order.parentId == 0 and
-                item.order.orderType == 'MKT' and
-                (item.orderStatus.status in OrderStatus.ActiveStates)):
-                totalValue += (item.order.lmtPrice * self.exchangeUSDRate) * abs(item.order.totalQuantity)
-                self.pendingOrdersMarketNumber += 1
-        # TODO: Tenho que melhorar esta lógica. este a dividir por 3 tem que ser dinamico. Esta no strategyData esta info
-        self.pendingOrdersMarketValue = self.pendingOrdersMarketNumber*self.totalCashBalance/3
+        for trade in self.trades:
+            if trade.order.parentId == 0:
+                totalValue += (trade.order.price * self.exchangeUSDRate) * abs(trade.order.size)
+        self.pendingOrdersMarketValue = totalValue
 
     # Orders
 
-    def canCreateOrder(self, ib: IB, contract: ibContract, order: ibOrder):
-        #today = datetime.now() TODO: Tenho que validar se esta trade pertence ao dia de hoje
-        hasOrder = len([d for d in ib.trades() if d.contract.symbol == contract.symbol]) > 0
-        canCreate = (order.lmtPrice * order.totalQuantity) <= self.cashAvailable
+    def canCreateOrder(self, contract: Contract, bracketOrder: BracketOrder):
+        order = bracketOrder.parentOrder
+        hasOrder = len([d for d in self.trades if d.contract.symbol == contract.symbol]) > 0
+        canCreate = (order.price * order.size) <= self.cashAvailable
         if (not canCreate and 
             not hasOrder):
             log("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: %.2f❗️\n" % self.cashAvailable) 

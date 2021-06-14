@@ -128,9 +128,9 @@ class VaultZigZag(Vault):
     async def handleResultsToTrade(self):
         self.resultsToTrade.sort(key=lambda x: x.priority, reverse=True)
         for result in self.resultsToTrade:
-            if self.canCreateOrder(result.ticker.contract, result.order):
+            if self.canCreateOrder(result.ticker.contract, result.bracketOrder):
                 if result.order.totalQuantity > 1:
-                    self.createOrder(result.ticker.contract, result.order)
+                    self.createOrder(result.ticker.contract, result.bracketOrder)
                     self.saveFill(result.ticker)
                     await self.syncProviderData()
                 else:
@@ -180,8 +180,6 @@ class VaultZigZag(Vault):
         filteredFills = list(filter(lambda x: x.date < limitDate, fills))
         self.databaseModule.deleteFills(filteredFills)
 
-########################################################
-
     # Portfolio
 
     def updatePortfolio(self):
@@ -192,16 +190,16 @@ class VaultZigZag(Vault):
 
     # Portfolio - Manage Orders
 
-    def canCreateOrder(self, contract: Contract, order: Order):
-        return self.portfolio.canCreateOrder(self.ib, contract, order)
+    def canCreateOrder(self, contract: Contract, bracketOrder: BracketOrder):
+        return self.portfolio.canCreateOrder(self.delegate.controller.provider, contract, bracketOrder)
 
     def createOrder(self, contract: Contract, bracketOrder: BracketOrder):
-        return self.portfolio.createOrder(self.ib, contract, bracketOrder)
+        return self.portfolio.createOrder(self.delegate.controller.provider, contract, bracketOrder)
 
     def cancelOrder(self, contract: Contract):
-        return self.portfolio.cancelOrder(self.ib, contract)
+        return self.portfolio.cancelOrder(self.delegate.controller.provider, contract)
 
     # Portfolio - Manage Positions
 
     def cancelPosition(self, orderAction: OrderAction, position: Position):
-        return self.portfolio.cancelPosition(self.ib, orderAction, position)
+        return self.portfolio.cancelPosition(self.delegate.controller.provider, orderAction, position)

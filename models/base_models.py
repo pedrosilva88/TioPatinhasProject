@@ -1,5 +1,7 @@
 from enum import Enum
 import datetime as dt
+
+from ib_insync import contract
 from country_config.models import Country
 
 class Contract:
@@ -70,12 +72,14 @@ class Order:
     type: OrderType
     size: float
     price: float
+    parentId: int
 
-    def __init__(self, action: OrderAction, type: OrderType, size: int, price: float = None):
+    def __init__(self, action: OrderAction, type: OrderType, size: int, price: float = None, parentId: int = 0):
         self.action = action
         self.type = type
         self.size = size
         self.price = price
+        self.parentId = parentId
 
 class BracketOrder:
     parentOrder: Order
@@ -98,3 +102,12 @@ class Position:
     @property
     def postionType(self) -> OrderAction:
         return OrderAction.Buy if self.size > 0 else OrderAction.Sell
+
+class Trade:
+    contract: Contract
+    order: Order
+
+    def __init__(self, contract: Contract, order: Order) -> None:
+        self.contract = contract
+        self.order = order
+        

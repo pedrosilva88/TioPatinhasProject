@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from enum import Enum
 from typing import Any, List
-from models.base_models import Contract, Event, Order, Position
+from models.base_models import Contract, Event, Order, Position, Trade
 
 class Provider(Enum):
     TWS = "TWS"
@@ -77,13 +77,13 @@ class ProviderClient:
     def positions(self) -> List[Position]:
         pass
 
-    def orders(self) -> List[Order]:
+    def trades(self) -> List[Trade]:
         pass
 
     def cashBalance(self) -> float:
         pass
 
-    def currencyRateFor(currency: str) -> float:
+    def currencyRateFor(self, currency: str) -> float:
         pass
 
 class ProviderController:
