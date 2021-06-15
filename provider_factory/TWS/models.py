@@ -1,13 +1,12 @@
-from country_config.country_manager import getCountryFromCode, getCountryFromCurrency
+from country_config.country_manager import getCountryFromCurrency
 from datetime import date, datetime, timedelta
-from os import name
-from typing import List
-from asyncio.unix_events import SelectorEventLoop
+from typing import Callable, List
 
 from ib_insync.objects import BarData
-from ib_insync import IB, IBC, Stock, Order as IBOrder
+from ib_insync import IB, IBC, Stock, Order as IBOrder, LimitOrder, StopOrder
+from ib_insync import Contract as IBContract, BracketOrder as IBBracketOrder, MarketOrder
 
-from models.base_models import Contract, Event, Order, OrderAction, OrderType, Position, Trade
+from models.base_models import BracketOrder, Contract, Event, Order, OrderAction, OrderType, Position, Trade
 from configs.models import Provider, ProviderConfigs
 from provider_factory.models import ProviderClient, ProviderController
 
@@ -51,7 +50,8 @@ class TWSClient(ProviderClient):
         items = self.client.positions()
         positions = []
         for item in items:
-            positions.append(Position(item.contract, item.position))
+            contract = Contract(item.contract.symbol, getCountryFromCurrency(item.contract.currency), item.contract.exchange)
+            positions.append(Position(contract, item.position))
         return positions
 
     def trades(self) -> List[Trade]:
@@ -75,11 +75,57 @@ class TWSClient(ProviderClient):
             if (account.tag == "ExchangeRate" and account.currency == currency):
                 return float(account.value)
 
+    def createOrder(self, contract: Contract, bracketOrder: BracketOrder):
+        parentOrder = bracketOrder.parentOrder
+        profitOrder = bracketOrder.takeProfitOrder
+        stopLossOrder = bracketOrder.stopLossOrder
+
+        if parentOrder.type == OrderType.MarketOrder:
+            assert parentOrder.action in (OrderAction.Buy, OrderAction.Sell)
+            reverseAction = parentOrder.action.reverse.value
+
+            parent = IBOrder(action=parentOrder.action.value, totalQuantity=parentOrder.size,
+                            orderId=self.client.client.getReqId(),
+                            orderType="MKT",
+                            transmit=False)
+            takeProfit = LimitOrder(reverseAction, profitOrder.size, profitOrder.price,
+                                    orderId=self.client.client.getReqId(),
+                                    tif="GTC",
+                                    transmit=False,
+                                    parentId=parent.orderId)
+            stopLoss = StopOrder(reverseAction, stopLossOrder.size, stopLossOrder.price,
+                                orderId=self.client.client.getReqId(),
+                                tif="GTC",
+                                transmit=True,
+                                parentId=parent.orderId)
+
+            bracket = IBBracketOrder(parent, takeProfit, stopLoss)
+            for o in bracket:
+                self.client.placeOrder(contract, o)
+        else:
+            bracket = self.client.bracketOrder(parentOrder.action, parentOrder.size, parentOrder.price, profitOrder.price, stopLossOrder.price)
+
+            for o in bracket:
+                self.client.placeOrder(contract, o)
+
     def cancelOrder(self, order: Order):
         ibOrder: IBOrder = IBOrder(orderId=order.id, parentId=order.parentId, 
                                     type=order.type.value, action=order.action.value,
                                     totalQuantity=order.size, lmtPrice=order.price)
         self.client.cancelOrder(ibOrder)
+
+    def cancelPosition(self, action: OrderAction, position: Position):
+        order = MarketOrder(action.value, abs(position.size))
+        contract: IBContract = IBContract(symbol=position.contract.symbol, 
+                                            currency=position.contract.currency,
+                                            exchange=position.contract.exchange)
+        self.client.placeOrder(contract, order)
+
+    def subscribeOnTimeoutEvent(self, callable: Callable):
+        self.client.timeoutEvent += callable
+
+    def unsubscribeOnTimeoutEvent(self, callable: Callable):
+        self.client.timeoutEvent -= callable
 
     # Historical Data
 
@@ -166,8 +212,8 @@ class TWSController(ProviderController):
     def __init__(self, providerConfigs: ProviderConfigs) -> None:
         super().__init__()
         self.type = Provider.TWS
-        self.session = IB()
-        self.sessionController = IBC(version= providerConfigs.version, 
+        self.provider = TWSClient(providerConfigs)
+        self.sessionController = IBC(twsVersion= providerConfigs.version, 
                                     tradingMode= providerConfigs.tradingMode, 
                                     userid= providerConfigs.user, 
                                     password= providerConfigs.password)

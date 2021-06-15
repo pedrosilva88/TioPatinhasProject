@@ -30,7 +30,6 @@ class TioPatinhasConfigs:
         self.timezone = timezone(settingsConfig['Default']['timezone'])
         dummyStrategies = eval(settingsConfig.get("Default", "strategies"), {}, {})
         self.strategies = TioPatinhasConfigs.parseStrategies(dummyStrategies)
-
         if self.providerConfigs is None or self.timezone is None:
             log("🚨 Unable to get the initial configs 🚨")
             sys.exit()
@@ -42,10 +41,10 @@ class TioPatinhasConfigs:
             keyCountry = item[1]
             strategyType = None
             country = None
-            if keyStrategy == StrategyType.zigzag:
+            if keyStrategy == StrategyType.zigzag.value:
                 strategyType = StrategyType.zigzag
 
-            if keyCountry == Country.USA:
+            if keyCountry == Country.USA.code:
                 country = Country.USA
 
             if strategyType is not None and country is not None:

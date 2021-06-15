@@ -29,7 +29,8 @@ class StrategyZigZagConfig(StrategyConfig):
                         runPositionsCheckTime: time,
                         daysBeforeToDownload: int,
                         daysBefore: int,
-                        daysAfterZigZag: int):
+                        daysAfterZigZag: int,
+                        barSize: str):
 
         StrategyConfig.__init__(self, market= market, runStrategyTime=runStrategyTime, 
                                 willingToLose=willingToLose, stopToLosePercentage= stopToLosePercentage, profitPercentage= profitPercentage, 
@@ -48,6 +49,7 @@ class StrategyZigZagConfig(StrategyConfig):
         self.daysBefore = daysBefore
 
         self.daysAfterZigZag = daysAfterZigZag
+        self.barSize = barSize
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
         currentTime = now.time
@@ -60,4 +62,10 @@ class StrategyZigZagConfig(StrategyConfig):
             return datetime.combine(nextDay, self.runStrategyTime)
 
     def nextAction(self, now: datetime) -> StrategyAction:
-        pass
+        currentTime = now.time
+        if self.runStrategyTime > currentTime:
+            return StrategyAction.runStrategy
+        elif self.runPositionsCheckTime > currentTime:
+            return StrategyAction.checkPositions
+        else:
+            return StrategyAction.runStrategy

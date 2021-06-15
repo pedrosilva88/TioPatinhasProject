@@ -1,6 +1,6 @@
 from country_config.models import Market
 from provider_factory.models import ProviderClient
-from models.base_models import BracketOrder, Contract, Order, Position, Trade
+from models.base_models import BracketOrder, Contract, Position, Trade
 from typing import List
 from models import OrderAction
 from helpers import log
@@ -55,36 +55,7 @@ class Portfolio:
         return canCreate
 
     def createOrder(self, client: ProviderClient, contract: Contract, bracketOrder: BracketOrder):
-        if order.orderType == "MKT" or order.orderType == "MIDPRICE":
-            assert order.action in ('BUY', 'SELL')
-            reverseAction = 'BUY' if order.action == 'SELL' else 'SELL'
-            parent = Order(
-                action=order.action, totalQuantity=order.totalQuantity,
-                orderId=ib.client.getReqId(),
-                orderType="MKT",
-                transmit=False)
-            takeProfit = LimitOrder(reverseAction, profitOrder.totalQuantity, profitOrder.lmtPrice,
-                                    orderId=ib.client.getReqId(),
-                                    tif="GTC",
-                                    transmit=False,
-                                    parentId=parent.orderId)
-            stopLoss = StopOrder(
-                reverseAction, stopLossOrder.totalQuantity, stopLossOrder.auxPrice,
-                orderId=ib.client.getReqId(),
-                tif="GTC",
-                transmit=True,
-                parentId=parent.orderId)
-
-            bracket = BracketOrder(parent, takeProfit, stopLoss)
-            for o in bracket:
-                ib.placeOrder(contract, o)
-        else:
-            bracket = ib.bracketOrder(order.action, order.totalQuantity, order.lmtPrice, profitOrder.lmtPrice, stopLossOrder.auxPrice)
-
-            for o in bracket:
-                if ((isinstance(o, LimitOrder) and o.lmtPrice > 0) or
-                    (isinstance(o, StopOrder) and o.auxPrice > 0)):
-                    ib.placeOrder(contract, o)
+        client.createOrder(contract, bracketOrder)
                 
     def cancelOrder(self, client: ProviderClient, contract: Contract):
         log("🥊  Cancel Orders - %s 🥊" % contract.symbol)
@@ -101,9 +72,6 @@ class Portfolio:
                 return position
         return None
     
-    def cancelPosition(self, ib: IB, orderAction: OrderAction, position: ibPosition):
-        stock = Stock(position.contract.symbol, "SMART", position.contract.currency)
-        order = MarketOrder(orderAction, abs(position.position))
-        
-        self.cancelOrder(ib, stock)
-        ib.placeOrder(stock, order)        
+    def cancelPosition(self, client: ProviderClient, action: OrderAction, position: Position):
+        self.cancelOrder(client, position.contract)
+        client.cancelPosition(action, position)

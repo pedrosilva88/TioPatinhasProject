@@ -55,7 +55,8 @@ class VaultsController(VaultsControllerProtocol):
         self.nextVaultToRun = None
 
         for vault in self.vaults:
-            operationDatetime = vault.nextOperationDatetime().astimezone(self.config.timezone) 
+            nowTime = datetime.now().astimezone(self.config.timezone)
+            operationDatetime = vault.nextOperationDatetime(nowTime).astimezone(self.config.timezone)
             if vaultToRunDatetime == None or operationDatetime <= vaultToRunDatetime:
                 vaultToRun = vault
                 vaultToRunDatetime = operationDatetime
@@ -67,7 +68,7 @@ class VaultsController(VaultsControllerProtocol):
 
     async def runNextVaultOperation(self):
         nowTime = datetime.now().astimezone(self.config.timezone)
-        await self.nextVaultToRun.nextOperationBlock(nowTime)
+        await self.nextVaultToRun.runNextOperationBlock(nowTime)
         await self.scheduleNextOperation()
 
     class Constants:

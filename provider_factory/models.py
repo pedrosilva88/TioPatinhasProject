@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, List
-from models.base_models import Contract, Event, Order, Position, Trade
+from typing import Any, Callable, List
+from models.base_models import BracketOrder, Contract, Event, Order, OrderAction, Position, Trade
 
 class Provider(Enum):
     TWS = "TWS"
@@ -47,7 +47,7 @@ class ProviderConfigs:
 
 class ProviderClient:
     type: Provider
-    providerConfigs = ProviderConfigs
+    providerConfigs: ProviderConfigs
     session: Any
 
     def run(self):
@@ -85,9 +85,22 @@ class ProviderClient:
 
     def currencyRateFor(self, currency: str) -> float:
         pass
+    
+    def createOrder(self, contract: Contract, bracketOrder: BracketOrder):
+        pass
 
     def cancelOrder(self, order: Order):
         pass
+
+    def cancelPosition(self, action: OrderAction, position: Position):
+        pass
+
+    def subscribeOnTimeoutEvent(self, callable: Callable):
+        pass
+
+    def unsubscribeOnTimeoutEvent(self, callable: Callable):
+        pass
+
 
 class ProviderController:
     type: Provider

@@ -1,11 +1,12 @@
 import asyncio
+from island.island_events import IslandEvents
 from island.island_protocol import IslandProtocol
 from vaults.vaults_controller import VaultsController
 from provider_factory.provider_module import ProviderModule
 from helpers import log
 from configs.models import TioPatinhasConfigs
 
-class Island(IslandProtocol):
+class Island(IslandProtocol, IslandEvents):
     vaultsController: VaultsController
     waiter: asyncio.Future
 
@@ -46,7 +47,7 @@ class Island(IslandProtocol):
                 await self.controller.provider.connectAsync()
 
                 self.controller.provider.setTimeout()
-                # self.subscribeSystemEvents(self.ib)
+                self.subscribeEvents(self.controller.provider)
 
                 while self.controller.runner:
                     self.waiter = asyncio.Future()
@@ -56,14 +57,12 @@ class Island(IslandProtocol):
             except ConnectionRefusedError:
                 log("🚨 Connection Refused error 🚨 ")
             except Warning as w:
-                self._logger.warning(w)
                 log(w)
             except Exception as e:
-                self._logger.exception(e)
                 log(e)
             finally:
                 log("🥺 Finishing 🥺")
-                # self.unsubscribeEvents(self.ib)
+                self.unsubscribeEvents(self.controller.provider)
                 # self.vault.databaseModule.closeDatabaseConnection()
                 await self.controller.terminateAsync()
 
