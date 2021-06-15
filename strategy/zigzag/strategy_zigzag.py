@@ -165,7 +165,7 @@ class StrategyZigZag(Strategy):
 
     def handleFill(self):
         today = self.strategyData.today # date.today() #date(2021, 5, 21)
-        now = self.strategyData.now #datetime.now() #datetime(2021,5,21,17,30) 
+        now = self.strategyData.now.astimezone(timezone('UTC')) #datetime.now() #datetime(2021,5,21,17,30) 
 
         executionDate = self.strategyData.fill.date
         dateLimit = today-timedelta(days=6)

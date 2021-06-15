@@ -90,7 +90,7 @@ class Portfolio:
                         (isinstance(o, StopOrder) and o.auxPrice > 0)):
                         ib.placeOrder(contract, o)
 
-        ib.reqAllOpenOrdersAsync()
+        await ib.reqAllOpenOrdersAsync()
         self.updatePortfolio(ib)
     
     def updateOrder(self, ib: IB, contract: ibContract, order: ibOrder, profitOrder: LimitOrder = None, stopLossOrder: StopOrder = None):
