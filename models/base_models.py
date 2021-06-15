@@ -72,14 +72,17 @@ class Order:
     type: OrderType
     size: float
     price: float
-    parentId: int
 
-    def __init__(self, action: OrderAction, type: OrderType, size: int, price: float = None, parentId: int = 0):
+    parentId: int
+    id: int
+
+    def __init__(self, action: OrderAction, type: OrderType, size: int, price: float = None, parentId: int = 0, id: int = 0):
         self.action = action
         self.type = type
         self.size = size
         self.price = price
         self.parentId = parentId
+        self.id = id
 
 class BracketOrder:
     parentOrder: Order

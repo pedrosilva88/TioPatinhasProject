@@ -86,6 +86,9 @@ class ProviderClient:
     def currencyRateFor(self, currency: str) -> float:
         pass
 
+    def cancelOrder(self, order: Order):
+        pass
+
 class ProviderController:
     type: Provider
     provider: ProviderClient

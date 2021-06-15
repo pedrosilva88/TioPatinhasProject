@@ -130,9 +130,12 @@ class VaultZigZag(Vault):
         for result in self.resultsToTrade:
             if self.canCreateOrder(result.ticker.contract, result.bracketOrder):
                 if result.order.totalQuantity > 1:
+
                     self.createOrder(result.ticker.contract, result.bracketOrder)
                     self.saveFill(result.ticker)
                     await self.syncProviderData()
+                    self.updatePortfolio()
+
                 else:
                     log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
                     None
@@ -151,6 +154,7 @@ class VaultZigZag(Vault):
         for contract, events in zip(self.contracts, allEvents):
             if contract.symbol not in self.allContractsEvents:
                 self.allContractsEvents[contract.symbol] = []
+                
             histData = HistoricalData.computeEventsForZigZagStrategy(events)
             if len(histData) > 0:
                 self.allContractsEvents[contract.symbol] = histData

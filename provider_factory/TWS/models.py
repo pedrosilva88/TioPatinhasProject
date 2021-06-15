@@ -5,7 +5,7 @@ from typing import List
 from asyncio.unix_events import SelectorEventLoop
 
 from ib_insync.objects import BarData
-from ib_insync import IB, IBC, Stock, client
+from ib_insync import IB, IBC, Stock, Order as IBOrder
 
 from models.base_models import Contract, Event, Order, OrderAction, OrderType, Position, Trade
 from configs.models import Provider, ProviderConfigs
@@ -23,6 +23,8 @@ class TWSClient(ProviderClient):
         ib = IB()
         self.session = ib
 
+    # Connections
+
     def run(self):
         self.client.run()
 
@@ -37,6 +39,8 @@ class TWSClient(ProviderClient):
 
     async def connectAsync(self):
         await self.client.connectAsync(self.providerConfigs.endpoint, self.providerConfigs.port, self.providerConfigs.clientID, self.providerConfigs.connectTimeout)
+
+    # Portfolio
 
     async def syncData(self):
         await self.client.accountSummaryAsync()
@@ -55,7 +59,7 @@ class TWSClient(ProviderClient):
         trades = []
         for item in items:
             price = item.order.auxPrice if item.order.orderType == OrderType.StopOrder else item.order.lmtPrice
-            order = Order(OrderAction(item.order.action), OrderType(item.order.orderType), item.order.totalQuantity, price, item.order.parentId)
+            order = Order(OrderAction(item.order.action), OrderType(item.order.orderType), item.order.totalQuantity, price, item.order.parentId, item.order.orderId)
             country = getCountryFromCurrency(item.contract.currency)
             contract = Contract(item.contract.symbol, country, item.contract.exchange)
             trades.append(Trade(contract, order))
@@ -70,6 +74,14 @@ class TWSClient(ProviderClient):
         for account in self.client.accountValues():
             if (account.tag == "ExchangeRate" and account.currency == currency):
                 return float(account.value)
+
+    def cancelOrder(self, order: Order):
+        ibOrder: IBOrder = IBOrder(orderId=order.id, parentId=order.parentId, 
+                                    type=order.type.value, action=order.action.value,
+                                    totalQuantity=order.size, lmtPrice=order.price)
+        self.client.cancelOrder(ibOrder)
+
+    # Historical Data
 
     def downloadHistoricalData(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
         if contract is None:
