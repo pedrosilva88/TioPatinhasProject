@@ -83,6 +83,7 @@ class VaultZigZag:
         self.runStrategy()
         await self.handleResultsToTrade()
         await self.ib.reqPositionsAsync()
+        await self.ib.reqAllOpenOrdersAsync()
         await self.runStrategyForPositions()
         await self.closeMarketAt(self.countryConfig.closeMarket)
         
