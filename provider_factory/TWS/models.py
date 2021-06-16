@@ -68,7 +68,7 @@ class TWSClient(ProviderClient):
     def cashBalance(self) -> float:
         for account in self.client.accountValues():
             if account.tag == "AvailableFunds":
-                self.cashBalance = float(account.value)
+                return float(account.value)
 
     def currencyRateFor(self, currency: str) -> float:
         for account in self.client.accountValues():
@@ -166,7 +166,11 @@ class TWSClient(ProviderClient):
         startDate = configs.startDate
 
         while startDate <= configs.endDate:
-            endtime = startDate+timedelta(days=1) if barSize.endswith('min') else ''
+            endtime = '' 
+            if barSize.endswith('min'):
+                endtime = configs.startDate+timedelta(days=1)
+            else:
+                endtime = configs.endDate
             bars: List[BarData] = await self.client.reqHistoricalDataAsync(configs.stock, endDateTime=endtime, 
                                                     durationStr=configs.durationStr, 
                                                     barSizeSetting=barSize, 
@@ -178,7 +182,7 @@ class TWSClient(ProviderClient):
 
         events = []
         for bar in allBars:
-            events.append(Event(contract, bar.date, bar.open, bar.close, bar.high, bar.low, bar.volume))
+            events.append(Event(contract, bar.date, bar.open, bar.close, bar.high, bar.low))
         return events
 
     class HistoricalRequestConfigs:

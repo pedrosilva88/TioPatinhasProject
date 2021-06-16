@@ -47,8 +47,7 @@ class VaultZigZag(Vault):
         log("🤖 Reset ZigZag Vault 🤖")
         self.databaseModule.closeDatabaseConnection()
 
-    async def runNextOperationBlock(self, now: datetime):
-        action = self.strategyConfig.nextAction(now)
+    async def runNextOperationBlock(self, action: StrategyAction):
         if action == StrategyAction.runStrategy:
             await self.runMainStrategy()
 
@@ -58,7 +57,7 @@ class VaultZigZag(Vault):
     # Strategy
 
     async def runMainStrategy(self):
-        log("🕐 Run ZigZag Strategy for %s market now 🕐" % self.countryConfig.key.code)
+        log("🕐 Run ZigZag Strategy for %s market now 🕐" % self.strategyConfig.market.country.code)
         self.setupVault()
 
         await self.syncProviderData()
@@ -101,7 +100,7 @@ class VaultZigZag(Vault):
                             previousEvents: List[EventZigZag], currentEvent: EventZigZag,
                             fill: FillDB):
         data = StrategyZigZagData(contract=contract,
-                                    totalCash= self.portfolio.totalCashBalance,
+                                    totalCash= self.portfolio.cashBalance,
                                     event=currentEvent,
                                     previousEvents=previousEvents,
                                     position=position,
@@ -154,7 +153,7 @@ class VaultZigZag(Vault):
             if contract.symbol not in self.allContractsEvents:
                 self.allContractsEvents[contract.symbol] = []
                 
-            histData = HistoricalData.computeEventsForZigZagStrategy(events)
+            histData = HistoricalData.computeEventsForZigZagStrategy(events, self.strategyConfig)
             if len(histData) > 0:
                 self.allContractsEvents[contract.symbol] = histData
                 log("🧶 Historical Data for %s 🧶" % (contract.symbol))
@@ -186,7 +185,7 @@ class VaultZigZag(Vault):
     # Portfolio
 
     def updatePortfolio(self):
-        return self.portfolio.updatePortfolio()
+        return self.portfolio.updatePortfolio(self.delegate.controller.provider, self.strategyConfig.market)
 
     def getPosition(self, contract: Contract):
         return self.portfolio.getPosition(contract)

@@ -22,8 +22,7 @@ class Portfolio:
         self.positions = []
         self.trades = []
         self.cashBalance = 0
-        self.totalCashBalance = 0
-        self.totalCashBalanceLastUpdate = None
+        self.pendingOrdersMarketValue = 0
 
     # Account
 

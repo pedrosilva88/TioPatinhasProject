@@ -2,11 +2,11 @@ from pytz import timezone
 from vaults.vaults_controller import VaultsControllerProtocol
 from configs.models import TioPatinhasConfigs
 from datetime import datetime
-from logging import log
+from helpers.logs import log
 from models.base_models import Contract
 from typing import List
 from strategy.strategy import Strategy
-from strategy.configs.models import StrategyConfig
+from strategy.configs.models import StrategyAction, StrategyConfig
 from scanner import Scanner
 from portfolio import Portfolio
 
@@ -27,7 +27,7 @@ class Vault:
     def setupVault(self):
         log("🏃‍ Setup Vault for %s Market 🏃‍" % self.strategyConfig.market.country.code)
         configs = TioPatinhasConfigs()
-        path = Scanner.getPathFor(configs.provider, 
+        path = Scanner.getPathFor(configs.provider.value, 
                                             self.strategyConfig.type.value,
                                             self.strategyConfig.market.country.code)
         self.contracts = Scanner.contratcsFrom(path)
@@ -40,8 +40,11 @@ class Vault:
         
     def nextOperationDatetime(self, now: datetime) -> datetime:
         return self.strategyConfig.nextProcessDatetime(now)
+    
+    def nextOperationAction(self, now: datetime) -> StrategyAction:
+        return self.strategyConfig.nextAction(now)
 
-    def runNextOperationBlock(self, now: datetime):
+    def runNextOperationBlock(self, action: StrategyAction):
         pass
 
     async def syncProviderData(self):
