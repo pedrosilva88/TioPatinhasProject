@@ -1,8 +1,9 @@
-from datetime import timedelta, timezone
+from database.model import FillDB
+from datetime import timedelta
+from pytz import timezone
 from strategy.configs.models import StrategyConfig
 from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
 from typing import List, Tuple
-from ib_insync import Fill
 from helpers import log
 from strategy import Strategy
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
@@ -14,7 +15,7 @@ class StrategyZigZag(Strategy):
     # Properties
     currentBar: EventZigZag = None
     previousBars: List[EventZigZag] = None
-    fill: Fill = None
+    fill: FillDB = None
 
     # Strategy Parameters
     profitPercentage: float = None
@@ -24,6 +25,8 @@ class StrategyZigZag(Strategy):
 
     minRSI: float = None
     maxRSI: float = None
+
+    timezone: timezone = None
 
     def run(self, strategyData: StrategyData, strategyConfig: StrategyConfig) -> StrategyResult:
         self.strategyData = strategyData
@@ -114,6 +117,7 @@ class StrategyZigZag(Strategy):
         # Event Data
         self.currentBar = strategyData.event
         self.previousBars = strategyData.previousEvents
+        self.fill = strategyData.fill
 
         # Strategy Parameters
         self.willingToLose = strategyConfig.willingToLose
@@ -123,6 +127,8 @@ class StrategyZigZag(Strategy):
 
         self.minRSI = strategyConfig.minRSI
         self.maxRSI = strategyConfig.maxRSI
+
+        self.timezone = strategyData.timezone
     
     # Validations
 
@@ -165,9 +171,9 @@ class StrategyZigZag(Strategy):
 
     def handleFill(self):
         today = self.strategyData.today # date.today() #date(2021, 5, 21)
-        now = self.strategyData.now.astimezone(timezone('UTC')) #datetime.now() #datetime(2021,5,21,17,30) 
+        now = self.strategyData.now.astimezone(self.timezone) #datetime.now() #datetime(2021,5,21,17,30) 
 
-        executionDate = self.strategyData.fill.date
+        executionDate = self.fill.date
         dateLimit = today-timedelta(days=6)
 
         if (self.strategyData.position is None and
@@ -176,8 +182,8 @@ class StrategyZigZag(Strategy):
             return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.DoNothing)
 
         elif self.strategyData.position is not None:
-            shares = self.strategyData.position.position
-            closeMarketDate = self.countryConfig.closeMarket.astimezone(timezone('UTC'))
+            shares = self.strategyData.position.size
+            closeMarketDate = self.strategyConfig.market.closeTime.astimezone(self.timezone)
             if (now.hour == (closeMarketDate-timedelta(hours=1)).hour and today >= (executionDate+timedelta(days=0))):
                 if shares > 0:
                     return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.PositionExpired_Sell, None, None, self.strategyData.position)    

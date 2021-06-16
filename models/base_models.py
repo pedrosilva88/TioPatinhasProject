@@ -28,13 +28,17 @@ class Event:
     low: float
 
     def __init__(self, contract: Contract, 
-                        datetime: dt.datetime, 
+                        datetime: dt.datetime or dt.date, 
                         open: float, 
                         close: float, 
                         high: float, 
                         low: float) -> None:
         self.contract = contract
-        self.datetime = datetime
+        
+        if type(datetime) == dt.date:
+            self.datetime = dt.datetime.combine(datetime, dt.datetime.now().time())
+        else:    
+            self.datetime = datetime
         self.open = open
         self.close = close
         self.high = high

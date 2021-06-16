@@ -1,4 +1,5 @@
 import asyncio
+from configs.models import TioPatinhasConfigs
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from helpers.array_helper import Helpers
 from vaults.vaults_controller import VaultsControllerProtocol
@@ -7,10 +8,10 @@ from strategy.zigzag.models import StrategyZigZagData
 from models.zigzag.models import EventZigZag
 from strategy.configs.models import StrategyAction
 from typing import List, Union
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from vaults.vault import Vault
 from helpers import logExecutionZigZag, log
-from models import Order, OrderAction
+from models import OrderAction
 from strategy import StrategyZigZag, StrategyResult, StrategyResultType, HistoricalData, StrategyConfig
 from portfolio import Portfolio
 from database import DatabaseModule, FillDB
@@ -104,7 +105,8 @@ class VaultZigZag(Vault):
                                     event=currentEvent,
                                     previousEvents=previousEvents,
                                     position=position,
-                                    fill=fill)
+                                    fill=fill,
+                                    timezone=self.configs.timezone)
         result = self.strategy.run(data, self.strategyConfig)
         logExecutionZigZag(data, result)
         self.handleStrategyResult(result, contract)

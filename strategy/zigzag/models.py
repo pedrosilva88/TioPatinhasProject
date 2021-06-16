@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from pytz import timezone
 from models.base_models import BracketOrder, Contract, Event, Position
 from models.zigzag.models import EventZigZag
 from typing import List
@@ -6,6 +7,7 @@ from database.model import FillDB
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 
 class StrategyZigZagData(StrategyData):
+    timezone: timezone
     previousEvents: List[EventZigZag]
     fill: FillDB
 
@@ -13,12 +15,15 @@ class StrategyZigZagData(StrategyData):
                         totalCash: float, 
                         event: EventZigZag, 
                         previousEvents: List[EventZigZag],  
-                        position: Position = None, fill: FillDB = None,
+                        position: Position = None, 
+                        fill: FillDB = None,
                         today: date = None,
-                        now: datetime = None):
+                        now: datetime = None,
+                        timezone: timezone = timezone('UTC')):
         super().__init__(contract, totalCash, event, position=position, today=today, now=now)
         self.previousEvents = previousEvents
         self.fill = fill
+        self.timezone = timezone
         
 class StrategyZigZagResult(StrategyResult):
     priority: int

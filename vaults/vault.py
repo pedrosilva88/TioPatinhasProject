@@ -11,6 +11,7 @@ from scanner import Scanner
 from portfolio import Portfolio
 
 class Vault:
+    configs: TioPatinhasConfigs
     strategyConfig: StrategyConfig
     strategy: Strategy
     portfolio: Portfolio
@@ -26,8 +27,8 @@ class Vault:
 
     def setupVault(self):
         log("🏃‍ Setup Vault for %s Market 🏃‍" % self.strategyConfig.market.country.code)
-        configs = TioPatinhasConfigs()
-        path = Scanner.getPathFor(configs.provider.value, 
+        self.configs = TioPatinhasConfigs()
+        path = Scanner.getPathFor(self.configs.provider.value, 
                                             self.strategyConfig.type.value,
                                             self.strategyConfig.market.country.code)
         self.contracts = Scanner.contratcsFrom(path)
