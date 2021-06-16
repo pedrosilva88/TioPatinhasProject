@@ -28,8 +28,8 @@ class Scanner:
     def getPathFor(provider: str, 
                     strategy: str, 
                     country: str, 
-                    filename: str = "scan_to_run_startegy.csv") -> str:
+                    filename: str = "scan_to_run_strategy.csv") -> str:
         return ("%s/%s/%s/%s/%s" % (Constants.rootPath, provider, strategy, country, filename))
 
-    class Constants:
-        rootPath = "scanner/Data/CSV"
+class Constants:
+    rootPath = "scanner/Data/CSV"
