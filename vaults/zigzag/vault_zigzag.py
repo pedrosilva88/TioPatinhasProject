@@ -8,7 +8,7 @@ from models.zigzag.models import EventZigZag
 from strategy.configs.models import StrategyAction
 from typing import List, Union
 from datetime import date, datetime, timedelta
-from vaults.models import Vault
+from vaults.vault import Vault
 from helpers import logExecutionZigZag, log
 from models import Order, OrderAction
 from strategy import StrategyZigZag, StrategyResult, StrategyResultType, HistoricalData, StrategyConfig
@@ -68,7 +68,6 @@ class VaultZigZag(Vault):
         
         for contract in self.contracts:
             events = self.allContractsEvents[contract.symbol]
-            zigzagFound = False
             if len(events) >= 5:
                 currentEvent = events[-1]
                 previousEvents = [] 

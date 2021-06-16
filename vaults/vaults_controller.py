@@ -8,7 +8,7 @@ from island.island import IslandProtocol
 from vaults.zigzag.vault_zigzag import VaultZigZag
 from strategy.configs.models import StrategyType
 from typing import List
-from vaults.models import Vault
+from vaults.vault import Vault
 from configs.models import TioPatinhasConfigs
 
 # class IslandProtocol(Protocol):
@@ -55,8 +55,8 @@ class VaultsController(VaultsControllerProtocol):
         self.nextVaultToRun = None
 
         for vault in self.vaults:
-            nowTime = datetime.now().astimezone(self.config.timezone)
-            operationDatetime = vault.nextOperationDatetime(nowTime).astimezone(self.config.timezone)
+            nowTime = datetime.now(self.config.timezone)
+            operationDatetime = vault.nextOperationDatetime(nowTime)
             if vaultToRunDatetime == None or operationDatetime <= vaultToRunDatetime:
                 vaultToRun = vault
                 vaultToRunDatetime = operationDatetime
@@ -71,10 +71,10 @@ class VaultsController(VaultsControllerProtocol):
         await self.nextVaultToRun.runNextOperationBlock(nowTime)
         await self.scheduleNextOperation()
 
-    class Constants:
-        safeMarginSeconds: int = 3
-
     ## VaultsControllerProtocol
 
     def controller(self) -> ProviderController:
         return self.delegate.controller
+
+class Constants:
+    safeMarginSeconds: int = 3

@@ -66,7 +66,7 @@ class BacktestConfigs:
         self.downloadModel = BacktestDownloadModel(path, nDays, barSize)
 
         market = MarketManager.getMarketFor(self.country)
-        self.strategy = StrategyConfigFactory.createStrategyFor(strategyType=self.strategyType, market=market)
+        self.strategy = StrategyConfigFactory.createStrategyFor(strategyType=self.strategyType, market=market, timezone=self.timezone)
         self.dynamicParameters = eval(settingsConfig.get("Options_Action_5", "startegyDynamicConfigs"), {}, {})
 
         if self.provider is None or self.action is None:

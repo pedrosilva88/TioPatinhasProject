@@ -1,3 +1,4 @@
+from pytz import timezone
 from vaults.vaults_controller import VaultsControllerProtocol
 from configs.models import TioPatinhasConfigs
 from datetime import datetime

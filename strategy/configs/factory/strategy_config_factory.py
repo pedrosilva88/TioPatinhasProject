@@ -1,21 +1,24 @@
 from datetime import timedelta
+from pytz import timezone
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from strategy.configs.models import StrategyConfig, StrategyType
 from country_config.models import Market
 
 class StrategyConfigFactory:
-    def createStrategyFor(strategyType: StrategyType, market: Market) -> StrategyConfig:
+    def createStrategyFor(strategyType: StrategyType, market: Market, tz: timezone) -> StrategyConfig:
         if strategyType == StrategyType.zigzag:
-            return StrategyConfigFactory.createZigZagStrategyFor(market)
+            return StrategyConfigFactory.createZigZagStrategyFor(market, tz)
         elif strategyType == StrategyType.opg:
             return None
         else:
             return None
 
 
-    def createZigZagStrategyFor(market: Market) -> StrategyConfig:
+    def createZigZagStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
         if market.country == market.country.USA:
-            return StrategyZigZagConfig(market= market, runStrategyTime= market.openTime+timedelta(minutes=Constants.ZigZag.runStrategyAfterMinutes),
+            openTime = (market.openTime.astimezone(tz)+timedelta(minutes=Constants.ZigZag.runStrategyAfterMinutes)).time()
+            checkPositionsTime = (market.closeTime.astimezone(tz)-timedelta(hours=Constants.ZigZag.runPositionsCheckBeforeHours)).time()
+            return StrategyZigZagConfig(market= market, runStrategyTime=openTime,
                                         willingToLose=Constants.ZigZag.willingToLose,
                                         stopToLosePercentage=Constants.ZigZag.stopToLosePercentage, 
                                         profitPercentage=Constants.ZigZag.profitPercentage, 
@@ -23,7 +26,7 @@ class StrategyConfigFactory:
                                         minRSI=Constants.ZigZag.minRSI, maxRSI=Constants.ZigZag.maxRSI, 
                                         rsiOffsetDays=Constants.ZigZag.rsiOffsetDays, zigzagSpread=Constants.ZigZag.zigzagSpread,
                                         daysToHold= Constants.ZigZag.daysToHold,
-                                        runPositionsCheckTime=market.closeTime-timedelta(hours=Constants.ZigZag.runPositionsCheckBeforeHours),
+                                        runPositionsCheckTime=checkPositionsTime,
                                         daysBeforeToDownload=Constants.ZigZag.daysBeforeToDownload, daysBefore=Constants.ZigZag.daysBefore,
                                         daysAfterZigZag=Constants.ZigZag.daysAfterZigZag,
                                         barSize=Constants.ZigZag.barSize)

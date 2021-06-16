@@ -1,4 +1,6 @@
 from datetime import time, datetime, timedelta
+
+from pytz import timezone
 from country_config.models import Market
 from strategy.configs.models import StrategyAction, StrategyConfig, StrategyType
 
@@ -52,20 +54,26 @@ class StrategyZigZagConfig(StrategyConfig):
         self.barSize = barSize
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
-        currentTime = now.time
-        if self.runStrategyTime > currentTime:
-            return datetime.combine(now.date, self.runStrategyTime)
-        elif self.runPositionsCheckTime > currentTime:
-            return datetime.combine(now.date, self.runPositionsCheckTime)
+        currentTime = now.time()
+        strategyTime = self.runStrategyTime
+        checkPositionsTime = self.runPositionsCheckTime
+
+        if strategyTime > currentTime:
+            return datetime.combine(now.date(), self.runStrategyTime, now.tzinfo)
+        elif checkPositionsTime > currentTime:
+            return datetime.combine(now.date(), self.runPositionsCheckTime, now.tzinfo)
         else:
-            nextDay = now.date+timedelta(days=1)
-            return datetime.combine(nextDay, self.runStrategyTime)
+            nextDay = now.date()+timedelta(days=1)
+            return datetime.combine(nextDay, self.runStrategyTime, now.tzinfo)
 
     def nextAction(self, now: datetime) -> StrategyAction:
-        currentTime = now.time
-        if self.runStrategyTime > currentTime:
+        currentTime = now.time()
+        strategyTime = self.runStrategyTime
+        checkPositionsTime = self.runPositionsCheckTime
+
+        if strategyTime > currentTime:
             return StrategyAction.runStrategy
-        elif self.runPositionsCheckTime > currentTime:
+        elif checkPositionsTime > currentTime:
             return StrategyAction.checkPositions
         else:
             return StrategyAction.runStrategy

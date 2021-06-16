@@ -3,7 +3,7 @@ from island.island_events import IslandEvents
 from island.island_protocol import IslandProtocol
 from vaults.vaults_controller import VaultsController
 from provider_factory.provider_module import ProviderModule
-from helpers import log
+from helpers import log, logError
 from configs.models import TioPatinhasConfigs
 
 class Island(IslandProtocol, IslandEvents):
@@ -55,11 +55,11 @@ class Island(IslandProtocol, IslandEvents):
                     await self.vaultsController.start()
 
             except ConnectionRefusedError:
-                log("🚨 Connection Refused error 🚨 ")
+                logError("🚨 Connection Refused error 🚨 ")
             except Warning as w:
-                log(w)
+                logError(w)
             except Exception as e:
-                log(e)
+                logError(e)
             finally:
                 log("🥺 Finishing 🥺")
                 self.unsubscribeEvents(self.controller.provider)

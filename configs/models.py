@@ -29,12 +29,12 @@ class TioPatinhasConfigs:
 
         self.timezone = timezone(settingsConfig['Default']['timezone'])
         dummyStrategies = eval(settingsConfig.get("Default", "strategies"), {}, {})
-        self.strategies = TioPatinhasConfigs.parseStrategies(dummyStrategies)
+        self.strategies = TioPatinhasConfigs.parseStrategies(dummyStrategies, self.timezone)
         if self.providerConfigs is None or self.timezone is None:
             log("🚨 Unable to get the initial configs 🚨")
             sys.exit()
 
-    def parseStrategies(items: List[Tuple[str, str]]) -> List[StrategyConfig]:
+    def parseStrategies(items: List[Tuple[str, str]], tz: timezone) -> List[StrategyConfig]:
         strategies = []
         for item in items:
             keyStrategy = item[0]
@@ -50,7 +50,7 @@ class TioPatinhasConfigs:
             if strategyType is not None and country is not None:
                 market = MarketManager.getMarketFor(country)
                 if market is not None:
-                    strategy = StrategyConfigFactory.createStrategyFor(strategyType=strategyType, market=market)
+                    strategy = StrategyConfigFactory.createStrategyFor(strategyType=strategyType, market=market, tz=tz)
                     if strategy is not None:
                         strategies.append(strategy)
                     else:

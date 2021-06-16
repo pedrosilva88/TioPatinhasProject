@@ -1,5 +1,6 @@
 from logging import *
 from datetime import *
+import logging
 import sys, os
 import errno
 
@@ -12,6 +13,7 @@ def mkdir(path):
         else: raise
 
 def createLog():
+    logging.basicConfig(level=logging.WARNING)
     logger = getLogger("Tio Patinhas")
     logger.setLevel(DEBUG)
 
@@ -71,6 +73,10 @@ def logInitTioPatinhas():
 def log(str: str):
     logger = getLog()
     logger.info(str)
+
+def logError(str: str):
+    logger = getLog()
+    logger.exception(str)
 
 def logCounter(prefix: str, total: int, current: int):
     sys.stdout.write("\t %s: %i/%i \r" % (prefix, current, total) )
