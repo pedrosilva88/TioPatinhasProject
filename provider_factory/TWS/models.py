@@ -103,7 +103,7 @@ class TWSClient(ProviderClient):
             for o in bracket:
                 self.client.placeOrder(contract, o)
         else:
-            bracket = self.client.bracketOrder(parentOrder.action, parentOrder.size, parentOrder.price, profitOrder.price, stopLossOrder.price)
+            bracket = self.client.bracketOrder(parentOrder.action.value, parentOrder.size, parentOrder.price, profitOrder.price, stopLossOrder.price)
 
             for o in bracket:
                 self.client.placeOrder(contract, o)

@@ -59,11 +59,16 @@ class StrategyResult:
     position: Position
 
     def __str__(self):
-        return "Result for %s: %s %s size(%d) price(%.2f)\n" % (self.contract.symbol, 
-                                                                self.event.datetime.date(), 
-                                                                self.type.name, 
-                                                                self.bracketOrder.parentOrder.size,
-                                                                self.bracketOrder.parentOrder.price)
+        if self.bracketOrder.parentOrder is not None:
+            return "Result for %s: %s %s size(%d) price(%.2f)\n" % (self.contract.symbol, 
+                                                                    self.event.datetime.date(), 
+                                                                    self.type, 
+                                                                    self.bracketOrder.parentOrder.size,
+                                                                    self.bracketOrder.parentOrder.price)
+        else:
+            return "Result for %s: %s %s\n" % (self.contract.symbol, 
+                                                self.event.datetime.date(), 
+                                                self.type)
 
     def __init__(self, contract: Contract, event: Event, type: StrategyResultType, bracketOrder: BracketOrder = None, position: Position = None):
         self.contract = contract

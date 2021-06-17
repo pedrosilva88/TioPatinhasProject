@@ -1,5 +1,4 @@
 import asyncio
-from configs.models import TioPatinhasConfigs
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from helpers.array_helper import Helpers
 from vaults.vaults_controller import VaultsControllerProtocol
@@ -84,7 +83,8 @@ class VaultZigZag(Vault):
 
     async def runStrategyToClosePositions(self):
         log("⭐️ Checking Positions ⭐️")
-
+        self.setupVault()
+        
         await self.syncProviderData()
         self.updatePortfolio()
             
@@ -121,18 +121,18 @@ class VaultZigZag(Vault):
             orderAction = OrderAction.Buy.value if result.type == StrategyResultType.PositionExpired_Buy else OrderAction.Sell.value
             return self.cancelPosition(orderAction, result.position)
         else:
-            log("🤨 %s " % result)
+            log("🤨 %s " % result.type)
 
         return
 
     async def handleResultsToTrade(self):
         self.resultsToTrade.sort(key=lambda x: x.priority, reverse=True)
         for result in self.resultsToTrade:
-            if self.canCreateOrder(result.ticker.contract, result.bracketOrder):
-                if result.order.totalQuantity > 1:
+            if self.canCreateOrder(result.contract, result.bracketOrder):
+                if result.bracketOrder.parentOrder.size > 1:
 
-                    self.createOrder(result.ticker.contract, result.bracketOrder)
-                    self.saveFill(result.ticker)
+                    self.createOrder(result.contract, result.bracketOrder)
+                    self.saveFill(result.contract)
                     await self.syncProviderData()
                     self.updatePortfolio()
 
@@ -195,7 +195,7 @@ class VaultZigZag(Vault):
     # Portfolio - Manage Orders
 
     def canCreateOrder(self, contract: Contract, bracketOrder: BracketOrder):
-        return self.portfolio.canCreateOrder(self.delegate.controller.provider, contract, bracketOrder)
+        return self.portfolio.canCreateOrder(contract, bracketOrder)
 
     def createOrder(self, contract: Contract, bracketOrder: BracketOrder):
         return self.portfolio.createOrder(self.delegate.controller.provider, contract, bracketOrder)

@@ -59,7 +59,7 @@ def logExecutionTicker(data, result):
 def logExecutionZigZag(data, result):
     logger = getLog()
     if (result.type.value == 2 or result.type.value == 3):
-        logger.info("⭐️ ZigZag %s: %s ⭐️" % (data.ticker.contract.symbol,
+        logger.info("⭐️ ZigZag %s: %s ⭐️" % (data.contract.symbol,
                                             result.type))
 
 
