@@ -108,7 +108,7 @@ class BacktestZigZagModule(BacktestModule):
     def setupRunStrategy(self, events: List[Event], dynamicParameters: List[List[float]]):
         config = BacktestConfigs()
         isForStockPerformance = True if config.action == BacktestAction.runStrategyPerformance or config.action == BacktestAction.runStrategyPerformanceWithDynamicParameters else False
-        strategyConfig: StrategyZigZagConfig = StrategyConfigFactory.createZigZagStrategyFor(MarketManager.getMarketFor(config.country))
+        strategyConfig: StrategyZigZagConfig = StrategyConfigFactory.createZigZagStrategyFor(MarketManager.getMarketFor(config.country), config.timezone)
         if dynamicParameters is not None:
             strategyConfig.profitPercentage = float(dynamicParameters[0])
             strategyConfig.stopToLosePercentage = float(dynamicParameters[1])
@@ -156,6 +156,9 @@ class BacktestZigZagModule(BacktestModule):
     def getStrategyData(self, event: Event, events: List[Event], index: int) -> StrategyData:
         strategyConfig: StrategyZigZagConfig = self.strategyModel.strategyConfig
         event: EventZigZag = event
+        cloneEvent = EventZigZag(event.contract, event.datetime, event.open, event.open, 
+                                 event.open, event.open, event.zigzag, event.zigzagType, 
+                                 event.rsi, event.open)
         events: List[EventZigZag] = events
         previousEvents = self.getPreviousEvents(event, strategyConfig.daysBeforeToDownload)
         if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
@@ -164,10 +167,9 @@ class BacktestZigZagModule(BacktestModule):
         previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
         fill = self.getFill(event.contract)
         balance = min(150000, self.getBalance())
-
         return StrategyZigZagData(contract= event.contract,
                                     totalCash= balance,
-                                    event= event,
+                                    event= cloneEvent,
                                     previousEvents= previousEventsFiltered,
                                     position= None,
                                     fill= fill,
@@ -202,11 +204,11 @@ class BacktestZigZagModule(BacktestModule):
         model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
         if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and model.tradesAvailable > 0):
             balance = self.getBalance()
-            totalOrderCost = result.order.parentOrder.price*result.order.parentOrder.size
-            if (balance > totalOrderCost and result.order.parentOrder.size > 0) or model.isForStockPerformance:
+            totalOrderCost = result.bracketOrder.parentOrder.price*result.bracketOrder.parentOrder.size
+            if (balance > totalOrderCost and result.bracketOrder.parentOrder.size > 0) or model.isForStockPerformance:
                 identifier = self.uniqueIdentifier(result.contract.symbol, result.event.datetime.date())
-                model.positions[identifier] = (result.order,
-                                                Position(contract=result.contract, size= result.order.parentOrder.size),
+                model.positions[identifier] = (result.bracketOrder,
+                                                Position(contract=result.contract, size= result.bracketOrder.parentOrder.size),
                                                 result.event.datetime.date(),
                                                 event)
                 model.positionZigZagDates[identifier] = result.event.datetime.date()+timedelta(days=result.priority)

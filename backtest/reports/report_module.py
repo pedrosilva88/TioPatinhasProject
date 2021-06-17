@@ -198,8 +198,8 @@ class ReportModule:
         config = BacktestConfigs()
         filename = reportStrategyResultForPerformanceFilename if isForPerformance else reportStrategyResultFilename
         tradesFilename = BacktestScannerManager.getPathFileToSaveReports(config.provider, config.country, config.strategyType, filename)
-        with open(tradesFilename, 'w', newline='') as file:
+        with open(tradesFilename, 'a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(self.getHeaderRowForStrategyReport())
+            #writer.writerow(self.getHeaderRowForStrategyReport())
             for result in self.strategyResults:
                 writer.writerow(self.getRowForStrategyReport(result))

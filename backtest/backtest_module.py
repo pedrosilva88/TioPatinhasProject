@@ -114,8 +114,8 @@ class BacktestModule:
             self.runStrategy(events, parameters)
             self.reportModule.createStrategyResult(parameters)
             self.reportModule.results = []
-        
-        self.reportModule.createStrategyReport(self.strategyModel.isForStockPerformance)
+            self.reportModule.createStrategyReport(self.strategyModel.isForStockPerformance)
+            self.reportModule.strategyResults = []
             
     def runShowGraphAction(self):
         self.showGraph()
