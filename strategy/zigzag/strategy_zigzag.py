@@ -172,9 +172,9 @@ class StrategyZigZag(Strategy):
     def handleFill(self):
         today = self.strategyData.today # date.today() #date(2021, 5, 21)
         now = self.strategyData.now.astimezone(self.timezone) #datetime.now() #datetime(2021,5,21,17,30) 
-
+        strategyConfig: StrategyZigZagConfig = self.strategyConfig
         executionDate = self.fill.date
-        dateLimit = today-timedelta(days=6)
+        dateLimit = today-timedelta(days=strategyConfig.daysBefore)
 
         if (self.strategyData.position is None and
             dateLimit <= executionDate):
@@ -183,8 +183,9 @@ class StrategyZigZag(Strategy):
 
         elif self.strategyData.position is not None:
             shares = self.strategyData.position.size
-            closeMarketDate = self.strategyConfig.market.closeTime.astimezone(self.timezone)
-            if (now.hour == (closeMarketDate-timedelta(hours=1)).hour and today >= (executionDate+timedelta(days=0))):
+            posisitonsCheckTime = strategyConfig.runPositionsCheckTime
+            daysToHold = executionDate+timedelta(days=strategyConfig.daysToHold)
+            if (now.hour == posisitonsCheckTime.hour and today >= daysToHold):
                 if shares > 0:
                     return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.PositionExpired_Sell, None, None, self.strategyData.position)    
                 elif shares < 0:
@@ -197,7 +198,7 @@ class StrategyZigZag(Strategy):
     # Calculations
 
     def getOrderPrice(self, action: OrderAction):
-        return self.currentBar.lastPrice #(self.currentBar.high+self.currentBar.low)/2  #self.currentBar.low if action == OrderAction.Buy else self.currentBar.high
+        return self.currentBar.lastPrice
 
     def calculatePnl(self, action: OrderAction):
         price = self.getOrderPrice(action)
