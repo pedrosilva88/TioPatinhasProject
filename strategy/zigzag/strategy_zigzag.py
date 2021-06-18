@@ -1,14 +1,13 @@
 from database.model import FillDB
 from datetime import timedelta
-from pytz import timezone
 from strategy.configs.models import StrategyConfig
 from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
 from typing import List, Tuple
 from helpers import log
-from strategy import Strategy
+from strategy.strategy import Strategy
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from strategy.configs.zigzag.models import StrategyZigZagConfig
-from models.base_models import BracketOrder, Order, OrderAction, OrderType
+from models.base_models import OrderAction
 from models.zigzag.models import EventZigZag
 
 class StrategyZigZag(Strategy):
@@ -63,11 +62,11 @@ class StrategyZigZag(Strategy):
             return StrategyZigZagResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)
 
     def getZigZag(self) -> Tuple[EventZigZag, int]:
-        totalBars = len(self.previousBars)
+        strategyConfig: StrategyZigZagConfig = self.strategyConfig
         index = -1
         zigzagBar = None
         for bar in reversed(self.previousBars):
-            if (bar.zigzag == True and (bar.rsi <= self.minRSI or bar.rsi >= self.maxRSI) and index < -self.strategyConfig.daysAfterZigZag):
+            if (bar.zigzag == True and (bar.rsi <= self.minRSI or bar.rsi >= self.maxRSI) and index < -strategyConfig.daysAfterZigZag):
                 log("🎃 Bar Found %s: %d 🎃" % (self.strategyData.contract.symbol, index))
                 zigzagBar = bar
                 break
@@ -209,7 +208,6 @@ class StrategyZigZag(Strategy):
 
     def getStopLossPrice(self, action: OrderAction):
         price = self.getOrderPrice(action)
-        totalCash = self.strategyData.totalCash
         stopLossPriceRatio = price*self.stopToLosePercentage
 
         return price - stopLossPriceRatio if action == OrderAction.Buy else price + stopLossPriceRatio

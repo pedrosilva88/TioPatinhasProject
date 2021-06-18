@@ -35,11 +35,11 @@ class StrategyConfigFactory:
 
 class Constants:
     class ZigZag:
-        runStrategyAfterMinutes = 5
+        runStrategyAfterMinutes = 0
         runPositionsCheckBeforeHours = 1
         willingToLose = 0.04
         stopToLosePercentage = 0.03
-        profitPercentage = 0.04
+        profitPercentage = 0.05
         maxToInvestPerStockPercentage = 1
         minRSI = 30
         maxRSI = 70
