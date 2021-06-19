@@ -39,7 +39,7 @@ class Constants:
         runPositionsCheckBeforeHours = 1
         willingToLose = 0.04
         stopToLosePercentage = 0.03
-        profitPercentage = 0.05
+        profitPercentage = 0.04
         maxToInvestPerStockPercentage = 1
         minRSI = 30
         maxRSI = 70
@@ -50,16 +50,3 @@ class Constants:
         daysToHold = 0
         daysAfterZigZag = 2
         barSize = "1 day"
-
-## OPG UK ##
-#     if key == CountryKey.UK:
-#         return StrategyConfig(startRunningStrategy=timezone.localize(datetime.combine(date.today(),time(8,0,45)), is_dst=None), 
-#                                 strategyValidPeriod=timezone.localize(datetime.combine(date.today(),time(8,15)), is_dst=None),
-#                                 strategyMaxTime=timezone.localize(datetime.combine(date.today(),time(13,0)), is_dst=None), 
-#                                 minGap= 2, maxGap= 8, maxLastGap= 9, gapProfitPercentage= 0.75,
-#                                 willingToLose= 0.04, 
-#                                 stopToLosePercentage= 0.08, 
-#                                 maxToInvestPerStockPercentage= 1, 
-#                                 averageVolumePercentage= 1.8)
-#     else:
-#         return None
