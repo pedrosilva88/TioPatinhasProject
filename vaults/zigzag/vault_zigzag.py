@@ -7,7 +7,7 @@ from strategy.zigzag.models import StrategyZigZagData
 from models.zigzag.models import EventZigZag
 from strategy.configs.models import StrategyAction
 from typing import List, Union
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from vaults.vault import Vault
 from helpers import logExecutionZigZag, log
 from models import OrderAction
@@ -146,10 +146,11 @@ class VaultZigZag(Vault):
         config: StrategyZigZagConfig = self.strategyConfig
         provider = self.delegate.controller.provider
         chunks = Helpers.grouper(self.contracts, 50)
+        today = datetime.today()
         allEvents = []
 
         for contracts in chunks:
-            allEvents += await asyncio.gather(*[provider.downloadHistoricalDataAsync(contract, config.daysBeforeToDownload, config.barSize) for contract in contracts ])
+            allEvents += await asyncio.gather(*[provider.downloadHistoricalDataAsync(contract, config.daysBeforeToDownload, config.barSize, today) for contract in contracts ])
 
         for contract, events in zip(self.contracts, allEvents):
             if contract.symbol not in self.allContractsEvents:
