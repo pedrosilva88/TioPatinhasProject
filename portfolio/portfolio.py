@@ -60,7 +60,7 @@ class Portfolio:
         log("🥊  Cancel Orders - %s 🥊" % contract.symbol)
         for trade in self.trades:
             if contract.symbol == trade.contract.symbol:
-                log("🥊  Cancel Order - %s - %s - %s 🥊" % (trade.contract.symbol, trade.order.orderType, trade.orderStatus.status))
+                log("🥊  Cancel Order - %s - %s 🥊" % (trade.contract.symbol, trade.order.type.value))
                 client.cancelOrder(trade.order)
 
     # Positions

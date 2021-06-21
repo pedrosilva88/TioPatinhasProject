@@ -79,6 +79,7 @@ class TWSClient(ProviderClient):
         parentOrder = bracketOrder.parentOrder
         profitOrder = bracketOrder.takeProfitOrder
         stopLossOrder = bracketOrder.stopLossOrder
+        newContract: IBContract = Stock(symbol=contract.symbol, exchange=contract.exchange, currency=contract.currency)
 
         if parentOrder.type == OrderType.MarketOrder:
             assert parentOrder.action in (OrderAction.Buy, OrderAction.Sell)
@@ -101,12 +102,11 @@ class TWSClient(ProviderClient):
 
             bracket = IBBracketOrder(parent, takeProfit, stopLoss)
             for o in bracket:
-                self.client.placeOrder(contract, o)
+                self.client.placeOrder(newContract, o)
         else:
             bracket = self.client.bracketOrder(parentOrder.action.value, parentOrder.size, parentOrder.price, profitOrder.price, stopLossOrder.price)
-
             for o in bracket:
-                self.client.placeOrder(contract, o)
+                self.client.placeOrder(newContract, o)
 
     def cancelOrder(self, order: Order):
         ibOrder: IBOrder = IBOrder(orderId=order.id, parentId=order.parentId, 
