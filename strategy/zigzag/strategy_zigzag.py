@@ -55,9 +55,9 @@ class StrategyZigZag(Strategy):
                     type = StrategyResultType.Sell
                     order = self.createOrder(type)
                     return StrategyZigZagResult(strategyData.contract, self.currentBar, type, zigzagIndex, order, None)
-                return StrategyZigZagResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)   
+                return StrategyZigZagResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)
             else:
-                return StrategyZigZagResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)   
+                return StrategyZigZagResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)
         else:
             return StrategyZigZagResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)
 
@@ -87,7 +87,7 @@ class StrategyZigZag(Strategy):
                 return False
             else:
                 log("👻 😁 (%.2f) Shorting %.2f > %.2f 😁 👻" % (index, self.previousBars[index-1].high, self.previousBars[index].high))
-            index += 1 
+            index += 1
         return True
 
     def isLonging(self, startIndex: int):
@@ -128,7 +128,7 @@ class StrategyZigZag(Strategy):
         self.maxRSI = strategyConfig.maxRSI
 
         self.timezone = strategyData.timezone
-    
+
     # Validations
 
     def validateStrategy(self):
@@ -139,7 +139,7 @@ class StrategyZigZag(Strategy):
         if handleFillResult is None:
             if (not self.isConfigsValid() or not self.isStrategyDataValid()):
                 return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
-            else: 
+            else:
                 return None
         else:
             return handleFillResult
@@ -165,12 +165,12 @@ class StrategyZigZag(Strategy):
                 self.willingToLose > 0 and
                 self.stopToLosePercentage > 0 and
                 self.maxToInvestPerStockPercentage > 0)
-    
+
     # Handlers
 
     def handleFill(self):
         today = self.strategyData.today # date.today() #date(2021, 5, 21)
-        now = self.strategyData.now.astimezone(self.timezone) #datetime.now() #datetime(2021,5,21,17,30) 
+        now = self.strategyData.now.astimezone(self.timezone) #datetime.now() #datetime(2021,5,21,17,30)
         strategyConfig: StrategyZigZagConfig = self.strategyConfig
         executionDate = self.fill.date
         dateLimit = today-timedelta(days=strategyConfig.daysBefore)
@@ -186,7 +186,7 @@ class StrategyZigZag(Strategy):
             daysToHold = executionDate+timedelta(days=strategyConfig.daysToHold)
             if (now.hour == posisitonsCheckTime.hour and today >= daysToHold):
                 if shares > 0:
-                    return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.PositionExpired_Sell, None, None, self.strategyData.position)    
+                    return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.PositionExpired_Sell, None, None, self.strategyData.position)
                 elif shares < 0:
                     return StrategyZigZagResult(self.strategyData.contract, self.currentBar, StrategyResultType.PositionExpired_Buy, None, None, self.strategyData.position)
             log("🥵 Cant do nothing with Stock (%s) - You already have a position and it's not expired 🥵" % self.strategyData.contract.symbol)
