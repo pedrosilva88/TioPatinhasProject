@@ -58,7 +58,7 @@ class TWSClient(ProviderClient):
         items = self.client.openTrades()
         trades = []
         for item in items:
-            price = item.order.auxPrice if item.order.orderType == OrderType.StopOrder else item.order.lmtPrice
+            price = item.order.auxPrice if item.order.orderType == OrderType.StopOrder.value else item.order.lmtPrice
             order = Order(OrderAction(item.order.action), OrderType(item.order.orderType), item.order.totalQuantity, price, item.order.parentId, item.order.orderId)
             country = getCountryFromCurrency(item.contract.currency)
             contract = Contract(item.contract.symbol, country, item.contract.exchange)
@@ -110,8 +110,12 @@ class TWSClient(ProviderClient):
 
     def cancelOrder(self, order: Order):
         ibOrder: IBOrder = IBOrder(orderId=order.id, parentId=order.parentId, 
-                                    type=order.type.value, action=order.action.value,
-                                    totalQuantity=order.size, lmtPrice=order.price)
+                                    orderType=order.type.value, action=order.action.value,
+                                    totalQuantity=order.size)
+        if order.type == OrderType.StopOrder:
+            ibOrder.auxPrice = order.price
+        else:
+            ibOrder.lmtPrice = order.price
         self.client.cancelOrder(ibOrder)
 
     def cancelPosition(self, action: OrderAction, position: Position):
