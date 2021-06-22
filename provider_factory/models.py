@@ -8,6 +8,12 @@ class Provider(Enum):
     Coinbase = "Coinbase"
     Binance = "Binance"
 
+class ProviderEvents(Enum):
+    didConnect = 0
+    didDisconnect = 1
+    didTimeOut = 2
+    didGetError = 3
+
 class ProviderConfigs:
     version: str
     tradingMode: str
@@ -95,12 +101,11 @@ class ProviderClient:
     def cancelPosition(self, action: OrderAction, position: Position):
         pass
 
-    def subscribeOnTimeoutEvent(self, callable: Callable):
+    def subscribeEvent(self, event: ProviderEvents, callable: Callable):
         pass
 
-    def unsubscribeOnTimeoutEvent(self, callable: Callable):
+    def unsubscribeEvent(self, event: ProviderEvents, callable: Callable):
         pass
-
 
 class ProviderController:
     type: Provider

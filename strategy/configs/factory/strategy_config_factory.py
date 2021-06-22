@@ -17,7 +17,7 @@ class StrategyConfigFactory:
     def createZigZagStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
         if market.country == market.country.USA:
             openTime = (market.openTime.astimezone(tz)+timedelta(seconds=Constants.ZigZag.runStrategyAfterSeconds)).time()
-            checkPositionsTime = (market.closeTime.astimezone(tz)-timedelta(hours=Constants.ZigZag.runPositionsCheckBeforeHours)).time()
+            checkPositionsTime = (market.closeTime.astimezone(tz)-timedelta(minutes=Constants.ZigZag.runPositionsCheckBeforeMinutes)).time()
             return StrategyZigZagConfig(market= market, runStrategyTime=openTime,
                                         willingToLose=Constants.ZigZag.willingToLose,
                                         stopToLosePercentage=Constants.ZigZag.stopToLosePercentage, 
@@ -36,7 +36,7 @@ class StrategyConfigFactory:
 class Constants:
     class ZigZag:
         runStrategyAfterSeconds = 30
-        runPositionsCheckBeforeHours = 1
+        runPositionsCheckBeforeMinutes = 30
         willingToLose = 0.04
         stopToLosePercentage = 0.03
         profitPercentage = 0.04

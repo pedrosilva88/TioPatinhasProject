@@ -8,7 +8,7 @@ from ib_insync import Contract as IBContract, BracketOrder as IBBracketOrder, Ma
 
 from models.base_models import BracketOrder, Contract, Event, Order, OrderAction, OrderType, Position, Trade
 from configs.models import Provider, ProviderConfigs
-from provider_factory.models import ProviderClient, ProviderController
+from provider_factory.models import ProviderClient, ProviderController, ProviderEvents
 
 class TWSClient(ProviderClient):
     @property
@@ -121,12 +121,6 @@ class TWSClient(ProviderClient):
                                             exchange=position.contract.exchange)
         self.client.placeOrder(contract, order)
 
-    def subscribeOnTimeoutEvent(self, callable: Callable):
-        self.client.timeoutEvent += callable
-
-    def unsubscribeOnTimeoutEvent(self, callable: Callable):
-        self.client.timeoutEvent -= callable
-
     # Historical Data
 
     def downloadHistoricalData(self, contract: Contract, days: int, barSize: str, endDate: date = datetime.today()) -> List[Event]:
@@ -203,6 +197,25 @@ class TWSClient(ProviderClient):
             self.startDate = self.endDate-timedelta(days=self.nDays+1) if barSize.endswith('min') else self.endDate
             self.stock = Stock(contract.symbol, contract.exchange, contract.currency)
             self.durationStr = '5 D' if barSize.endswith('min') else self.durationDays
+
+    # Events
+
+    def subscribeEvent(self, event: ProviderEvents, callable: Callable):
+        if event == ProviderEvents.didTimeOut:
+            self.client.timeoutEvent += callable
+        elif event == ProviderEvents.didGetError:
+            self.client.errorEvent += callable
+        elif event == ProviderEvents.didDisconnect:
+            self.client.disconnectedEvent += callable
+
+    def unsubscribeEvent(self, event: ProviderEvents, callable: Callable):
+        if event == ProviderEvents.didTimeOut:
+            self.client.timeoutEvent -= callable
+        elif event == ProviderEvents.didGetError:
+            self.client.errorEvent -= callable
+        elif event == ProviderEvents.didDisconnect:
+            self.client.disconnectedEvent -= callable
+
 
 class TWSController(ProviderController):
     @property

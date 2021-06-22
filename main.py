@@ -3,11 +3,12 @@ name="Tio Patinhas"
 author="Pedro Silva"
 author_email="pedromiguelsilva88@gmail.com"
 url="https://github.com/pedrosilva88/TioPatinhasProject"
-version="1"
+version="1.5"
 description="A Python client library for the Interactive Brokers integration"
 long_description = long_description
 long_description_content_type="text/markdown"
-packages=['vault, strategy, porfolio, models, scanner, country_config, logs, earnings_calendar, helpers']
+packages=[backtest, configs, country_config, database, earnings_calendar, helpers, 
+            island, logs, models, portfolio, provider_factory, scanner, strategy, vaults]
 zip_safe=False
 '''
 import asyncio

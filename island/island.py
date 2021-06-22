@@ -6,10 +6,9 @@ from provider_factory.provider_module import ProviderModule
 from helpers import log, logError
 from configs.models import TioPatinhasConfigs
 
-class Island(IslandProtocol, IslandEvents):
+class Island(IslandEvents):
     vaultsController: VaultsController
-    waiter: asyncio.Future
-
+    
     def __init__(self):
         config = TioPatinhasConfigs()
         if config.providerConfigs.useController:
