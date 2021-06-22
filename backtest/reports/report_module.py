@@ -1,6 +1,6 @@
 import csv, statistics, math
 from scanner.scanner import Scanner
-from backtest.scanner.scanner_manager import BacktestScannerManager, reportContractsPerformanceFilename, reportTradesPerformanceFilename, reportTradesFilename, reportStrategyResultForPerformanceFilename, reportStrategyResultFilename 
+from backtest.scanner.scanner_manager import BacktestScannerManager, reportContractsPerformanceFilename, reportTradesPerformanceFilename, reportTradesFilename, reportStrategyResultForPerformanceFilename, reportStrategyResultFilename
 from datetime import date
 from models.base_models import BracketOrder, Event
 from typing import Any, List, Union
@@ -27,7 +27,7 @@ class StrategyResultModel:
         self.averageReturnPerTrade = averageReturnPerTrade
         self.standardDeviation = standardDeviation
         self.sharpRatio = sharpRatio
-        
+
 
 class ReportModule:
     results: List[BacktestResult]
@@ -72,7 +72,7 @@ class ReportModule:
     def createReportPerformance(self):
         contractsPerformance = self.createContractsPerformance()
         self.saveReportPerformance(contractsPerformance)
-    
+
     def createReportTrades(self, isForPerformance: bool):
         self.saveReportTrades(isForPerformance)
 
@@ -172,12 +172,13 @@ class ReportModule:
             if result.type == BacktestResultType.profit or result.type == BacktestResultType.takeProfit:
                 if result.pnl > 0:
                     battingAverageCount +=1
-                positiveResultsCount +=1
-                totalPositivePercentage += abs(percentage)
-                
+                    positiveResultsCount +=1
+                    totalPositivePercentage += abs(percentage)
+
             else:
-                negativeResultsCount +=1
-                totalNegativePercentage += abs(percentage)
+                if result.pnl < 0:
+                    negativeResultsCount +=1
+                    totalNegativePercentage += abs(percentage)
 
         totalDailyReturn += dailyReturnSum
         standardDeviationData.append(dailyDeviationData)
@@ -186,7 +187,7 @@ class ReportModule:
         winLossRatio = 0
         if positiveResultsCount > 0 and negativeResultsCount > 0:
             winLossRatio = (totalPositivePercentage/positiveResultsCount) / (totalNegativePercentage/negativeResultsCount)
-        averageReturnPerTrade = totalDailyReturn/numberOfDays
+        averageReturnPerTrade = totalReturn/len(self.results)
         standardDeviation = statistics.stdev(standardDeviationData)
         sharpRatio = (averageReturnPerTrade/standardDeviation)*math.sqrt(365)
         return StrategyResultModel(len(self.results), totalPnL, totalReturn, battingaAverage, winLossRatio, averageReturnPerTrade, standardDeviation, sharpRatio)
