@@ -156,7 +156,6 @@ class ReportModule:
                 totalDailyReturn += dailyReturnSum
                 if dailyDeviationData != 0:
                     standardDeviationData.append(dailyDeviationData)
-                    dates.append(currentDay)
                 dailyDeviationData = 0
                 dailyReturnSum = 0
                 numberOfDays += 1
@@ -168,6 +167,7 @@ class ReportModule:
             totalReturn += percentage
             dailyReturnSum += percentage
             dailyDeviationData += percentage
+            dates.append(result.closeTradeDate)
 
             if result.type == BacktestResultType.profit or result.type == BacktestResultType.takeProfit:
                 if result.pnl > 0:
@@ -182,12 +182,13 @@ class ReportModule:
 
         totalDailyReturn += dailyReturnSum
         standardDeviationData.append(dailyDeviationData)
+        setOfDates = set(dates)
 
         battingaAverage = battingAverageCount/len(self.results)
         winLossRatio = 0
         if positiveResultsCount > 0 and negativeResultsCount > 0:
             winLossRatio = (totalPositivePercentage/positiveResultsCount) / (totalNegativePercentage/negativeResultsCount)
-        averageReturnPerTrade = totalReturn/len(self.results)
+        averageReturnPerTrade = totalDailyReturn/len(setOfDates)
         standardDeviation = statistics.stdev(standardDeviationData)
         sharpRatio = (averageReturnPerTrade/standardDeviation)*math.sqrt(365)
         return StrategyResultModel(len(self.results), totalPnL, totalReturn, battingaAverage, winLossRatio, averageReturnPerTrade, standardDeviation, sharpRatio)
