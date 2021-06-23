@@ -35,7 +35,7 @@ class StrategyConfigFactory:
 
 class Constants:
     class ZigZag:
-        runStrategyAfterSeconds = 30
+        runStrategyAfterSeconds = ((60*2) + 10)
         runPositionsCheckBeforeMinutes = 30
         willingToLose = 0.04
         stopToLosePercentage = 0.03

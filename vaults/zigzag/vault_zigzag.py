@@ -118,7 +118,7 @@ class VaultZigZag(Vault):
             self.resultsToTrade.append(result)
 
         elif (result.type == StrategyResultType.PositionExpired_Buy or result.type == StrategyResultType.PositionExpired_Sell):
-            orderAction = OrderAction.Buy.value if result.type == StrategyResultType.PositionExpired_Buy else OrderAction.Sell.value
+            orderAction = OrderAction.Buy if result.type == StrategyResultType.PositionExpired_Buy else OrderAction.Sell
             return self.cancelPosition(orderAction, result.position)
         else:
             log("🤨 %s " % result.type)
