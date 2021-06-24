@@ -79,7 +79,7 @@ class TWSClient(ProviderClient):
         parentOrder = bracketOrder.parentOrder
         profitOrder = bracketOrder.takeProfitOrder
         stopLossOrder = bracketOrder.stopLossOrder
-        newContract: IBContract = Stock(symbol=contract.symbol, exchange=contract.exchange, currency=contract.currency)
+        newContract: Stock = Stock(symbol=contract.symbol, exchange=contract.exchange, currency=contract.currency)
 
         if parentOrder.type == OrderType.MarketOrder:
             assert parentOrder.action in (OrderAction.Buy, OrderAction.Sell)
@@ -120,9 +120,9 @@ class TWSClient(ProviderClient):
 
     def cancelPosition(self, action: OrderAction, position: Position):
         order = MarketOrder(action.value, abs(position.size))
-        contract: IBContract = IBContract(symbol=position.contract.symbol, 
-                                            currency=position.contract.currency,
-                                            exchange=position.contract.exchange)
+        contract: Stock = Stock(symbol=position.contract.symbol, 
+                                currency=position.contract.currency,
+                                exchange=position.contract.exchange)
         self.client.placeOrder(contract, order)
 
     # Historical Data
