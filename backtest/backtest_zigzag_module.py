@@ -39,7 +39,7 @@ class BacktestZigZagModule(BacktestModule):
             self.databaseModule = DatabaseModule()
             self.databaseModule.openDatabaseConnectionForBacktest()
             self.databaseModule.deleteFills(self.databaseModule.getFills())
-            
+
             self.currentDay = None
             self.tradesAvailable = 0
             self.positionZigZagDates = dict()
@@ -144,29 +144,29 @@ class BacktestZigZagModule(BacktestModule):
             if model.isForStockPerformance:
                 model.tradesAvailable = 9999
             else:
-                result = math.floor(balance/150000)
-                if balance - (150000*result) >= 2000:
+                result = math.floor(balance/50000)
+                if balance - (50000*result) >= 2000:
                     model.tradesAvailable = result+1
-                else: 
+                else:
                     model.tradesAvailable = result
 
-            self.clearOldFills(event) 
+            self.clearOldFills(event)
             model.currentDay = None
-    
+
     def getStrategyData(self, event: Event, events: List[Event], index: int) -> StrategyData:
         strategyConfig: StrategyZigZagConfig = self.strategyModel.strategyConfig
         event: EventZigZag = event
-        cloneEvent = EventZigZag(event.contract, event.datetime, event.open, event.open, 
-                                 event.open, event.open, event.zigzag, event.zigzagType, 
+        cloneEvent = EventZigZag(event.contract, event.datetime, event.open, event.open,
+                                 event.open, event.open, event.zigzag, event.zigzagType,
                                  event.rsi, event.open)
         events: List[EventZigZag] = events
         previousEvents = self.getPreviousEvents(event, strategyConfig.daysBeforeToDownload)
         if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
             return None
-        
+
         previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
         fill = self.getFill(event.contract)
-        balance = min(150000, self.getBalance())
+        balance = min(50000, self.getBalance())
         return StrategyZigZagData(contract= event.contract,
                                     totalCash= balance,
                                     event= cloneEvent,
@@ -175,13 +175,13 @@ class BacktestZigZagModule(BacktestModule):
                                     fill= fill,
                                     today = event.datetime.date(),
                                     now = event.datetime)
-        
+
     def getPreviousEvents(self, event: EventZigZag, daysBefore: int = 5):
         model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
         previousDays: List[EventZigZag] = []
 
-        cloneEvent = EventZigZag(event.contract, event.datetime, event.open, event.close, 
-                                 event.high, event.low, event.zigzag, event.zigzagType, 
+        cloneEvent = EventZigZag(event.contract, event.datetime, event.open, event.close,
+                                 event.high, event.low, event.zigzag, event.zigzagType,
                                  event.rsi, event.lastPrice)
         cloneEvent.close = event.open
         cloneEvent.lastPrice = event.open
@@ -226,7 +226,7 @@ class BacktestZigZagModule(BacktestModule):
     def handleEndOfDayIfNecessary(self, event: Event, events: List[Event], currentPosition: int):
         model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
         model.currentDay = event.datetime.date()
-        
+
         if len(events) > currentPosition+1 and events[currentPosition+1].datetime.date() != model.currentDay:
             self.handleProfitAndStop()
             self.handleExpiredFills()
