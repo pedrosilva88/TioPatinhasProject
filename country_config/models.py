@@ -6,6 +6,8 @@ class Country(Enum):
     UK = 2
     HongKong = 3
     Japan = 4
+    Germany = 5
+    Spain = 6
 
     @property
     def code(self):
@@ -13,6 +15,8 @@ class Country(Enum):
         if self == Country.UK: return "UK"
         if self == Country.HongKong: return "HK"
         if self == Country.Japan: return "JPN"
+        if self == Country.Germany: return "DE"
+        if self == Country.Spain: return "ES"
 
     @property
     def currency(self):
@@ -20,6 +24,8 @@ class Country(Enum):
         if self == Country.UK: return "GBP"
         if self == Country.HongKong: return "???"
         if self == Country.Japan: return "???"
+        if self == Country.Germany: return "EUR"
+        if self == Country.Spain: return "EUR"
 
 class Market():
     country: Country

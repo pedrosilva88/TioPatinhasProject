@@ -50,8 +50,16 @@ class Constants:
     class UK:
         timezone = timezone('Europe/London')
         openTime = datetime.combine(date.today(),time(8,0))
-        closeTime = datetime.combine(date.today(),time(13,10))
+        closeTime = datetime.combine(date.today(),time(16,30))
     class HK:
         timezone = timezone('Asia/Hong_Kong')
         openTime = datetime.combine(date.today(),time(9,10))
         closeTime = datetime.combine(date.today(),time(14,10))
+    class Germany:
+        timezone = timezone('Europe/Berlin')
+        openTime = datetime.combine(date.today(),time(9,0))
+        closeTime = datetime.combine(date.today(),time(17,0))
+    class Spain:
+        timezone = timezone('Europe/Madrid')
+        openTime = datetime.combine(date.today(),time(9,0))
+        closeTime = datetime.combine(date.today(),time(17,30))
