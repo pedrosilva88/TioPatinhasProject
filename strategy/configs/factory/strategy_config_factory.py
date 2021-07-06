@@ -15,15 +15,16 @@ class StrategyConfigFactory:
 
 
     def createZigZagStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
-        if market.country == market.country.USA:
+        if (market.country == market.country.USA or
+            market.country == market.country.UK):
             openTime = (market.openTime.astimezone(tz)+timedelta(seconds=Constants.ZigZag.runStrategyAfterSeconds)).time()
             checkPositionsTime = (market.closeTime.astimezone(tz)-timedelta(minutes=Constants.ZigZag.runPositionsCheckBeforeMinutes)).time()
             return StrategyZigZagConfig(market= market, runStrategyTime=openTime,
                                         willingToLose=Constants.ZigZag.willingToLose,
-                                        stopToLosePercentage=Constants.ZigZag.stopToLosePercentage, 
-                                        profitPercentage=Constants.ZigZag.profitPercentage, 
+                                        stopToLosePercentage=Constants.ZigZag.stopToLosePercentage,
+                                        profitPercentage=Constants.ZigZag.profitPercentage,
                                         maxToInvestPerStockPercentage=Constants.ZigZag.maxToInvestPerStockPercentage,
-                                        minRSI=Constants.ZigZag.minRSI, maxRSI=Constants.ZigZag.maxRSI, 
+                                        minRSI=Constants.ZigZag.minRSI, maxRSI=Constants.ZigZag.maxRSI,
                                         rsiOffsetDays=Constants.ZigZag.rsiOffsetDays, zigzagSpread=Constants.ZigZag.zigzagSpread,
                                         daysToHold= Constants.ZigZag.daysToHold,
                                         runPositionsCheckTime=checkPositionsTime,
