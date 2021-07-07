@@ -207,4 +207,6 @@ class VaultZigZag(Vault):
     # Portfolio - Manage Positions
 
     def cancelPosition(self, orderAction: OrderAction, position: Position):
-        return self.portfolio.cancelPosition(self.delegate.controller.provider, orderAction, position)
+        self.cancelOrder(position.contract)
+        self.updatePortfolio()
+        self.portfolio.cancelPosition(self.delegate.controller.provider, orderAction, position)

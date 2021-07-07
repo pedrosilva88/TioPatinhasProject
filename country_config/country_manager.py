@@ -8,7 +8,11 @@ def getCountryFromCode(code: str) -> Country:
     elif code == 'HK':
         return Country.HongKong
     elif code == 'JPN':
-        return Country.Japan
+        return Country.Japan    
+    elif code == 'ES':
+        return Country.Spain
+    elif code == 'DE':
+        return Country.Germany
 
 def getCountryFromCurrency(currency: str) -> Country:
     if currency == 'USD':
@@ -19,3 +23,7 @@ def getCountryFromCurrency(currency: str) -> Country:
         return Country.HongKong
     elif currency == '???':
         return Country.Japan
+    elif currency == 'EUR':
+        return Country.Spain
+    elif currency == 'EUR':
+        return Country.Germany

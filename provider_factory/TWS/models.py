@@ -1,3 +1,4 @@
+from helpers import log
 from country_config.country_manager import getCountryFromCurrency
 from datetime import date, datetime, timedelta
 from typing import Callable, List
@@ -58,6 +59,7 @@ class TWSClient(ProviderClient):
         items = self.client.openTrades()
         trades = []
         for item in items:
+            log("💎 IB Trade: Stock(%s) Order(id: %d, action: %s, size:%d, parentId:%d) Status(state: %s, filled: %d) 💎" % (item.contract.symbol, item.order.orderId, item.order.action, item.order.totalQuantity, item.order.parentId, item.orderStatus.status, item.orderStatus.filled))
             price = item.order.auxPrice if item.order.orderType == OrderType.StopOrder.value else item.order.lmtPrice
             order = Order(OrderAction(item.order.action), OrderType(item.order.orderType), item.order.totalQuantity, price, item.order.parentId, item.order.orderId)
             country = getCountryFromCurrency(item.contract.currency)
