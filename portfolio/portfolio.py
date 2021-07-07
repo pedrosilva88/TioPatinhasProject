@@ -1,4 +1,4 @@
-from country_config.models import Market
+from country_config.models import Country, Market
 from provider_factory.models import ProviderClient
 from models.base_models import BracketOrder, Contract, Position, Trade
 from typing import List
@@ -17,6 +17,12 @@ class Portfolio:
     @property
     def cashAvailable(self):
         return max(self.cashBalance - self.pendingOrdersMarketValue, 0)
+
+    def getCashBalanceFor(self, market: Market) -> float:
+        if market.country.currency == Country.USA.currency:
+            return self.cashBalance*self.exchangeUSDRate
+
+        return self.cashBalance
 
     def __init__(self):
         self.positions = []
@@ -47,10 +53,10 @@ class Portfolio:
     def canCreateOrder(self, contract: Contract, bracketOrder: BracketOrder):
         order = bracketOrder.parentOrder
         hasOrder = len([d for d in self.trades if d.contract.symbol == contract.symbol]) > 0
-        canCreate = (order.price * order.size) <= self.cashAvailable
+        canCreate = (order.price * order.size) <= (self.cashAvailable * self.exchangeUSDRate)
         if (not canCreate and 
             not hasOrder):
-            log("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: %.2f❗️\n" % self.cashAvailable) 
+            log("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: %.2f❗️\n" % (self.cashAvailable * self.exchangeUSDRate)) 
         return canCreate
 
     def createOrder(self, client: ProviderClient, contract: Contract, bracketOrder: BracketOrder):

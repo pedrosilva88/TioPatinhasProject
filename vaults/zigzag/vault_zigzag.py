@@ -101,7 +101,7 @@ class VaultZigZag(Vault):
                             previousEvents: List[EventZigZag], currentEvent: EventZigZag,
                             fill: FillDB):
         data = StrategyZigZagData(contract=contract,
-                                    totalCash= self.portfolio.cashBalance,
+                                    totalCash= self.portfolio.getCashBalanceFor(self.strategyConfig.market),
                                     event=currentEvent,
                                     previousEvents=previousEvents,
                                     position=position,
