@@ -1,27 +1,26 @@
+- Configuar a Strategy para UK no StrategyConfigFactory
+  - as horas de execução posso querer que sejam diferentes
+  - devia ter também a opção se quero ter market orders ou limit orders
+
+- A Base de dados de Fills devia guardar a estrategia e o country
+
+- Devia ter um max budget para cada Strategy e ainda um Max Budget para investir por cada Stock dessa estratégia
+
+
+
+
 - Create Orders
        * O o serviço Interactive Broker por vezes pode cancelar as orders que tenho de TakeProfit e StopLoss de um dia para o outro. Podia ter uma action só para criar as Orders dando um stocks
        * Exemple: `python main.py create_orders_for_position AAPL`
 
-- Strategy
-       * Devia ter uma class Strategy parent mais genérica
-
-- StrategyZigZag
-       * O número de dias a popular o previous bar devia estar nas configs
-       * isStrategyDataValid func só ta a olhar para as ultimas 3 previous bars. Tem que ser dinamico
-       * func handleFill validar todos os números estaticos que ali estão. Tem que vir tudo das configs
-
-
 - Look to `News`
        * Olhar para noticias e perceber se têm um ranking. E apartir disso tomar decisoesse faz sentido apostar ou não.
-
-- Calcular `comissions`
-       * Preciso saber quanto uma order me vai custar, antes de a executar. Isto porque pode não compensar executar essa order.
 
 - Create Order Issue
        * Neste momento o createOrder só permite criar `LimitOrder`. Era interessante poder criar pelo menos `MarketOrder`.
 
-- Select `ECN` 
-       * Ter uma lógica para escolher o `ECN` em vez de ser o `SMART`. 
+- Select `ECN`
+       * Ter uma lógica para escolher o `ECN` em vez de ser o `SMART`.
        * Nem que seja para já o `BYX`
        * Ver a aula do Mohsen onde explica as `ECN` e as suas `Fees`
 
@@ -73,24 +72,3 @@
        * Este pack olharia para uma eventual BD e apartir daí gerava os relatórios.
        * Podiam também ser enviados por email, para o bot telegram
        * Exportar em CSV.
-
-- Bugs
-       - Houve um caso da VUZI a (03/08) em que começou com um GAP de short e passado 2 minutos desceu tanto que o GAP passou a ser de LONG. ✅
-              * O bug que aconteceu foi que ao minuto 1 eu criei uma order de SELL e no minuto 2 os lmtPrices dessa orders foram atualizados para  valores de BUY, mas o tipo da action não muda, só muda os lmtPrices e Sizes. ✅
-              * Ou seja, aqui preciso também analisar se o lmtPrice faz sentido atualizar ou até mesmo criar ✅
-       - Uma das que apostei mais uma vez teve earning na sua abertura. ✅
-              * É muito importante validar isso ✅
-       - Há também a questão do Total Cash. O valor quando tenho várias apostas não parece correto. ✅
-              * Pode ter a ver com as apostas de Short em que o broker tira dinheiro para "maintenance" ✅
-
-- Update Orders ✅
-       * Validar se há novos dados a serem atualizados ✅
-              * Main Order ✅
-              * Profit Order ✅
-              * Stop Loss Order ✅
-       * Devia validar se compensa investir na stock mesmo que exista GAP. ✅
-              * Se o lastPrice for muito proximo do valor de fecho pode já não compensar ✅
-
-- Look at `Bid/Ask` ✅
-       * Para definir o `lmtPrice` que coloco na Order ✅
-       * Atualizar o `LmtPrice` de uma Order olhando para o `LastBid` & `LastAsk` ✅
