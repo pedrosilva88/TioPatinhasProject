@@ -15,6 +15,7 @@ class StrategyConfigFactory:
 
 
     def createZigZagStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
+        constantsDefault = Constants.ZigZag
         constants = Constants.ZigZag
 
         if market.country == market.country.USA:
@@ -24,21 +25,21 @@ class StrategyConfigFactory:
         else:
             print("🚨 Cant Create ZigZag Strategy for this country - %s 🚨" % market.country)
 
-        openTime = (market.openTime.astimezone(tz)+timedelta(seconds=constants.runStrategyAfterSeconds)).time()
-        checkPositionsTime = (market.closeTime.astimezone(tz)-timedelta(minutes=constants.runPositionsCheckBeforeMinutes)).time()
+        openTime = (market.openTime.astimezone(tz)+timedelta(seconds=constantsDefault.runStrategyAfterSeconds)).time()
+        checkPositionsTime = (market.closeTime.astimezone(tz)-timedelta(minutes=constantsDefault.runPositionsCheckBeforeMinutes)).time()
 
         return StrategyZigZagConfig(market= market, runStrategyTime=openTime,
-                                    willingToLose=constants.willingToLose,
-                                    stopToLosePercentage=constants.stopToLosePercentage,
-                                    profitPercentage=constants.profitPercentage,
-                                    maxToInvestPerStockPercentage=constants.maxToInvestPerStockPercentage,
-                                    minRSI=constants.minRSI, maxRSI=constants.maxRSI,
-                                    rsiOffsetDays=constants.rsiOffsetDays, zigzagSpread=constants.zigzagSpread,
-                                    daysToHold= Constants.ZigZag.daysToHold,
+                                    willingToLose=constantsDefault.willingToLose,
+                                    stopToLosePercentage=constantsDefault.stopToLosePercentage,
+                                    profitPercentage=constantsDefault.profitPercentage,
+                                    maxToInvestPerStockPercentage=constantsDefault.maxToInvestPerStockPercentage,
+                                    minRSI=constantsDefault.minRSI, maxRSI=constantsDefault.maxRSI,
+                                    rsiOffsetDays=constantsDefault.rsiOffsetDays, zigzagSpread=constantsDefault.zigzagSpread,
+                                    daysToHold= constantsDefault.daysToHold,
                                     runPositionsCheckTime=checkPositionsTime,
-                                    daysBeforeToDownload=constants.daysBeforeToDownload, daysBefore=constants.daysBefore,
-                                    daysAfterZigZag=constants.daysAfterZigZag,
-                                    barSize=constants.barSize)
+                                    daysBeforeToDownload=constantsDefault.daysBeforeToDownload, daysBefore=constantsDefault.daysBefore,
+                                    daysAfterZigZag=constantsDefault.daysAfterZigZag,
+                                    barSize=constantsDefault.barSize)
 
 
 class Constants:
