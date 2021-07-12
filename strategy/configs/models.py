@@ -29,16 +29,22 @@ class StrategyConfig:
     profitPercentage: float
     willingToLose: float
     maxToInvestPerStockPercentage: float
+    maxToInvestPerStock: float
+    maxToInvestPerStrategy: float
 
     def __init__(self, market: Market, runStrategyTime: time, 
                 willingToLose: float, stopToLosePercentage: float, profitPercentage: float,
-                maxToInvestPerStockPercentage: float) -> None:
+                maxToInvestPerStockPercentage: float,
+                maxToInvestPerStock: float,
+                maxToInvestPerStrategy: float) -> None:
         self.market = market
         self.runStrategyTime = runStrategyTime
         self.stopToLosePercentage = stopToLosePercentage
         self.profitPercentage = profitPercentage
         self.willingToLose = willingToLose
         self.maxToInvestPerStockPercentage = maxToInvestPerStockPercentage
+        self.maxToInvestPerStock = maxToInvestPerStock
+        self.maxToInvestPerStrategy = maxToInvestPerStrategy
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
         pass

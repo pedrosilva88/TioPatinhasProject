@@ -24,6 +24,8 @@ class StrategyConfigFactory:
                                         stopToLosePercentage=Constants.ZigZag.stopToLosePercentage,
                                         profitPercentage=Constants.ZigZag.profitPercentage,
                                         maxToInvestPerStockPercentage=Constants.ZigZag.maxToInvestPerStockPercentage,
+                                        maxToInvestPerStock=Constants.ZigZag.maxToInvestPerStock,
+                                        maxToInvestPerStrategy=Constants.ZigZag.maxToInvestPerStrategy,
                                         minRSI=Constants.ZigZag.minRSI, maxRSI=Constants.ZigZag.maxRSI,
                                         rsiOffsetDays=Constants.ZigZag.rsiOffsetDays, zigzagSpread=Constants.ZigZag.zigzagSpread,
                                         daysToHold= Constants.ZigZag.daysToHold,
@@ -38,10 +40,12 @@ class Constants:
     class ZigZag:
         runStrategyAfterSeconds = ((60*2) + 10)
         runPositionsCheckBeforeMinutes = 30
-        willingToLose = 0.04
+        willingToLose = 0.03
         stopToLosePercentage = 0.03
         profitPercentage = 0.04
         maxToInvestPerStockPercentage = 1
+        maxToInvestPerStock = -1
+        maxToInvestPerStrategy = 3000
         minRSI = 30
         maxRSI = 70
         rsiOffsetDays = 14
