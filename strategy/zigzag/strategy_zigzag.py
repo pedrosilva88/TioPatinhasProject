@@ -20,7 +20,9 @@ class StrategyZigZag(Strategy):
     profitPercentage: float = None
     willingToLose: float = None
     stopToLosePercentage: float = None
-    maxToInvestPerStockPercentage: None
+    maxToInvestPerStockPercentage: float = 1
+    maxToInvestPerStock: float = -1
+    maxToInvestPerStrategy: float = -1
 
     minRSI: float = None
     maxRSI: float = None
@@ -123,6 +125,8 @@ class StrategyZigZag(Strategy):
         self.stopToLosePercentage = strategyConfig.stopToLosePercentage
         self.profitPercentage = strategyConfig.profitPercentage
         self.maxToInvestPerStockPercentage = strategyConfig.maxToInvestPerStockPercentage
+        self.maxToInvestPerStock = strategyConfig.maxToInvestPerStock
+        self.maxToInvestPerStrategy = strategyConfig.maxToInvestPerStrategy
 
         self.minRSI = strategyConfig.minRSI
         self.maxRSI = strategyConfig.maxRSI
@@ -215,6 +219,8 @@ class StrategyZigZag(Strategy):
     def getSize(self, action: OrderAction):
         price = self.getOrderPrice(action)
         totalCash = self.strategyData.totalCash
+        if self.maxToInvestPerStrategy > 0:
+            totalCash = min(self.maxToInvestPerStrategy, self.strategyData.totalCash)
         portfolioLoss = totalCash * self.willingToLose
         stopLossPriceRatio = price*self.stopToLosePercentage
 

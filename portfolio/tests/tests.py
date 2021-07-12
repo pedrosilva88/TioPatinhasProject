@@ -1,4 +1,7 @@
-from ib_insync import IB, Order as ibOrder, Stock as ibStock
+from provider_factory.models import ProviderConfigs
+from provider_factory.TWS.models import TWSClient
+from models.base_models import Order, OrderType, Contract
+from ib_insync import IB
 from portfolio import *
 
 def runIB():
@@ -66,21 +69,44 @@ def printTestFailure():
     print ("Test Failed ❌")
 
 
-from ib_insync import IB, Order as ibOrder, Stock as ibStock, MarketOrder
+from ib_insync import IB
 from portfolio import *
-ib = IB()
-ib.connect('127.0.0.1', 7497, clientId=3)
+from provider_factory.models import ProviderConfigs
+from provider_factory.TWS.models import TWSClient
+from models.base_models import Order, OrderType, Contract
+from country_config.market_manager import MarketManager
+
 portfolio = Portfolio()
-contract = ibStock("AAPL", "SMART", "USD")
-order = MarketOrder("SELL", 10)
+market = MarketManager.getMarketFor(Country.USA)
+contract = Contract("CABK", Country.Spain)
+order = Order(OrderAction.Buy, OrderType.LimitOrder, 5, 1.4)
+profitOrder = Order(OrderAction.Sell, OrderType.LimitOrder, 5, 10)
+stopOrder = Order(OrderAction.Sell, OrderType.StopOrder, 5, 1)
+bracketOrder = BracketOrder(order, profitOrder, stopOrder)
+providerConfigs = ProviderConfigs(version="981",
+                                tradingMode="paper",
+                                user="silvap088", 
+                                password="pedro&IB+88",
+                                endpoint="127.0.0.1",
+                                port="7497",
+                                clientID="8",
+                                connectTimeout=45,
+                                appStartupTime=35,
+                                appTimeout=45,
+                                readOnly=False,
+                                useController=True)
+client = TWSClient(providerConfigs)
+client.connect()
+portfolio.createOrder(client, contract, bracketOrder)
 
-profitOrder = LimitOrder("BUY", 10, 10)
-stopOrder = StopOrder("BUY", 10, 180)
-portfolio.createOrder(ib, contract, order, profitOrder, stopOrder)
 
-#order = ibOrder(action="SELL", orderType="MIDPRICE", totalQuantity=10)
-
-
+client.session.reqPositions()
+portfolio.updatePortfolio(client, market)
+portfolio.cancelOrder(client, contract)
+portfolio.updatePortfolio(client, market)
+client.session.reqPositions()
+position= portfolio.getPosition(contract)
+portfolio.cancelPosition(client, OrderAction.Sell, position)
 
 #Test handle Fill
 from ib_insync import Position, Contract, Ticker

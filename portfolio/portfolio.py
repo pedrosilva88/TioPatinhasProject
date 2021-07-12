@@ -39,7 +39,8 @@ class Portfolio:
         self.exchangeUSDRate = client.currencyRateFor(market.country.currency)
 
         self.calcOpenTradesValue()
-        log("💵 \nCash Balance: %s \nAvailable Cash: %s \n💵\n" % (self.cashBalance, self.cashAvailable))
+        log("💵 \nCash Balance: %s€ (%2f$) \nAvailable Cash: %s€ (%2f$)\n💵\n" % (self.cashBalance, (self.cashBalance/self.exchangeUSDRate), self.cashAvailable, (self.cashAvailable/self.exchangeUSDRate)))
+        
 
     def calcOpenTradesValue(self):
         totalValue = 0
@@ -53,10 +54,10 @@ class Portfolio:
     def canCreateOrder(self, contract: Contract, bracketOrder: BracketOrder):
         order = bracketOrder.parentOrder
         hasOrder = len([d for d in self.trades if d.contract.symbol == contract.symbol]) > 0
-        canCreate = (order.price * order.size) <= (self.cashAvailable * self.exchangeUSDRate)
+        canCreate = (order.price * order.size) <= (self.cashAvailable / self.exchangeUSDRate)
         if (not canCreate and 
             not hasOrder):
-            log("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: %.2f❗️\n" % (self.cashAvailable * self.exchangeUSDRate)) 
+            log("❗️Can't create Order!❗️\n❗️Cause: already created or insufficient cash: $%.2f❗️\n" % (self.cashAvailable / self.exchangeUSDRate)) 
         return canCreate
 
     def createOrder(self, client: ProviderClient, contract: Contract, bracketOrder: BracketOrder):
@@ -78,5 +79,5 @@ class Portfolio:
         return None
     
     def cancelPosition(self, client: ProviderClient, action: OrderAction, position: Position):
-        self.cancelOrder(client, position.contract)
+        log("⛑ Cancel Position for: (%s, %s, %s)[%s]" % (position.contract.symbol, position.contract.exchange, position.contract.currency, action.value))
         client.cancelPosition(action, position)

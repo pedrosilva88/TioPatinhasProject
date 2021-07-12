@@ -29,24 +29,26 @@ class StrategyConfigFactory:
         checkPositionsTime = (market.closeTime.astimezone(tz)-timedelta(minutes=constantsDefault.runPositionsCheckBeforeMinutes)).time()
 
         return StrategyZigZagConfig(market= market, runStrategyTime=openTime,
-                                    willingToLose=constantsDefault.willingToLose,
-                                    stopToLosePercentage=constantsDefault.stopToLosePercentage,
-                                    profitPercentage=constantsDefault.profitPercentage,
-                                    maxToInvestPerStockPercentage=constantsDefault.maxToInvestPerStockPercentage,
-                                    minRSI=constantsDefault.minRSI, maxRSI=constantsDefault.maxRSI,
-                                    rsiOffsetDays=constantsDefault.rsiOffsetDays, zigzagSpread=constantsDefault.zigzagSpread,
-                                    daysToHold= constantsDefault.daysToHold,
-                                    runPositionsCheckTime=checkPositionsTime,
-                                    daysBeforeToDownload=constantsDefault.daysBeforeToDownload, daysBefore=constantsDefault.daysBefore,
-                                    daysAfterZigZag=constantsDefault.daysAfterZigZag,
-                                    barSize=constantsDefault.barSize)
+                                        willingToLose=Constants.ZigZag.willingToLose,
+                                        stopToLosePercentage=Constants.ZigZag.stopToLosePercentage,
+                                        profitPercentage=Constants.ZigZag.profitPercentage,
+                                        maxToInvestPerStockPercentage=Constants.ZigZag.maxToInvestPerStockPercentage,
+                                        maxToInvestPerStock=Constants.ZigZag.maxToInvestPerStock,
+                                        maxToInvestPerStrategy=Constants.ZigZag.maxToInvestPerStrategy,
+                                        minRSI=Constants.ZigZag.minRSI, maxRSI=Constants.ZigZag.maxRSI,
+                                        rsiOffsetDays=Constants.ZigZag.rsiOffsetDays, zigzagSpread=Constants.ZigZag.zigzagSpread,
+                                        daysToHold= Constants.ZigZag.daysToHold,
+                                        runPositionsCheckTime=checkPositionsTime,
+                                        daysBeforeToDownload=Constants.ZigZag.daysBeforeToDownload, daysBefore=Constants.ZigZag.daysBefore,
+                                        daysAfterZigZag=Constants.ZigZag.daysAfterZigZag,
+                                        barSize=Constants.ZigZag.barSize)
 
 
 class Constants:
     class ZigZag:
         runStrategyAfterSeconds = ((60*2) + 10)
         runPositionsCheckBeforeMinutes = 30
-        willingToLose = 0.04
+        willingToLose = 0.03
         stopToLosePercentage = 0.03
         profitPercentage = 0.04
         maxToInvestPerStockPercentage = 1
@@ -65,7 +67,7 @@ class Constants:
         class US:
             def __init__(self):
                 maxToInvestPerStock = 50000
-                maxToInvestPerStrategy = -1
+                maxToInvestPerStrategy = 3000
 
         class UK:
             def __init__(self):
