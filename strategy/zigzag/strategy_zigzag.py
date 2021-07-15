@@ -39,11 +39,11 @@ class StrategyZigZag(Strategy):
             return result
 
         log("😁 %s 😁" % (self.strategyData.contract.symbol))
-        log("😁 [%s] Bar[-4]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-4].datetime.date(), self.previousBars[-4].rsi, self.previousBars[-4].zigzag))
-        log("😁 [%s] Bar[-3]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].datetime.date(), self.previousBars[-3].rsi, self.previousBars[-3].zigzag))
-        log("😁 [%s] Bar[-2]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].datetime.date(), self.previousBars[-2].rsi, self.previousBars[-2].zigzag))
-        log("😁 [%s] Bar[-1]-> RSI(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].datetime.date(), self.previousBars[-1].rsi, self.previousBars[-1].zigzag))
-        log("😁 [%s] CurrentBar-> RSI(%.2f) ZigZag(%s) 😁" % (self.currentBar.datetime.date(), self.currentBar.rsi, self.currentBar.zigzag))
+        log("😁 [%s] Bar[-4]-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.previousBars[-4].datetime.date(), self.previousBars[-4].rsi, self.previousBars[-4].open, self.previousBars[-4].close, self.previousBars[-4].high, self.previousBars[-4].low, self.previousBars[-4].zigzag))
+        log("😁 [%s] Bar[-3]-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].datetime.date(), self.previousBars[-3].rsi, self.previousBars[-3].open, self.previousBars[-3].close, self.previousBars[-3].high, self.previousBars[-3].low, self.previousBars[-3].zigzag))
+        log("😁 [%s] Bar[-2]-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].datetime.date(), self.previousBars[-2].rsi, self.previousBars[-2].open, self.previousBars[-2].close, self.previousBars[-2].high, self.previousBars[-2].low, self.previousBars[-2].zigzag))
+        log("😁 [%s] Bar[-1]-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].datetime.date(), self.previousBars[-1].rsi, self.previousBars[-1].open, self.previousBars[-1].close, self.previousBars[-1].high, self.previousBars[-1].low, self.previousBars[-1].zigzag))
+        log("😁 [%s] CurrentBar-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.currentBar.datetime.date(), self.currentBar.rsi, self.currentBar.open, self.currentBar.close, self.currentBar.high, self.currentBar.low, self.currentBar.zigzag))
         log("😁  😁")
 
         zigzagBar, zigzagIndex = self.getZigZag()
