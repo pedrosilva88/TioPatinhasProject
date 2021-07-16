@@ -79,5 +79,5 @@ class Portfolio:
         return None
     
     def cancelPosition(self, client: ProviderClient, action: OrderAction, position: Position):
-        log("⛑ Cancel Position for: (%s, %s, %s)[%s]" % (position.contract.symbol, position.contract.exchange, position.contract.currency, action.value))
+        log("⛑ Cancel Position for: (%s, %s, %s)[%s] ⛑" % (position.contract.symbol, position.contract.exchange, position.contract.currency, action.value))
         client.cancelPosition(action, position)
