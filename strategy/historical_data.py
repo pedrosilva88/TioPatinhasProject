@@ -12,7 +12,7 @@ class HistoricalData:
 
         zigzagValues = HistoricalData.calculateZigZag(events, strategyConfigs)
         rsiValues = HistoricalData.calculateRSI(events, strategyConfigs)
-        
+
         if zigzagValues is None or rsiValues is None:
             return []
 
@@ -71,14 +71,14 @@ class HistoricalData:
 
         up_chg = 0 * diff
         down_chg = 0 * diff
-        
+
         up_chg[diff > 0] = diff[ diff>0 ]
-        
+
         down_chg[diff < 0] = diff[ diff < 0 ]
-        
+
         up_chg_avg   = up_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
         down_chg_avg = down_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
-        
+
         rs = abs(up_chg_avg/down_chg_avg)
         rsi = 100 - 100/(1+rs)
         return rsi
@@ -93,14 +93,14 @@ class HistoricalData:
     #     minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
     #     value = self.calculateAverageVolume(minute_bars)
     #     return value
-    
+
     # def calculateAverageVolume(self, datas: List[BarData]):
     #     nBars = len(datas)
     #     if nBars > 0:
     #         sum = 0
-    #         for data in datas: 
+    #         for data in datas:
     #             sum += data.volume
-            
+
     #         return sum/nBars
     #     else:
     #         return None

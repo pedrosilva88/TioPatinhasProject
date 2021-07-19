@@ -227,7 +227,8 @@ class BacktestZigZagModule(BacktestModule):
         model: BacktestZigZagModule.RunStrategyZigZagModel = self.strategyModel
         model.currentDay = event.datetime.date()
 
-        if len(events) > currentPosition+1 and events[currentPosition+1].datetime.date() != model.currentDay:
+        if ((len(events) > currentPosition+1 and events[currentPosition+1].datetime.date() != model.currentDay) or
+            (len(events) == currentPosition+1)):
             self.handleProfitAndStop()
             self.handleExpiredFills()
 
