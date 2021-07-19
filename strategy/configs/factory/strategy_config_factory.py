@@ -53,7 +53,7 @@ class Constants:
         profitPercentage = 0.04
         maxToInvestPerStockPercentage = 1
         maxToInvestPerStock = -1
-        maxToInvestPerStrategy = -1
+        maxToInvestPerStrategy = 1500
         minRSI = 30
         maxRSI = 70
         rsiOffsetDays = 14

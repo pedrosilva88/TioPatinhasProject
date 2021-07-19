@@ -51,7 +51,7 @@ class TWSClient(ProviderClient):
         items = self.client.positions()
         positions = []
         for item in items:
-            contract = Contract(item.contract.symbol, getCountryFromCurrency(item.contract.currency), item.contract.exchange)
+            contract = Contract(item.contract.symbol, getCountryFromCurrency(item.contract.currency), "SMART")
             positions.append(Position(contract, item.position))
         return positions
 
@@ -63,7 +63,7 @@ class TWSClient(ProviderClient):
             price = item.order.auxPrice if item.order.orderType == OrderType.StopOrder.value else item.order.lmtPrice
             order = Order(OrderAction(item.order.action), OrderType(item.order.orderType), item.order.totalQuantity, price, item.order.parentId, item.order.orderId)
             country = getCountryFromCurrency(item.contract.currency)
-            contract = Contract(item.contract.symbol, country, item.contract.exchange)
+            contract = Contract(item.contract.symbol, country, 'SMART')
             trades.append(Trade(contract, order))
         return trades
 
@@ -125,6 +125,7 @@ class TWSClient(ProviderClient):
         contract: Stock = Stock(symbol=position.contract.symbol, 
                                 currency=position.contract.currency,
                                 exchange=position.contract.exchange)
+        log("⛑ MKT Order: Action(%s) Type(%s) Size(%f) OrderId(%d) PermId(%d)⛑ " % (order.action, order.orderType, order.totalQuantity, order.orderId, order.permId))
         self.client.placeOrder(contract, order)
 
     # Historical Data
