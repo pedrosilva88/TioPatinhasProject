@@ -23,25 +23,28 @@ class StrategyConfigFactory:
         elif market.country == market.country.UK:
             constants = Constants.ZigZag.UK()
         else:
-            print("🚨 Cant Create ZigZag Strategy for this country - %s 🚨" % market.country)
+            print("🚨 Cant Create ZigZag Strategy for this country - %s 🚨" %
+                  market.country)
 
-        openTime = (market.openTime.astimezone(tz)+timedelta(seconds=constantsDefault.runStrategyAfterSeconds)).time()
-        checkPositionsTime = (market.closeTime.astimezone(tz)-timedelta(minutes=constantsDefault.runPositionsCheckBeforeMinutes)).time()
+        openTime = (market.openTime.astimezone(
+            tz)+timedelta(seconds=constantsDefault.runStrategyAfterSeconds)).time()
+        checkPositionsTime = (market.closeTime.astimezone(
+            tz)-timedelta(minutes=constantsDefault.runPositionsCheckBeforeMinutes)).time()
 
-        return StrategyZigZagConfig(market= market, runStrategyTime=openTime,
-                                        willingToLose=Constants.ZigZag.willingToLose,
-                                        stopToLosePercentage=Constants.ZigZag.stopToLosePercentage,
-                                        profitPercentage=Constants.ZigZag.profitPercentage,
-                                        maxToInvestPerStockPercentage=Constants.ZigZag.maxToInvestPerStockPercentage,
-                                        maxToInvestPerStock=Constants.ZigZag.maxToInvestPerStock,
-                                        maxToInvestPerStrategy=Constants.ZigZag.maxToInvestPerStrategy,
-                                        minRSI=Constants.ZigZag.minRSI, maxRSI=Constants.ZigZag.maxRSI,
-                                        rsiOffsetDays=Constants.ZigZag.rsiOffsetDays, zigzagSpread=Constants.ZigZag.zigzagSpread,
-                                        daysToHold= Constants.ZigZag.daysToHold,
-                                        runPositionsCheckTime=checkPositionsTime,
-                                        daysBeforeToDownload=Constants.ZigZag.daysBeforeToDownload, daysBefore=Constants.ZigZag.daysBefore,
-                                        daysAfterZigZag=Constants.ZigZag.daysAfterZigZag,
-                                        barSize=Constants.ZigZag.barSize)
+        return StrategyZigZagConfig(market=market, runStrategyTime=openTime,
+                                    willingToLose=constantsDefault.willingToLose,
+                                    stopToLosePercentage=constantsDefault.stopToLosePercentage,
+                                    profitPercentage=constantsDefault.profitPercentage,
+                                    maxToInvestPerStockPercentage=constantsDefault.maxToInvestPerStockPercentage,
+                                    maxToInvestPerStock=constants.maxToInvestPerStock,
+                                    maxToInvestPerStrategy=constants.maxToInvestPerStrategy,
+                                    minRSI=constantsDefault.minRSI, maxRSI=constantsDefault.maxRSI,
+                                    rsiOffsetDays=constantsDefault.rsiOffsetDays, zigzagSpread=constantsDefault.zigzagSpread,
+                                    daysToHold=constantsDefault.daysToHold,
+                                    runPositionsCheckTime=checkPositionsTime,
+                                    daysBeforeToDownload=constantsDefault.daysBeforeToDownload, daysBefore=constantsDefault.daysBefore,
+                                    daysAfterZigZag=constantsDefault.daysAfterZigZag,
+                                    barSize=constantsDefault.barSize)
 
 
 class Constants:
@@ -66,10 +69,9 @@ class Constants:
 
         class US:
             def __init__(self):
-                maxToInvestPerStock = 50000
-                maxToInvestPerStrategy = 3000
+                self.maxToInvestPerStock = 50000
+                self.maxToInvestPerStrategy = 3000
 
         class UK:
             def __init__(self):
-                maxToInvestPerStock = 50000
-                maxToInvestPerStrategy = 10000
+                self.maxToInvestPerStock = 50000
