@@ -128,7 +128,7 @@ class VaultZigZag(Vault):
     async def handleResultsToTrade(self):
         # Lets not sort the results. In backtest I dont do this.
         # self.resultsToTrade.sort(key=lambda x: x.priority, reverse=True)
-        
+
         for result in self.resultsToTrade:
             if self.canCreateOrder(result.contract, result.bracketOrder):
                 if result.bracketOrder.parentOrder.size > 1:
@@ -140,7 +140,8 @@ class VaultZigZag(Vault):
 
                 else:
                     log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
-                    None
+            else:
+                log("❗️ Can't create order for %s!❗️\n❗️Cause: already created or insufficient cash❗️\n" % result.ticker.contract.symbol)
 
     # Historical Data
 
