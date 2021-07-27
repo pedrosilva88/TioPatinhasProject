@@ -101,7 +101,7 @@ class VaultZigZag(Vault):
                             previousEvents: List[EventZigZag], currentEvent: EventZigZag,
                             fill: FillDB):
         data = StrategyZigZagData(contract=contract,
-                                    totalCash= self.portfolio.getCashBalanceFor(self.strategyConfig.market),
+                                    totalCash= min(self.strategyConfig.maxToInvestPerStrategy, self.portfolio.getCashBalanceFor(self.strategyConfig.market)),
                                     event=currentEvent,
                                     previousEvents=previousEvents,
                                     position=position,
@@ -126,7 +126,9 @@ class VaultZigZag(Vault):
         return
 
     async def handleResultsToTrade(self):
-        self.resultsToTrade.sort(key=lambda x: x.priority, reverse=True)
+        # Lets not sort the results. In backtest I dont do this.
+        # self.resultsToTrade.sort(key=lambda x: x.priority, reverse=True)
+        
         for result in self.resultsToTrade:
             if self.canCreateOrder(result.contract, result.bracketOrder):
                 if result.bracketOrder.parentOrder.size > 1:
@@ -196,7 +198,9 @@ class VaultZigZag(Vault):
     # Portfolio - Manage Orders
 
     def canCreateOrder(self, contract: Contract, bracketOrder: BracketOrder):
-        return self.portfolio.canCreateOrder(contract, bracketOrder)
+        config: StrategyZigZagConfig = self.strategyConfig
+        balance = config.maxToInvestPerStrategy - self.portfolio.pendingOrdersMarketValue
+        return (self.portfolio.canCreateOrder(contract, bracketOrder) and balance >= config.maxToInvestPerStrategy)
 
     def createOrder(self, contract: Contract, bracketOrder: BracketOrder):
         return self.portfolio.createOrder(self.delegate.controller.provider, contract, bracketOrder)
