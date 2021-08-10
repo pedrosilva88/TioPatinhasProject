@@ -139,9 +139,9 @@ class VaultZigZag(Vault):
                     self.updatePortfolio()
 
                 else:
-                    log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.ticker.contract.symbol)
+                    log("❗️ (%s) Order Size is lower then 2 Shares❗️" % result.contract.symbol)
             else:
-                log("❗️ Can't create order for %s!❗️\n❗️Cause: already created or insufficient cash❗️\n" % result.ticker.contract.symbol)
+                log("❗️ Can't create order for %s!❗️\n❗️Cause: already created or insufficient cash❗️\n" % result.contract.symbol)
 
     # Historical Data
 
