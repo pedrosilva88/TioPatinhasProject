@@ -187,7 +187,7 @@ class VaultZigZag(Vault):
     def clearOldFills(self):
         fills = self.databaseModule.getFills()
         limitDate = date.today()-timedelta(days=40)
-        filteredFills = list(filter(lambda x: x.date < limitDate, fills))
+        filteredFills = list(filter(lambda x: (x.date < limitDate and x.country == self.strategyConfig.market.country and x.strategy == self.strategyConfig.type), fills))
         self.databaseModule.deleteFills(filteredFills)
 
     # Portfolio

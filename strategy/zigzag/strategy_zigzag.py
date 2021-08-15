@@ -21,7 +21,6 @@ class StrategyZigZag(Strategy):
     willingToLose: float = None
     stopToLosePercentage: float = None
     maxToInvestPerStockPercentage: float = 1
-    maxToInvestPerStock: float = -1
     maxToInvestPerStrategy: float = -1
 
     minRSI: float = None
@@ -125,7 +124,6 @@ class StrategyZigZag(Strategy):
         self.stopToLosePercentage = strategyConfig.stopToLosePercentage
         self.profitPercentage = strategyConfig.profitPercentage
         self.maxToInvestPerStockPercentage = strategyConfig.maxToInvestPerStockPercentage
-        self.maxToInvestPerStock = strategyConfig.maxToInvestPerStock
         self.maxToInvestPerStrategy = strategyConfig.maxToInvestPerStrategy
 
         self.minRSI = strategyConfig.minRSI

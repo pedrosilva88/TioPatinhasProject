@@ -41,7 +41,8 @@ class Strategy:
 
         log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
 
-        profitOrder = Order(action.reverse, OrderType.LimitOrder, size, round(profitTarget, 2))
+        mainOrderType = self.strategyConfig.orderType
+        profitOrder = Order(action.reverse, mainOrderType, size, round(profitTarget, 2))
         stopLossOrder = Order(action.reverse, OrderType.StopOrder, size, round(stopLossPrice, 2))
         parentOrder = Order(action, OrderType.LimitOrder, size, round(price, 2))
         return BracketOrder(parentOrder, profitOrder, stopLossOrder)

@@ -1,3 +1,4 @@
+from models.base_models import OrderType
 from pytz import timezone
 from country_config.models import Market
 from datetime import datetime, time
@@ -29,22 +30,22 @@ class StrategyConfig:
     profitPercentage: float
     willingToLose: float
     maxToInvestPerStockPercentage: float
-    maxToInvestPerStock: float
     maxToInvestPerStrategy: float
+    orderType: OrderType
 
     def __init__(self, market: Market, runStrategyTime: time, 
                 willingToLose: float, stopToLosePercentage: float, profitPercentage: float,
                 maxToInvestPerStockPercentage: float,
-                maxToInvestPerStock: float,
-                maxToInvestPerStrategy: float) -> None:
+                maxToInvestPerStrategy: float,
+                orderType: OrderType) -> None:
         self.market = market
         self.runStrategyTime = runStrategyTime
         self.stopToLosePercentage = stopToLosePercentage
         self.profitPercentage = profitPercentage
         self.willingToLose = willingToLose
         self.maxToInvestPerStockPercentage = maxToInvestPerStockPercentage
-        self.maxToInvestPerStock = maxToInvestPerStock
         self.maxToInvestPerStrategy = maxToInvestPerStrategy
+        self.orderType = orderType
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
         pass

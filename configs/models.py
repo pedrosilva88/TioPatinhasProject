@@ -1,3 +1,4 @@
+from country_config.country_manager import getCountryFromCode
 import sys
 import configparser
 from typing import List, Tuple
@@ -40,12 +41,9 @@ class TioPatinhasConfigs:
             keyStrategy = item[0]
             keyCountry = item[1]
             strategyType = None
-            country = None
+            country = getCountryFromCode(keyCountry)
             if keyStrategy == StrategyType.zigzag.value:
                 strategyType = StrategyType.zigzag
-
-            if keyCountry == Country.USA.code:
-                country = Country.USA
 
             if strategyType is not None and country is not None:
                 market = MarketManager.getMarketFor(country)

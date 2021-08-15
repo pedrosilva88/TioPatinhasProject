@@ -1,6 +1,5 @@
 from datetime import time, datetime, timedelta
-
-from pytz import timezone
+from models.base_models import OrderType
 from country_config.models import Market
 from strategy.configs.models import StrategyAction, StrategyConfig, StrategyType
 
@@ -25,8 +24,8 @@ class StrategyZigZagConfig(StrategyConfig):
                         runStrategyTime: time,
                         willingToLose: float, stopToLosePercentage: float, profitPercentage: float,
                         maxToInvestPerStockPercentage: float,
-                        maxToInvestPerStock: float,
                         maxToInvestPerStrategy: float,
+                        orderType: OrderType,
                         minRSI: float, maxRSI: float,
                         rsiOffsetDays: int, zigzagSpread:float,
                         daysToHold: int,
@@ -39,8 +38,8 @@ class StrategyZigZagConfig(StrategyConfig):
         StrategyConfig.__init__(self, market= market, runStrategyTime=runStrategyTime, 
                                 willingToLose=willingToLose, stopToLosePercentage= stopToLosePercentage, profitPercentage= profitPercentage, 
                                 maxToInvestPerStockPercentage=maxToInvestPerStockPercentage,
-                                maxToInvestPerStock= maxToInvestPerStock,
-                                maxToInvestPerStrategy= maxToInvestPerStrategy)
+                                maxToInvestPerStrategy= maxToInvestPerStrategy,
+                                orderType= orderType)
                                 
         self.type = StrategyType.zigzag
         self.minRSI = minRSI

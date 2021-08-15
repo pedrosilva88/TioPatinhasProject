@@ -5,7 +5,8 @@ from typing import Callable, List
 
 from ib_insync.objects import BarData
 from ib_insync import IB, IBC, Stock, Order as IBOrder, LimitOrder, StopOrder
-from ib_insync import Contract as IBContract, BracketOrder as IBBracketOrder, MarketOrder
+from ib_insync import Contract, BracketOrder as IBBracketOrder, MarketOrder
+from ib_insync.client import Client
 
 from models.base_models import BracketOrder, Contract, Event, Order, OrderAction, OrderType, Position, Trade
 from configs.models import Provider, ProviderConfigs
@@ -86,18 +87,19 @@ class TWSClient(ProviderClient):
         if parentOrder.type == OrderType.MarketOrder:
             assert parentOrder.action in (OrderAction.Buy, OrderAction.Sell)
             reverseAction = parentOrder.action.reverse.value
+            client: Client = self.client.client
 
             parent = IBOrder(action=parentOrder.action.value, totalQuantity=parentOrder.size,
-                            orderId=self.client.client.getReqId(),
+                            orderId=client.getReqId(),
                             orderType="MKT",
                             transmit=False)
             takeProfit = LimitOrder(reverseAction, profitOrder.size, profitOrder.price,
-                                    orderId=self.client.client.getReqId(),
+                                    orderId=client.getReqId(),
                                     tif="GTC",
                                     transmit=False,
                                     parentId=parent.orderId)
             stopLoss = StopOrder(reverseAction, stopLossOrder.size, stopLossOrder.price,
-                                orderId=self.client.client.getReqId(),
+                                orderId=client.getReqId(),
                                 tif="GTC",
                                 transmit=True,
                                 parentId=parent.orderId)
