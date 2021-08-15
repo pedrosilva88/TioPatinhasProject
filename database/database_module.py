@@ -7,7 +7,9 @@ from .model import FillDB
 sql_create_fills_table =    """ CREATE TABLE IF NOT EXISTS fills (
                                         id integer PRIMARY KEY,
                                         symbol text NOT NULL,
-                                        date text NOT NULL
+                                        date text NOT NULL,
+                                        country text NOT NULL,
+                                        strategy text NOT NULL
                                     ); """
 
 def create_connection(path, fileName):
@@ -63,8 +65,8 @@ class DatabaseModule:
         :return: fill id
         """
 
-        sql = ''' INSERT INTO fills(symbol,date)
-                    VALUES(?,?) '''
+        sql = ''' INSERT INTO fills(symbol,date,country,strategy)
+                    VALUES(?,?,?,?) '''
         cur = self.conn.cursor()
         cur.execute(sql, fill.sqlFormat)
         self.conn.commit()
@@ -78,9 +80,9 @@ class DatabaseModule:
         :return:
         """
         for fill in fills:
-            sql = 'DELETE FROM fills WHERE (symbol=? AND date=?)'
+            sql = 'DELETE FROM fills WHERE (symbol=? AND date=? AND country=? AND strategy=?)'
             cur = self.conn.cursor()
-            cur.execute(sql, (fill.symbol, fill.dateToString))
+            cur.execute(sql, (fill.symbol, fill.dateToString, fill.country.code, fill.strategy.value))
             self.conn.commit()
 
     def openDatabaseConnection(self):

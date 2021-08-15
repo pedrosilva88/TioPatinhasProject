@@ -11,7 +11,9 @@ from datetime import date, datetime, timedelta
 from vaults.vault import Vault
 from helpers import logExecutionZigZag, log
 from models import OrderAction
-from strategy import StrategyZigZag, StrategyResult, StrategyResultType, HistoricalData, StrategyConfig
+from strategy.strategy import StrategyResult, StrategyResultType, StrategyConfig
+from strategy.historical_data import HistoricalData
+from strategy.zigzag.strategy_zigzag import StrategyZigZag
 from portfolio import Portfolio
 from database import DatabaseModule, FillDB
 
