@@ -180,7 +180,7 @@ class VaultZigZag(Vault):
         return None
 
     def saveFill(self, contract: Contract):
-        fill = FillDB(contract.symbol, date.today())
+        fill = FillDB(contract.symbol, date.today(), contract.country, self.strategy.strategyConfig.type)
         self.databaseModule.createFill(fill)
         self.currentFills = self.databaseModule.getFills()
 
