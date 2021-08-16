@@ -10,6 +10,7 @@ class Portfolio:
     pendingOrdersMarketValue: float
 
     exchangeUSDRate: float = 1
+    exchangeUKRate: float = 1
 
     positions: List[Position]
     trades: List[Trade]
@@ -20,6 +21,8 @@ class Portfolio:
 
     def getCashBalanceFor(self, market: Market) -> float:
         if market.country.currency == Country.USA.currency:
+            return self.cashBalance*self.exchangeUSDRate
+        elif market.country.currency == Country.UK.currency:
             return self.cashBalance*self.exchangeUSDRate
 
         return self.cashBalance
@@ -36,7 +39,11 @@ class Portfolio:
         self.positions = client.positions()
         self.trades = client.trades()
         self.cashBalance = client.cashBalance()
-        self.exchangeUSDRate = client.currencyRateFor(market.country.currency)
+
+        if market.country.currency == Country.USA.currency:
+            self.exchangeUSDRate = client.currencyRateFor(market.country.currency)
+        elif market.country.currency == Country.UK.currency:
+            self.exchangeUKRate = client.currencyRateFor(market.country.currency)
 
         self.calcOpenTradesValue()
         log("💵 \nCash Balance: %s€ (%2f$) \nAvailable Cash: %s€ (%2f$)\n💵\n" % (self.cashBalance, (self.cashBalance/self.exchangeUSDRate), self.cashAvailable, (self.cashAvailable/self.exchangeUSDRate)))

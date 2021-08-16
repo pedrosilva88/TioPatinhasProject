@@ -75,7 +75,7 @@ class Constants:
         class US(Default):
             def __init__(self):
                 Constants.ZigZag.Default.__init__(self)
-                self.maxToInvestPerStrategy = 1500
+                self.maxToInvestPerStrategy = 3000
 
         class UK(Default):
             def __init__(self):
