@@ -222,4 +222,8 @@ class StrategyZigZag(Strategy):
         portfolioLoss = totalCash * self.willingToLose
         stopLossPriceRatio = price*self.stopToLosePercentage
 
+        if (stopLossPriceRatio == 0 or price == 0):
+            print("Price is 0 for: ", self.strategyData.contract.symbol,
+                  " at:", self.currentBar.datetime.date())
+            return 0
         return int(min(portfolioLoss/stopLossPriceRatio, (totalCash*self.maxToInvestPerStockPercentage)/price))

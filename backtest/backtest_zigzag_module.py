@@ -153,8 +153,8 @@ class BacktestZigZagModule(BacktestModule):
             if model.isForStockPerformance:
                 model.tradesAvailable = 9999
             else:
-                result = math.floor(balance/50000)
-                if balance - (50000*result) >= 2000:
+                result = math.floor(balance/30000)
+                if balance - (30000*result) >= 2000:
                     model.tradesAvailable = result+1
                 else:
                     model.tradesAvailable = result
@@ -176,7 +176,7 @@ class BacktestZigZagModule(BacktestModule):
 
         previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
         fill = self.getFill(event.contract)
-        balance = min(50000, self.getBalance())
+        balance = min(30000, self.getBalance())
         return StrategyZigZagData(contract=event.contract,
                                   totalCash=balance,
                                   event=cloneEvent,
@@ -342,8 +342,8 @@ class BacktestZigZagModule(BacktestModule):
 
     def isProfit(self, event: EventZigZag, bracketOrder: BracketOrder) -> bool:
         mainOrder = bracketOrder.parentOrder
-        return ((mainOrder.action == OrderAction.Buy and mainOrder.price <= event.close) or
-                (mainOrder.action == OrderAction.Sell and mainOrder.price >= event.close))
+        return ((mainOrder.action == OrderAction.Buy and mainOrder.price < event.close) or
+                (mainOrder.action == OrderAction.Sell and mainOrder.price > event.close))
 
     def addIndicatorsToGraph(self, events: List[Event]) -> Union[str, Any]:
         import numpy as np
