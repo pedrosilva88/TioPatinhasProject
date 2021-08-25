@@ -1,5 +1,12 @@
-from typing import Any, List, Tuple
+from datetime import datetime
+import math
+
+import numpy
+from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
+from models.stoch_diverge.models import EventStochDiverge
+from typing import Any, List, Tuple, Union
 from pandas import DataFrame
+import pandas_ta as ta
 from zigzag import peak_valley_pivots_candlestick
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from models.zigzag.models import EventZigZag, ZigZagType
@@ -44,6 +51,44 @@ class HistoricalData:
 
     def computeEventsForOPGStrategy(events: List[Event]) -> Tuple[Any, List[Any]]: #Tuple[ContractDetails, List[PriceIncrement]]
         pass
+
+    def computeEventsForStochDivergeStrategy(events: List[Event], strategyConfigs: StrategyStochDivergeConfig) -> List[EventStochDiverge]:
+        if len(events) <= 0:
+            return []
+
+        stochOscillatorsValues = HistoricalData.calculateStochasticOscillators(events, strategyConfigs)
+
+        if stochOscillatorsValues is None:
+            return []
+
+        stochDivergeEvents = []
+        i = 0
+        for event in events:
+            stochiValues = stochOscillatorsValues[event.datetime]
+            eventStochDiverge = EventStochDiverge(contract=event.contract,
+                                            datetime=event.datetime,
+                                            open=event.open,
+                                            high=event.high,
+                                            low=event.low,
+                                            close=event.close,
+                                            k=None if numpy.isnan(stochiValues['%K']) else stochiValues['%K'],
+                                            d=None if numpy.isnan(stochiValues['%D']) else stochiValues['%D'],
+                                            divergence=None)
+            
+            stochDivergeEvents.append(eventStochDiverge)
+            i += 1
+
+        return stochDivergeEvents
+    
+    def calculateStochasticOscillators(events: List[Event], strategyConfigs: StrategyStochDivergeConfig) -> Union[datetime, Union[str, float]]:
+        df = ta.DataFrame.from_records([event.to_dict() for event in events], index ="datetime")
+        _kName = f'STOCHk_{strategyConfigs.kPeriod}_{strategyConfigs.dPeriod}_{strategyConfigs.smooth}'
+        _dName = f'STOCHd_{strategyConfigs.kPeriod}_{strategyConfigs.dPeriod}_{strategyConfigs.smooth}'
+        df.ta.stoch(high='high', low='low', k=strategyConfigs.kPeriod, 
+                                            d=strategyConfigs.dPeriod, 
+                                            smooth_k=strategyConfigs.smooth, 
+                                            append=True)
+        return df.rename(columns={_kName: '%K', _dName: '%D'}).filter(items=['%K', '%D']).to_dict('index')
 
     def calculateRSI(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
         dfEvents = DataFrame.from_records([event.to_dict() for event in events])

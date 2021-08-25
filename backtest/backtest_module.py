@@ -1,10 +1,8 @@
 from strategy.historical_data import HistoricalData
-
-from matplotlib import pyplot
-from matplotlib.axes import Axes
-from mplfinance import plot, make_addplot
+from mplfinance import plot
 import matplotlib.dates as mpl_dates
 import pandas as pd
+
 from pandas.core.frame import DataFrame
 
 from backtest.reports.report_module import ReportModule

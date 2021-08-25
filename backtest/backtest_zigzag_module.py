@@ -5,7 +5,7 @@ import csv
 import math
 from distutils.util import strtobool
 from database.model import FillDB
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from strategy.zigzag.models import StrategyZigZagData, StrategyZigZagResult
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from typing import Any, List, Tuple, Union
@@ -59,8 +59,7 @@ class BacktestZigZagModule(BacktestModule):
             events = HistoricalData.computeEventsForZigZagStrategy(
                 bars, config.strategy)
             if events is not None:
-                newData[stockSymbol] = (
-                    stock, HistoricalData.computeEventsForZigZagStrategy(bars, config.strategy))
+                newData[stockSymbol] = (stock, events)
         return newData
 
     def getStockFileHeaderRow(self) -> List[str]:

@@ -3,13 +3,14 @@ from datetime import datetime
 
 DateSystemFormat = "%Y-%m-%d %H:%M:%S"
 DateMiniFormat = "%Y%m%d"
+DateFormat = "%Y-%m-%d"
 
 class Helpers(object):
     def utcToLocal(datetime: datetime, timezone:timezone):
         return datetime.astimezone(timezone)
 
-    def dateToString(date: datetime) -> str:
-        return date.strftime(DateSystemFormat)
+    def dateToString(date: datetime, format: str = DateSystemFormat) -> str:
+        return date.strftime(format)
 
     def stringToDate(dateStr: str, format: str = DateSystemFormat) -> datetime:
         return datetime.strptime(dateStr, format)

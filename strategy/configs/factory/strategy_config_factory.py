@@ -1,4 +1,5 @@
 from datetime import timedelta
+from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
 from models.base_models import OrderType
 from pytz import timezone
 from strategy.configs.zigzag.models import StrategyZigZagConfig
@@ -11,6 +12,10 @@ class StrategyConfigFactory:
             return StrategyConfigFactory.createZigZagStrategyFor(market, tz)
         elif strategyType == StrategyType.opg:
             return None
+        elif strategyType == StrategyType.stoch_diverge:
+            return StrategyConfigFactory.createStochasticDivergeStrategyFor(market, tz)
+        elif strategyType == StrategyType.stoch_sma:
+            return StrategyConfigFactory.createStochasticDivergeStrategyFor(market, tz)
         else:
             return None
 
@@ -44,6 +49,36 @@ class StrategyConfigFactory:
                                     runPositionsCheckTime=checkPositionsTime,
                                     daysBeforeToDownload=constants.daysBeforeToDownload, daysBefore=constants.daysBefore,
                                     daysAfterZigZag=constants.daysAfterZigZag,
+                                    barSize=constants.barSize)
+
+    def createStochasticDivergeStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
+        constants = Constants.StochasticDivergence.Default()
+
+        if market.country == market.country.USA:
+            constants = Constants.StochasticDivergence.US()
+        elif market.country == market.country.UK:
+            constants = Constants.StochasticDivergence.UK()
+        else:
+            print("🚨 Cant Create ZigZag Strategy for this country - %s 🚨" %
+                  market.country)
+
+        openTime = (market.openTime.astimezone(
+            tz)-timedelta(seconds=constants.runPositionsCheckBeforeMinutes)).time()
+        checkPositionsTime = (market.closeTime.astimezone(
+            tz)-timedelta(minutes=constants.runPositionsCheckBeforeMinutes)).time()
+
+        return StrategyStochDivergeConfig(market=market, runStrategyTime=openTime,
+                                    willingToLose=constants.willingToLose,
+                                    stopToLosePercentage=constants.stopToLosePercentage,
+                                    profitPercentage=constants.profitPercentage,
+                                    maxToInvestPerStockPercentage=constants.maxToInvestPerStockPercentage,
+                                    maxToInvestPerStrategy=constants.maxToInvestPerStrategy,
+                                    orderType=constants.orderType,
+                                    kPeriod=constants.kPeriod, dPeriod=constants.dPeriod,
+                                    smooth=constants.smooth,
+                                    daysToHold=constants.daysToHold,
+                                    runPositionsCheckTime=checkPositionsTime,
+                                    daysBeforeToDownload=constants.daysBeforeToDownload, daysBefore=constants.daysBefore,
                                     barSize=constants.barSize)
 
 
@@ -82,3 +117,33 @@ class Constants:
                 Constants.ZigZag.Default.__init__(self)
                 self.maxToInvestPerStrategy = 1500
                 self.orderType = OrderType.MarketOrder
+
+    class StochasticDivergence:
+        class Default:
+            runStrategyBeforeSeconds = 60*30 #30 minutes before
+            runPositionsCheckBeforeMinutes = 40
+            daysBeforeToDownload = 90
+            daysBefore = 40
+            daysToHold = 0
+            willingToLose = 0.03
+            stopToLosePercentage = 0.03
+            profitPercentage = 0.04
+            maxToInvestPerStockPercentage = 1
+            maxToInvestPerStrategy = -1
+            orderType = OrderType.LimitOrder
+            barSize = "1 day"
+            kPeriod = 8
+            dPeriod = 3
+            smooth = 5
+
+            def __init__(self):
+                None
+
+
+        class US(Default):
+            def __init__(self):
+                Constants.StochasticDivergence.Default.__init__(self)
+
+        class UK(Default):
+            def __init__(self):
+                Constants.StochasticDivergence.Default.__init__(self)
