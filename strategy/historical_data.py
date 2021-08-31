@@ -1,7 +1,6 @@
 from datetime import datetime
-import math
-
-import numpy
+import numpy as np
+from numpy.lib import npyio
 from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
 from models.stoch_diverge.models import EventStochDiverge
 from typing import Any, List, Tuple, Union
@@ -11,6 +10,8 @@ from zigzag import peak_valley_pivots_candlestick
 from strategy.configs.zigzag.models import StrategyZigZagConfig
 from models.zigzag.models import EventZigZag, ZigZagType
 from models.base_models import Event
+from scipy.signal import argrelextrema
+from collections import deque
 
 class HistoricalData:
     def computeEventsForZigZagStrategy(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[EventZigZag]:
@@ -56,39 +57,81 @@ class HistoricalData:
         if len(events) <= 0:
             return []
 
-        stochOscillatorsValues = HistoricalData.calculateStochasticOscillators(events, strategyConfigs)
+        stochDF: DataFrame = HistoricalData.calculateStochasticOscillators(events, strategyConfigs)
+        stochOscillatorsValues: Union[datetime, Union[str, float]] = HistoricalData.getStochasticOscillatorsValues(stochDF)
 
         if stochOscillatorsValues is None:
             return []
 
+        hhCloseValues = HistoricalData.getHigherHighs(stochDF['close'].values)
+        llCloseValues = HistoricalData.getLowerLows(stochDF['close'].values)
+        hlStochValues = HistoricalData.getHigherLows(stochDF['%K'].values)
+        lhStochValues = HistoricalData.getLowerHighs(stochDF['%K'].values)
+
         stochDivergeEvents = []
-        i = 0
-        for event in events:
+        for j, event in enumerate(events):
             stochiValues = stochOscillatorsValues[event.datetime]
+            priceDivergenceOverbought=None
+            kDivergenceOverbought=None
+
+            priceDivergenceOversold=None
+            kDivergenceOversold=None
+
+            for item in lhStochValues:
+                if j == item[1]:
+                    kDivergenceOverbought = events[item[0]].datetime
+
+            for item in hhCloseValues:
+                if j == item[1]:
+                    priceDivergenceOverbought = events[item[0]].datetime
+
+            for item in hlStochValues:
+                if j == item[1]:
+                    kDivergenceOversold = events[item[0]].datetime
+
+            for item in llCloseValues:
+                if j == item[1]:
+                    priceDivergenceOversold = events[item[0]].datetime
+
             eventStochDiverge = EventStochDiverge(contract=event.contract,
                                             datetime=event.datetime,
                                             open=event.open,
                                             high=event.high,
                                             low=event.low,
                                             close=event.close,
-                                            k=None if numpy.isnan(stochiValues['%K']) else stochiValues['%K'],
-                                            d=None if numpy.isnan(stochiValues['%D']) else stochiValues['%D'],
-                                            divergence=None)
+                                            k=None if np.isnan(stochiValues['%K']) else stochiValues['%K'],
+                                            d=None if np.isnan(stochiValues['%D']) else stochiValues['%D'],
+                                            priceDivergenceOverbought=priceDivergenceOverbought,
+                                            kDivergenceOverbought=kDivergenceOverbought,
+                                            priceDivergenceOversold=priceDivergenceOversold,
+                                            kDivergenceOversold=kDivergenceOversold)
             
             stochDivergeEvents.append(eventStochDiverge)
-            i += 1
 
         return stochDivergeEvents
     
-    def calculateStochasticOscillators(events: List[Event], strategyConfigs: StrategyStochDivergeConfig) -> Union[datetime, Union[str, float]]:
+    def calculateStochasticOscillators(events: List[Event], strategyConfigs: StrategyStochDivergeConfig) -> DataFrame:
         df = ta.DataFrame.from_records([event.to_dict() for event in events], index ="datetime")
         _kName = f'STOCHk_{strategyConfigs.kPeriod}_{strategyConfigs.dPeriod}_{strategyConfigs.smooth}'
         _dName = f'STOCHd_{strategyConfigs.kPeriod}_{strategyConfigs.dPeriod}_{strategyConfigs.smooth}'
-        df.ta.stoch(high='high', low='low', k=strategyConfigs.kPeriod, 
+        try:
+            df.ta.stoch(high='high', low='low', k=strategyConfigs.kPeriod, 
                                             d=strategyConfigs.dPeriod, 
                                             smooth_k=strategyConfigs.smooth, 
                                             append=True)
-        return df.rename(columns={_kName: '%K', _dName: '%D'}).filter(items=['%K', '%D']).to_dict('index')
+            return df.rename(columns={_kName: '%K', _dName: '%D'})
+        except TypeError as e:
+            print(e)
+            return None
+        except AttributeError as e:
+            print(e)
+            return None
+
+    def getStochasticOscillatorsValues(df: DataFrame) -> Union[datetime, Union[str, float]]:
+        if df is None:
+            return None
+
+        return df.filter(items=['%K', '%D']).to_dict('index')
 
     def calculateRSI(events: List[Event], strategyConfigs: StrategyZigZagConfig) -> List[float]:
         dfEvents = DataFrame.from_records([event.to_dict() for event in events])
@@ -128,24 +171,121 @@ class HistoricalData:
         rsi = 100 - 100/(1+rs)
         return rsi
 
-    # async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple[ContractDetails, List[PriceIncrement]]:
-    #     contractDetails = await ib.reqContractDetailsAsync(stock)
-    #     ruleId = contractDetails[0].marketRuleIds.split(',')[0]
-    #     priceIncrementRules = await ib.reqMarketRuleAsync(ruleId)
-    #     return (contractDetails, priceIncrementRules)
+    def getHigherLows(data: np.array, order=5, K=2):
+        '''
+        Finds consecutive higher lows in price pattern.
+        Must not be exceeded within the number of periods indicated by the width 
+        parameter for the value to be confirmed.
+        K determines how many consecutive lows need to be higher.
+        '''
+        # Get lows
+        low_idx = argrelextrema(data, np.less, order=order)[0]
+        lows = data[low_idx]
+        # Ensure consecutive lows are higher than previous lows
+        extrema = []
+        ex_deque = deque(maxlen=K)
+        for i, idx in enumerate(low_idx):
+            if i == 0:
+                ex_deque.append(idx)
+                continue
+            if lows[i] < lows[i-1]:
+                ex_deque.clear()
+            ex_deque.append(idx)
+            if len(ex_deque) == K:
+                extrema.append(ex_deque.copy())
+        return extrema
 
-    # async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
-    #     minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
-    #     value = self.calculateAverageVolume(minute_bars)
-    #     return value
+    def getLowerHighs(data: np.array, order=5, K=2):
+        '''
+        Finds consecutive lower highs in price pattern.
+        Must not be exceeded within the number of periods indicated by the width 
+        parameter for the value to be confirmed.
+        K determines how many consecutive highs need to be lower.
+        '''
+        # Get highs
+        high_idx = argrelextrema(data, np.greater, order=order)[0]
+        highs = data[high_idx]
+        # Ensure consecutive highs are lower than previous highs
+        extrema = []
+        ex_deque = deque(maxlen=K)
+        for i, idx in enumerate(high_idx):
+            if i == 0:
+                ex_deque.append(idx)
+                continue
+            if highs[i] > highs[i-1]:
+                ex_deque.clear()
+            ex_deque.append(idx)
+            if len(ex_deque) == K:
+                extrema.append(ex_deque.copy())
+        return extrema
+    
+    def getHigherHighs(data: np.array, order=5, K=2):
+        '''
+        Finds consecutive higher highs in price pattern.
+        Must not be exceeded within the number of periods indicated by the width 
+        parameter for the value to be confirmed.
+        K determines how many consecutive highs need to be higher.
+        '''
+        # Get highs
+        high_idx = argrelextrema(data, np.greater, order=order)[0]
+        highs = data[high_idx]
+        # Ensure consecutive highs are higher than previous highs
+        extrema = []
+        ex_deque = deque(maxlen=K)
+        for i, idx in enumerate(high_idx):
+            if i == 0:
+                ex_deque.append(idx)
+                continue
+            if highs[i] < highs[i-1]:
+                ex_deque.clear()
+            ex_deque.append(idx)
+            if len(ex_deque) == K:
+                extrema.append(ex_deque.copy())
+        return extrema
+    
+    def getLowerLows(data: np.array, order=5, K=2):
+        '''
+        Finds consecutive lower lows in price pattern.
+        Must not be exceeded within the number of periods indicated by the width 
+        parameter for the value to be confirmed.
+        K determines how many consecutive lows need to be lower.
+        '''
+        # Get lows
+        low_idx = argrelextrema(data, np.less, order=order)[0]
+        lows = data[low_idx]
+        # Ensure consecutive lows are lower than previous lows
+        extrema = []
+        ex_deque = deque(maxlen=K)
+        for i, idx in enumerate(low_idx):
+            if i == 0:
+                ex_deque.append(idx)
+                continue
+            if lows[i] > lows[i-1]:
+                ex_deque.clear()
+            ex_deque.append(idx)
+            if len(ex_deque) == K:
+                extrema.append(ex_deque.copy())
+        return extrema
 
-    # def calculateAverageVolume(self, datas: List[BarData]):
-    #     nBars = len(datas)
-    #     if nBars > 0:
-    #         sum = 0
-    #         for data in datas:
-    #             sum += data.volume
 
-    #         return sum/nBars
-    #     else:
-    #         return None
+        # async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple[ContractDetails, List[PriceIncrement]]:
+        #     contractDetails = await ib.reqContractDetailsAsync(stock)
+        #     ruleId = contractDetails[0].marketRuleIds.split(',')[0]
+        #     priceIncrementRules = await ib.reqMarketRuleAsync(ruleId)
+        #     return (contractDetails, priceIncrementRules)
+
+        # async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
+        #     minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
+        #     value = self.calculateAverageVolume(minute_bars)
+        #     return value
+
+        # def calculateAverageVolume(self, datas: List[BarData]):
+        #     nBars = len(datas)
+        #     if nBars > 0:
+        #         sum = 0
+        #         for data in datas:
+        #             sum += data.volume
+
+        #         return sum/nBars
+        #     else:
+        #         return None

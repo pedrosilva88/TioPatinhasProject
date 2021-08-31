@@ -7,7 +7,7 @@ import csv
 from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
 from strategy.configs.factory.strategy_config_factory import StrategyConfigFactory
 
-from helpers.date_timezone import DateFormat, Helpers
+from helpers.date_timezone import DateFormat, DateSystemFormat, DateSystemFullFormat, Helpers
 from models.stoch_diverge.models import EventStochDiverge
 from strategy.historical_data import HistoricalData
 from backtest.configs.models import BacktestConfigs
@@ -52,11 +52,11 @@ class BacktestStochDivergeModule(BacktestModule):
         return newData
 
     def getStockFileHeaderRow(self) -> List[str]:
-        return ["Symbol", "Date", "Open", "Close", "High", "Low", "%K", "%D", "Divergence"]
+        return ["Symbol", "Date", "Open", "Close", "High", "Low", "%K", "%D", "HH_Close", "LL_Close", "HL_Stoch", "LH_Stoch"]
 
     def getStockFileDataRow(self, contract: Contract, data: EventStochDiverge) -> List[Any]:
         symbol = contract.symbol
-        date = Helpers.dateToString(data.datetime, format=DateFormat)
+        date = Helpers.dateToString(data.datetime, format=DateSystemFormat)
 
         open = 0 if not data.open else round(data.open, 2)
         close = 0 if not data.close else round(data.close, 2)
@@ -65,9 +65,12 @@ class BacktestStochDivergeModule(BacktestModule):
 
         k = None if data.k is None else data.k
         d = None if data.d is None else data.d
-        divergence = None
+        priceDivergenceOverbought = None if data.priceDivergenceOverbought is None else Helpers.dateToString(data.priceDivergenceOverbought, format=DateSystemFormat)
+        kDivergenceOverbought = None if data.kDivergenceOverbought is None else Helpers.dateToString(data.kDivergenceOverbought, format=DateSystemFormat)
+        priceDivergenceOversold = None if data.priceDivergenceOversold is None else Helpers.dateToString(data.priceDivergenceOversold, format=DateSystemFormat)
+        kDivergenceOversold = None if data.kDivergenceOversold is None else Helpers.dateToString(data.kDivergenceOversold, format=DateSystemFormat)
 
-        return [symbol, date, open, close, high, low, k, d, divergence]
+        return [symbol, date, open, close, high, low, k, d, priceDivergenceOverbought, priceDivergenceOversold, kDivergenceOversold, kDivergenceOverbought]
 
     def parseCSVFile(self, reader: csv.reader) -> List[Event]:
         configs = BacktestConfigs()
@@ -79,26 +82,28 @@ class BacktestStochDivergeModule(BacktestModule):
                 contract = Contract(symbol, configs.country)
 
                 datetimeStr = None if not row[1] else row[1]
-                datetime = Helpers.stringToDate(datetimeStr, DateFormat)
+                datetime = Helpers.stringToDate(datetimeStr, DateSystemFormat)
 
                 open = 0 if not row[2] else float(row[2])
                 close = 0 if not row[3] else float(row[3])
                 high = 0 if not row[4] else float(row[4])
                 low = 0 if not row[5] else float(row[5])
 
-                if datetime.day == 12 and datetime.month == 8 and datetime.year == 2021:
-                    print(open,close)
-
                 k = None if not row[6] else float(row[6])
                 d = None if not row[7] else float(row[7])
                 datetimeStr = None if not row[8] else row[8]
-                divergence = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateFormat)
+                priceDivergenceOverbought = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateSystemFormat)
+                datetimeStr = None if not row[9] else row[9]
+                priceDivergenceOversold = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateSystemFormat)
+                datetimeStr = None if not row[10] else row[10]
+                kDivergenceOversold = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateSystemFormat)
+                datetimeStr = None if not row[11] else row[11]
+                kDivergenceOverbought = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateSystemFormat)
 
-                event = EventStochDiverge(contract, datetime, open, close, high, low, k, d, divergence)
+                event = EventStochDiverge(contract, datetime, open, close, high, low, k, d, priceDivergenceOverbought, kDivergenceOverbought, priceDivergenceOversold, kDivergenceOversold)
                 contractEvents.append(event)
             line_count += 1
         return contractEvents
-
 
     def setupRunStrategy(self, events: List[Event], dynamicParameters: List[List[float]]):
         config = BacktestConfigs()

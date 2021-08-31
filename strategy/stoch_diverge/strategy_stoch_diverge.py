@@ -33,40 +33,96 @@ class StrategyStochDiverge(Strategy):
         self.strategyConfig = strategyConfig
 
         self.fetchInformation()
-        
+        crossBars = 3
+        diveregeDays = 6
         isEngulfing, state = self.engulfingState()
         if isEngulfing:
-            print("🎃 🎃 ENGULFING 🎃 🎃 \n\n\n")
-            print(self.currentBar.datetime,"--", state)
+            if state == 'short':
+                startPreviousBar = self.currentBar
+                if startPreviousBar.k <= 80 and startPreviousBar.d <= 80 and startPreviousBar.k < startPreviousBar.d:
+                    crossBelowUpperBand = False
+                    eventsAboveUpperBand = False
+                    for i in range(1, crossBars):
+                        previousBar = self.previousBars[-i]
+                        if previousBar.k <= 80 and previousBar.d <= 80 and previousBar.k > previousBar.d:
+                            crossBelowUpperBand = True
+                        elif previousBar.k > 80 and previousBar.d > 80 and previousBar.k > previousBar.d:
+                            break
 
-        # result = self.validateStrategy()
-        # if result:
-        #     return result
+                        if previousBar.k > 80 and previousBar.d > 80 and crossBelowUpperBand:
+                            eventsAboveUpperBand = True
 
-        # log("😁 %s 😁" % (self.strategyData.contract.symbol))
-        # log("😁 [%s] Bar[-4]-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.previousBars[-4].datetime.date(), self.previousBars[-4].rsi, self.previousBars[-4].open, self.previousBars[-4].close, self.previousBars[-4].high, self.previousBars[-4].low, self.previousBars[-4].zigzag))
-        # log("😁 [%s] Bar[-3]-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.previousBars[-3].datetime.date(), self.previousBars[-3].rsi, self.previousBars[-3].open, self.previousBars[-3].close, self.previousBars[-3].high, self.previousBars[-3].low, self.previousBars[-3].zigzag))
-        # log("😁 [%s] Bar[-2]-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.previousBars[-2].datetime.date(), self.previousBars[-2].rsi, self.previousBars[-2].open, self.previousBars[-2].close, self.previousBars[-2].high, self.previousBars[-2].low, self.previousBars[-2].zigzag))
-        # log("😁 [%s] Bar[-1]-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.previousBars[-1].datetime.date(), self.previousBars[-1].rsi, self.previousBars[-1].open, self.previousBars[-1].close, self.previousBars[-1].high, self.previousBars[-1].low, self.previousBars[-1].zigzag))
-        # log("😁 [%s] CurrentBar-> RSI(%.2f) Open(%.2f) Close(%.2f) High(%.2f) Low(%.2f) ZigZag(%s) 😁" % (self.currentBar.datetime.date(), self.currentBar.rsi, self.currentBar.open, self.currentBar.close, self.currentBar.high, self.currentBar.low, self.currentBar.zigzag))
-        # log("😁  😁")
+                        if crossBelowUpperBand and eventsAboveUpperBand:
+                            print("🎃 🎃 ENGULFING 🎃 🎃 ", self.currentBar.contract.symbol)
+                            print(previousBar.datetime,"--> K:", previousBar.k, "--> D:", previousBar.d)
+                            print("✅ Sell -- Engulfing Date:", self.currentBar.datetime)
+                            
+                            priceDivergenceFound = False
+                            kDivergenceFound = False
+                            kOverbought = False
+                            barKDivergence = None
+                            for j in range(i, diveregeDays):
+                                previousBar = self.previousBars[-j]
+                                if previousBar.kDivergenceOverbought is not None:
+                                    kDivergenceFound = True
+                                    barKDivergence = previousBar
+                                    if previousBar.k >= 70:
+                                        kOverbought = True
+                                if previousBar.priceDivergenceOverbought is not None:
+                                    priceDivergenceFound = True
 
-        #zigzagBar, zigzagIndex = self.getZigZag()
-        # if (zigzagBar is not None):
-        #     if (self.currentBar.rsi >= self.minRSI or self.currentBar.rsi <= self.maxRSI):
-        #         if (zigzagBar.rsi <= self.minRSI and self.isLonging(zigzagIndex)):
-        #             type = StrategyResultType.Buy
-        #             order = self.createOrder(type)
-        #             return StrategyStochDivergeResult(strategyData.contract, self.currentBar, type, zigzagIndex, order, None)
-        #         elif (zigzagBar.rsi >= self.maxRSI and self.isShorting(zigzagIndex)):
-        #             type = StrategyResultType.Sell
-        #             order = self.createOrder(type)
-        #             return StrategyStochDivergeResult(strategyData.contract, self.currentBar, type, zigzagIndex, order, None)
-        #         return StrategyStochDivergeResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)
-        #     else:
-        #         return StrategyStochDivergeResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)
-        # else:
-        #     return StrategyStochDivergeResult(strategyData.contract, self.currentBar, StrategyResultType.DoNothing, None)
+                                if priceDivergenceFound and kDivergenceFound:
+                                    print("💎 💎 💎 Overbought Divergence Found -- Date:", barKDivergence.datetime)
+                                    if kOverbought:
+                                        print("💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date:", barKDivergence.datetime)
+
+                                    break
+                            print("🎃 🎃 🎃 🎃 \n\n\n\n")
+                            break
+
+            if state == 'long':
+                startPreviousBar = self.currentBar
+                if startPreviousBar.k >= 20 and startPreviousBar.d >= 20 and startPreviousBar.k > startPreviousBar.d:
+                    crossAboveLowerBand = False
+                    eventsBelowLowerBand = False
+                    for i in range(1, crossBars):
+                        previousBar = self.previousBars[-i]
+
+                        if previousBar.k >= 20 and previousBar.d >= 20 and previousBar.k < previousBar.d:
+                            crossAboveLowerBand = True
+                        elif previousBar.k < 20 and previousBar.d < 20 and previousBar.k < previousBar.d:
+                            break
+
+                        if previousBar.k < 20 and previousBar.d < 20 and crossAboveLowerBand:
+                            eventsBelowLowerBand = True
+
+                        if crossAboveLowerBand and eventsBelowLowerBand:
+                            print("🎃 🎃 ENGULFING 🎃 🎃 ", self.currentBar.contract.symbol)
+                            print(previousBar.datetime,"--> K:", previousBar.k, "--> D:", previousBar.d)
+                            print("✅ Buy -- Engulfing Date:", self.currentBar.datetime)
+
+                            priceDivergenceFound = False
+                            kDivergenceFound = False
+                            kOversold = False
+                            barKDivergence = None
+                            for j in range(i, diveregeDays):
+                                previousBar = self.previousBars[-j]
+                                if previousBar.kDivergenceOversold is not None:
+                                    kDivergenceFound = True
+                                    barKDivergence = previousBar
+                                    if previousBar.k <= 20:
+                                        kOversold = True
+
+                                if previousBar.priceDivergenceOversold is not None:
+                                    priceDivergenceFound = True
+
+                                if priceDivergenceFound and kDivergenceFound:
+                                    print("💎 💎 💎 Oversold Divergence Found -- Date:", barKDivergence.datetime)
+                                    if kOversold:
+                                        print("💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date:", barKDivergence.datetime)
+                                    break
+                            print("🎃 🎃 🎃 🎃 \n\n\n\n")
+                            break
 
     def engulfingState(self) -> Tuple[bool, str]:
         previousBar = self.previousBars[-1]

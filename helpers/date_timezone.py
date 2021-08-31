@@ -2,6 +2,7 @@ from pytz import timezone
 from datetime import datetime
 
 DateSystemFormat = "%Y-%m-%d %H:%M:%S"
+DateSystemFullFormat = "%Y-%m-%d %H:%M:%S.%f"
 DateMiniFormat = "%Y%m%d"
 DateFormat = "%Y-%m-%d"
 

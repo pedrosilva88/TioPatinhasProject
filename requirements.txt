@@ -7,3 +7,4 @@ matplotlib==3.4.1
 mplfinance==0.12.7a17
 ZigZag @ git+git://github.com/tomas-rampas/ZigZag.git@2aa553bb23c86e3c22bccdf4cd67c515a24f5b45
 pandas_ta==0.3.14b0
+scipy==1.7.1
