@@ -90,7 +90,7 @@ class Constants:
             rsiOffsetDays = 14
             zigzagSpread = 0.05
             daysBeforeToDownload = 90
-            daysBefore = 4
+            daysBefore = 6
             daysToHold = 0
             daysAfterZigZag = 2
             barSize = "1 day"
