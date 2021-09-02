@@ -42,8 +42,7 @@ class TioPatinhasConfigs:
             keyCountry = item[1]
             strategyType = None
             country = getCountryFromCode(keyCountry)
-            if keyStrategy == StrategyType.zigzag.value:
-                strategyType = StrategyType.zigzag
+            strategyType = StrategyType.strategyFromCode(keyStrategy)
 
             if strategyType is not None and country is not None:
                 market = MarketManager.getMarketFor(country)
