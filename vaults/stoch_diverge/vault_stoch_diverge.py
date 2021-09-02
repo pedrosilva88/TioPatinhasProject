@@ -66,7 +66,7 @@ class VaultStochDiverge(Vault):
                     previousEvents.insert(0, event)
                     index -= 1
                 self.runStrategy(contract, previousEvents, currentEvent)
-                log("🏁 Finished to run Stochastic Divergence Strategy 🏁")
+        log("🏁 Finished to run Stochastic Divergence Strategy 🏁")
 
     def runStrategy(self, contract: Contract,
                             previousEvents: List[EventStochDiverge], currentEvent: EventStochDiverge):
@@ -99,7 +99,7 @@ class VaultStochDiverge(Vault):
             histData = HistoricalData.computeEventsForStochDivergeStrategy(events, self.strategyConfig)
             if len(histData) > 0:
                 self.allContractsEvents[contract.symbol] = histData
-                logCounter(("🧶 Compute Historical Data 🧶" % (contract.symbol)), len(allEvents), index)
+                logCounter("🧶 Compute Historical Data 🧶", len(allEvents), index)
             else:
                 log("🧶 ❗️ Invalid Historical Data for %s ❗️ 🧶" % (contract.symbol))
             index += 1 

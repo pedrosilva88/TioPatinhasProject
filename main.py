@@ -17,7 +17,7 @@ from island import *
 from country_config import *
 
 if __name__ == '__main__':
-    asyncio.get_event_loop().set_debug(True)
+    asyncio.get_event_loop()
     createLog()
     logInitTioPatinhas()
     try:

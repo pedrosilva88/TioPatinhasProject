@@ -113,8 +113,8 @@ class Constants:
     class StochasticDivergence:
         class Default:
             runStrategyBeforeHours = 3
-            daysBeforeToDownload = 120
-            daysBefore = 90
+            daysBeforeToDownload = 200
+            daysBefore = 40
             barSize = "1 day"
             kPeriod = 8
             dPeriod = 3

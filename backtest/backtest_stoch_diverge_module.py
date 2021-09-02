@@ -131,9 +131,7 @@ class BacktestStochDivergeModule(BacktestModule):
             event, strategyConfig.daysBeforeToDownload)
         if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
             return None
-
         previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
-        fill = self.getFill(event.contract)
         balance = min(30000, self.getBalance())
         return StrategyStochDivergeData(contract=event.contract,
                                   totalCash=balance,
