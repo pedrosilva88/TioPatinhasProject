@@ -59,25 +59,17 @@ class StrategyConfigFactory:
         elif market.country == market.country.UK:
             constants = Constants.StochasticDivergence.UK()
         else:
-            print("🚨 Cant Create ZigZag Strategy for this country - %s 🚨" %
+            print("🚨 Cant Create Stochastic Divergence Strategy for this country - %s 🚨" %
                   market.country)
 
         openTime = (market.openTime.astimezone(
-            tz)-timedelta(seconds=constants.runPositionsCheckBeforeMinutes)).time()
-        checkPositionsTime = (market.closeTime.astimezone(
-            tz)-timedelta(minutes=constants.runPositionsCheckBeforeMinutes)).time()
+            tz)-timedelta(seconds=constants.runStrategyBeforeHours)).time()
 
         return StrategyStochDivergeConfig(market=market, runStrategyTime=openTime,
-                                    willingToLose=constants.willingToLose,
-                                    stopToLosePercentage=constants.stopToLosePercentage,
-                                    profitPercentage=constants.profitPercentage,
-                                    maxToInvestPerStockPercentage=constants.maxToInvestPerStockPercentage,
-                                    maxToInvestPerStrategy=constants.maxToInvestPerStrategy,
-                                    orderType=constants.orderType,
                                     kPeriod=constants.kPeriod, dPeriod=constants.dPeriod,
                                     smooth=constants.smooth,
-                                    daysToHold=constants.daysToHold,
-                                    runPositionsCheckTime=checkPositionsTime,
+                                    minStochK=constants.minStochK, maxStochK=constants.maxStochK,
+                                    crossMaxPeriods= constants.crossMaxPeriods, divergenceMaxPeriods=constants.divergenceMaxPeriods,
                                     daysBeforeToDownload=constants.daysBeforeToDownload, daysBefore=constants.daysBefore,
                                     barSize=constants.barSize)
 
@@ -120,21 +112,17 @@ class Constants:
 
     class StochasticDivergence:
         class Default:
-            runStrategyBeforeSeconds = 60*30 #30 minutes before
-            runPositionsCheckBeforeMinutes = 40
-            daysBeforeToDownload = 90
-            daysBefore = 40
-            daysToHold = 0
-            willingToLose = 0.03
-            stopToLosePercentage = 0.03
-            profitPercentage = 0.04
-            maxToInvestPerStockPercentage = 1
-            maxToInvestPerStrategy = -1
-            orderType = OrderType.LimitOrder
+            runStrategyBeforeHours = 3
+            daysBeforeToDownload = 200
+            daysBefore = 100
             barSize = "1 day"
             kPeriod = 8
             dPeriod = 3
             smooth = 5
+            maxStochK = 80
+            minStochK = 20
+            crossMaxPeriods = 3
+            divergenceMaxPeriods = 6
 
             def __init__(self):
                 None
