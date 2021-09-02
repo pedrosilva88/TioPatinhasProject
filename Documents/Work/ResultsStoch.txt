@@ -1,16 +1,16 @@
-Wins        - 6
-Loses       - 6
-Ignores     - 2
+Wins        - 14
+Loses       - 13
+Ignores     - 4
 
-Sum Wins    - 50
-Sum Loses   - 21
+Sum Wins    - 134
+Sum Loses   - 64
 
 Last Checked
 
-💎 Stochastic Divergence Found: NGVT 💎 
-🔧 Order Type: Short 🔧 
-🍪 Engulfing Candle: 2021-01-07
-🍩 Cross Inside Bands: (2021-01-06) K(67.03) D(65.60)
-🍫 K Divergence - Point.1[Date(2020-12-11) K(-)] Point.2[Date(2020-12-30) K(84.04)
-🍫 Price Divergence - Point.1[Date(2020-12-15) Price(-)] Point.2[Date(2021-01-06) Price(78.37)
+💎 Stochastic Divergence Found: KBR 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2020-05-14
+🍩 Cross Inside Bands: (2020-05-13) K(28.92) D(29.01)
+🍫 K Divergence - Point.1[Date(2020-04-21) K(-)] Point.2[Date(2020-05-07) K(16.52)
+🍫 Price Divergence - Point.1[Date(2020-04-21) Price(-)] Point.2[Date(2020-05-13) Price(17.46)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 

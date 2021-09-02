@@ -996,7 +996,7 @@
 🍫 Price Divergence - Point.1[Date(2020-04-21) Price(-)] Point.2[Date(2020-05-13) Price(17.46)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 20%
 
 
 💎 Stochastic Divergence Found: AMN 💎 
@@ -1007,7 +1007,7 @@
 🍫 Price Divergence - Point.1[Date(2020-03-27) Price(-)] Point.2[Date(2020-05-13) Price(37.54)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 24%
 
 
 💎 Stochastic Divergence Found: VNOM 💎 
@@ -1018,7 +1018,7 @@
 🍫 Price Divergence - Point.1[Date(2020-04-30) Price(-)] Point.2[Date(2020-06-08) Price(13.70)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+❌ 8%
 
 
 💎 Stochastic Divergence Found: FNKO 💎 
@@ -1029,7 +1029,7 @@
 🍫 Price Divergence - Point.1[Date(2020-06-26) Price(-)] Point.2[Date(2020-07-09) Price(4.93)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 10%
 
 
 💎 Stochastic Divergence Found: GIII 💎 
@@ -1040,7 +1040,7 @@
 🍫 Price Divergence - Point.1[Date(2020-07-20) Price(-)] Point.2[Date(2020-08-03) Price(9.63)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 3%
 
 
 💎 Stochastic Divergence Found: AMD 💎 
@@ -1051,7 +1051,7 @@
 🍫 Price Divergence - Point.1[Date(2020-08-06) Price(-)] Point.2[Date(2020-09-01) Price(92.18)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🚨 - Gap é muito grande
 
 
 💎 Stochastic Divergence Found: TXRH 💎 
@@ -1062,7 +1062,7 @@
 🍫 Price Divergence - Point.1[Date(2020-07-15) Price(-)] Point.2[Date(2020-09-03) Price(65.37)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+❌ 4%
 
 
 💎 Stochastic Divergence Found: BKI 💎 
@@ -1073,7 +1073,7 @@
 🍫 Price Divergence - Point.1[Date(2020-09-02) Price(-)] Point.2[Date(2020-09-16) Price(86.21)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+❌ 2%
 
 
 💎 Stochastic Divergence Found: NUAN 💎 
@@ -1084,7 +1084,7 @@
 🍫 Price Divergence - Point.1[Date(2020-09-22) Price(-)] Point.2[Date(2020-10-13) Price(35.20)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 7%
 
 
 💎 Stochastic Divergence Found: BAND 💎 
@@ -1095,7 +1095,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-26) Price(-)] Point.2[Date(2020-11-16) Price(141.65)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 14%
 
 
 💎 Stochastic Divergence Found: COF 💎 
@@ -1106,7 +1106,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-12) Price(-)] Point.2[Date(2020-11-16) Price(88.61)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+❌ 7%
 
 
 💎 Stochastic Divergence Found: AMP 💎 
@@ -1117,7 +1117,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-23) Price(-)] Point.2[Date(2020-11-16) Price(185.97)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+❌ 6%
 
 
 💎 Stochastic Divergence Found: CNP PRB 💎 
@@ -1128,7 +1128,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-27) Price(-)] Point.2[Date(2020-11-17) Price(44.81)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🚨 - Nao ha dados desta Stock
 
 
 💎 Stochastic Divergence Found: NTRS 💎 
@@ -1139,7 +1139,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-16) Price(-)] Point.2[Date(2020-11-24) Price(97.61)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 5%
 
 
 💎 Stochastic Divergence Found: RCI 💎 
@@ -1150,7 +1150,7 @@
 🍫 Price Divergence - Point.1[Date(2020-11-11) Price(-)] Point.2[Date(2020-12-04) Price(47.79)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 1%
 
 
 💎 Stochastic Divergence Found: MYGN 💎 
@@ -1161,7 +1161,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-22) Price(-)] Point.2[Date(2020-12-11) Price(19.72)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+❌ 10%
 
 
 💎 Stochastic Divergence Found: LYB 💎 
@@ -1172,7 +1172,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-04) Price(-)] Point.2[Date(2020-12-18) Price(90.93)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+❌ 4%
 
 
 💎 Stochastic Divergence Found: NGVT 💎 
