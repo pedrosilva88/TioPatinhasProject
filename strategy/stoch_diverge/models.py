@@ -14,7 +14,7 @@ class StrategyStochDivergeData(StrategyData):
                         event: EventStochDiverge, 
                         previousEvents: List[EventStochDiverge],  
                         today: date = None,
-                        now: datetime = None,):
+                        now: datetime = None):
         super().__init__(contract, totalCash, event, position=None, today=today, now=now)
         self.previousEvents = previousEvents
         

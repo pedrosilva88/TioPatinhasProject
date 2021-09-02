@@ -1,4 +1,5 @@
 import asyncio
+from helpers.logs import logCounter
 from strategy.stoch_diverge.strategy_stoch_diverge import StrategyStochDiverge
 from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
 from typing import List, Union
@@ -15,7 +16,7 @@ from models.base_models import Contract
 from helpers.array_helper import Helpers
 from datetime import datetime
 
-class VaultZigZag(Vault):
+class VaultStochDiverge(Vault):
     historicalData: HistoricalData
 
     allContractsEvents: Union[str, List[EventStochDiverge]]
@@ -65,11 +66,12 @@ class VaultZigZag(Vault):
                     previousEvents.insert(0, event)
                     index -= 1
                 self.runStrategy(contract, previousEvents, currentEvent)
+                log("🏁 Finished to run Stochastic Divergence Strategy 🏁")
 
     def runStrategy(self, contract: Contract,
                             previousEvents: List[EventStochDiverge], currentEvent: EventStochDiverge):
         data = StrategyStochDivergeData(contract=contract,
-                                        totalCash= min(self.strategyConfig.maxToInvestPerStrategy, self.portfolio.getCashBalanceFor(self.strategyConfig.market)),
+                                        totalCash= self.portfolio.getCashBalanceFor(self.strategyConfig.market),
                                         event=currentEvent,
                                         previousEvents=previousEvents)
         result = self.strategy.run(data, self.strategyConfig)
@@ -83,10 +85,13 @@ class VaultZigZag(Vault):
         chunks = Helpers.grouper(self.contracts, 50)
         today = datetime.today()
         allEvents = []
-
+        index = 1
         for contracts in chunks:
             allEvents += await asyncio.gather(*[provider.downloadHistoricalDataAsync(contract, config.daysBeforeToDownload, config.barSize, today) for contract in contracts ])
+            logCounter("Download Contracts in Chunks", len(chunks), index)
+            index += 1
 
+        index = 1
         for contract, events in zip(self.contracts, allEvents):
             if contract.symbol not in self.allContractsEvents:
                 self.allContractsEvents[contract.symbol] = []
@@ -94,6 +99,7 @@ class VaultZigZag(Vault):
             histData = HistoricalData.computeEventsForStochDivergeStrategy(events, self.strategyConfig)
             if len(histData) > 0:
                 self.allContractsEvents[contract.symbol] = histData
-                log("🧶 Historical Data for %s 🧶" % (contract.symbol))
+                logCounter(("🧶 Compute Historical Data 🧶" % (contract.symbol)), len(allEvents), index)
             else:
                 log("🧶 ❗️ Invalid Historical Data for %s ❗️ 🧶" % (contract.symbol))
+            index += 1 

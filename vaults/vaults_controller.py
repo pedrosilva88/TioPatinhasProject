@@ -8,6 +8,7 @@ from datetime import datetime
 from pytz import timezone
 from island.island import IslandProtocol
 from vaults.zigzag.vault_zigzag import VaultZigZag
+from vaults.stoch_diverge.vault_stoch_diverge import VaultStochDiverge
 from strategy.configs.models import StrategyAction, StrategyType
 from typing import List
 from vaults.vault import Vault
@@ -40,6 +41,8 @@ class VaultsController(VaultsControllerProtocol):
         for strategyConfig in self.config.strategies:
             if strategyConfig.type == StrategyType.zigzag:
                 self.vaults.append(VaultZigZag(strategyConfig, self.portfolio, self))
+            elif strategyConfig.type == StrategyType.stoch_diverge:
+                self.vaults.append(VaultStochDiverge(strategyConfig, self.portfolio, self))
 
     async def start(self):
         await self.scheduleNextOperation()

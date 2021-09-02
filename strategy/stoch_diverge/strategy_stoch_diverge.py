@@ -161,9 +161,9 @@ class StrategyStochDiverge(Strategy):
 
     def validateStrategy(self):
         if (not self.isConfigsValid() or not self.isStrategyDataValid()):
+            log("🚨 Invalid data for %s 🚨" % self.currentBar.contract.symbol)
             return StrategyStochDivergeResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
         else:
-            log("🚨 Invalid data for %s 🚨" % self.currentBar.contract.symbol)
             return None
 
     def isStrategyDataValid(self):

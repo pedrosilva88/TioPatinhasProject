@@ -139,8 +139,6 @@ class BacktestStochDivergeModule(BacktestModule):
                                   totalCash=balance,
                                   event=event,
                                   previousEvents=previousEventsFiltered,
-                                  position=None,
-                                  fill=fill,
                                   today=event.datetime.date(),
                                   now=event.datetime)
 
