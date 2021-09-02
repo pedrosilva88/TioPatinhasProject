@@ -1,1214 +1,1342 @@
-🎃 🎃 Stoch 🎃 🎃  CLNE
-💎 💎 💎 Oversold Divergence Found -- Date: 2016-11-01 15:33:02
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2016-11-01 15:33:02
-Cross Bar - Date: 2016-11-07 15:33:02 --> K: 23.60757172434188 --> D: 24.020221108419843
-✅ Buy -- Engulfing Date: 2016-11-08 15:33:02
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: CLNE 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2016-11-08
+🍩 Cross Inside Bands: (2016-11-07) K(23.61) D(24.02)
+🍫 K Divergence - Point.1[Date(2016-10-18) K(-)] Point.2[Date(2016-11-01) K(18.98)
+🍫 Price Divergence - Point.1[Date(2016-09-20) Price(-)] Point.2[Date(2016-11-04) Price(3.42)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  HAL
-💎 💎 💎 Overbought Divergence Found -- Date: 2016-11-15 15:21:56
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2016-11-15 15:21:56
-Cross Bar - Date: 2016-11-21 15:21:56 --> K: 76.84591011049997 --> D: 74.53223580602956
-✅ Sell -- Engulfing Date: 2016-11-22 15:21:56
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: HAL 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2016-11-22
+🍩 Cross Inside Bands: (2016-11-21) K(76.85) D(74.53)
+🍫 K Divergence - Point.1[Date(2016-10-06) K(-)] Point.2[Date(2016-11-15) K(85.43)
+🍫 Price Divergence - Point.1[Date(2016-10-19) Price(-)] Point.2[Date(2016-11-21) Price(50.10)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  ASXC
-💎 💎 💎 Oversold Divergence Found -- Date: 2016-12-08 16:56:51
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2016-12-08 16:56:51
-Cross Bar - Date: 2016-12-14 16:56:51 --> K: 26.3360539184989 --> D: 27.593169043878707
-✅ Buy -- Engulfing Date: 2016-12-15 16:56:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: ASXC 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2016-12-15
+🍩 Cross Inside Bands: (2016-12-14) K(26.34) D(27.59)
+🍫 K Divergence - Point.1[Date(2016-10-27) K(-)] Point.2[Date(2016-12-08) K(10.14)
+🍫 Price Divergence - Point.1[Date(2016-11-03) Price(-)] Point.2[Date(2016-12-14) Price(17.43)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  OSTK
-💎 💎 💎 Overbought Divergence Found -- Date: 2016-12-19 15:36:52
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2016-12-19 15:36:52
-Cross Bar - Date: 2016-12-20 15:36:52 --> K: 79.39285714285714 --> D: 77.47591176939
-✅ Sell -- Engulfing Date: 2016-12-21 15:36:52
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: OSTK 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2016-12-21
+🍩 Cross Inside Bands: (2016-12-20) K(79.39) D(77.48)
+🍫 K Divergence - Point.1[Date(2016-11-16) K(-)] Point.2[Date(2016-12-19) K(81.60)
+🍫 Price Divergence - Point.1[Date(2016-11-25) Price(-)] Point.2[Date(2016-12-20) Price(19.10)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  ORLY
-💎 💎 💎 Overbought Divergence Found -- Date: 2016-12-23 15:12:56
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2016-12-23 15:12:56
-Cross Bar - Date: 2016-12-27 15:12:56 --> K: 79.18281573686319 --> D: 78.2555788662592
-✅ Sell -- Engulfing Date: 2016-12-28 15:12:56
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: ORLY 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2016-12-28
+🍩 Cross Inside Bands: (2016-12-27) K(79.18) D(78.26)
+🍫 K Divergence - Point.1[Date(2016-11-22) K(-)] Point.2[Date(2016-12-23) K(80.08)
+🍫 Price Divergence - Point.1[Date(2016-12-07) Price(-)] Point.2[Date(2016-12-21) Price(285.53)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  CERN
-💎 💎 💎 Oversold Divergence Found -- Date: 2016-12-30 15:17:32
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2016-12-30 15:17:32
-Cross Bar - Date: 2017-01-06 15:17:32 --> K: 35.48820574643345 --> D: 35.89767295149077
-✅ Buy -- Engulfing Date: 2017-01-09 15:17:32
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: CERN 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2017-01-09
+🍩 Cross Inside Bands: (2017-01-06) K(35.49) D(35.90)
+🍫 K Divergence - Point.1[Date(2016-12-07) K(-)] Point.2[Date(2016-12-30) K(17.26)
+🍫 Price Divergence - Point.1[Date(2016-12-06) Price(-)] Point.2[Date(2016-12-30) Price(47.37)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  MODV
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-02-15 17:37:58
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-02-15 17:37:58
-Cross Bar - Date: 2017-02-22 17:37:58 --> K: 76.7912858862766 --> D: 75.18902141265328
-✅ Sell -- Engulfing Date: 2017-02-23 17:37:58
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: MODV 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-02-23
+🍩 Cross Inside Bands: (2017-02-22) K(76.79) D(75.19)
+🍫 K Divergence - Point.1[Date(2017-01-31) K(-)] Point.2[Date(2017-02-15) K(83.63)
+🍫 Price Divergence - Point.1[Date(2017-01-06) Price(-)] Point.2[Date(2017-02-22) Price(41.85)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  A
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-02-24 15:11:08
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-02-24 15:11:08
-Cross Bar - Date: 2017-03-01 15:11:08 --> K: 78.67619047619034 --> D: 78.05613420396016
-✅ Sell -- Engulfing Date: 2017-03-02 15:11:08
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: A 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-03-02
+🍩 Cross Inside Bands: (2017-03-01) K(78.68) D(78.06)
+🍫 K Divergence - Point.1[Date(2017-02-13) K(-)] Point.2[Date(2017-02-24) K(82.14)
+🍫 Price Divergence - Point.1[Date(2017-01-11) Price(-)] Point.2[Date(2017-03-01) Price(52.04)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  WD
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-03-03 17:31:51
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-03-03 17:31:51
-Cross Bar - Date: 2017-03-06 17:31:51 --> K: 79.32801909401192 --> D: 78.54588868186462
-✅ Sell -- Engulfing Date: 2017-03-08 17:31:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: WD 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-03-08
+🍩 Cross Inside Bands: (2017-03-06) K(79.33) D(78.55)
+🍫 K Divergence - Point.1[Date(2017-02-17) K(-)] Point.2[Date(2017-03-03) K(82.50)
+🍫 Price Divergence - Point.1[Date(2017-01-13) Price(-)] Point.2[Date(2017-03-03) Price(42.33)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  QRVO
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-03-16 15:22:34
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-03-16 15:22:34
-Cross Bar - Date: 2017-03-17 15:22:34 --> K: 79.33148524520713 --> D: 78.67529053896371
-✅ Sell -- Engulfing Date: 2017-03-21 15:22:34
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: QRVO 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-03-21
+🍩 Cross Inside Bands: (2017-03-17) K(79.33) D(78.68)
+🍫 K Divergence - Point.1[Date(2017-02-14) K(-)] Point.2[Date(2017-03-16) K(81.35)
+🍫 Price Divergence - Point.1[Date(2017-03-01) Price(-)] Point.2[Date(2017-03-15) Price(68.95)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  SHYF
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-03-31 17:52:51
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-03-31 17:52:51
-Cross Bar - Date: 2017-04-03 17:52:51 --> K: 76.77213309566245 --> D: 76.05848399966042
-✅ Sell -- Engulfing Date: 2017-04-05 17:52:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: SHYF 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-04-05
+🍩 Cross Inside Bands: (2017-04-03) K(76.77) D(76.06)
+🍫 K Divergence - Point.1[Date(2017-03-17) K(-)] Point.2[Date(2017-03-31) K(80.13)
+🍫 Price Divergence - Point.1[Date(2017-03-17) Price(-)] Point.2[Date(2017-03-31) Price(8.00)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  LII
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-04-21 15:42:56
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-04-21 15:42:56
-Cross Bar - Date: 2017-04-24 15:42:56 --> K: 78.68561326064791 --> D: 77.16051914126696
-✅ Sell -- Engulfing Date: 2017-04-26 15:42:56
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: LII 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-04-26
+🍩 Cross Inside Bands: (2017-04-24) K(78.69) D(77.16)
+🍫 K Divergence - Point.1[Date(2017-03-20) K(-)] Point.2[Date(2017-04-21) K(82.93)
+🍫 Price Divergence - Point.1[Date(2017-04-11) Price(-)] Point.2[Date(2017-04-21) Price(172.43)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  AVAV
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-05-26 17:10:51
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-05-26 17:10:51
-Cross Bar - Date: 2017-06-02 17:10:51 --> K: 70.51648232501525 --> D: 68.6717346099783
-✅ Sell -- Engulfing Date: 2017-06-05 17:10:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: AVAV 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-06-05
+🍩 Cross Inside Bands: (2017-06-02) K(70.52) D(68.67)
+🍫 K Divergence - Point.1[Date(2017-05-15) K(-)] Point.2[Date(2017-05-26) K(81.73)
+🍫 Price Divergence - Point.1[Date(2017-05-22) Price(-)] Point.2[Date(2017-06-02) Price(32.40)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  LITE
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-06-02 15:56:53
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-06-02 15:56:53
-Cross Bar - Date: 2017-06-08 15:56:53 --> K: 79.89987565458088 --> D: 76.94471588361925
-✅ Sell -- Engulfing Date: 2017-06-09 15:56:53
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: LITE 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-06-09
+🍩 Cross Inside Bands: (2017-06-08) K(79.90) D(76.94)
+🍫 K Divergence - Point.1[Date(2017-05-16) K(-)] Point.2[Date(2017-06-02) K(81.57)
+🍫 Price Divergence - Point.1[Date(2017-04-24) Price(-)] Point.2[Date(2017-06-08) Price(65.10)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  FRC
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-07-10 15:30:26
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-07-10 15:30:26
-Cross Bar - Date: 2017-07-11 15:30:26 --> K: 74.9358926536028 --> D: 74.74400256194545
-✅ Sell -- Engulfing Date: 2017-07-13 15:30:26
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: FRC 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-07-13
+🍩 Cross Inside Bands: (2017-07-11) K(74.94) D(74.74)
+🍫 K Divergence - Point.1[Date(2017-06-13) K(-)] Point.2[Date(2017-07-10) K(80.04)
+🍫 Price Divergence - Point.1[Date(2017-06-19) Price(-)] Point.2[Date(2017-07-10) Price(103.43)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  UNM
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-07-13 16:08:51
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-07-13 16:08:51
-Cross Bar - Date: 2017-07-19 16:08:51 --> K: 74.66253029800353 --> D: 72.21570648085189
-✅ Sell -- Engulfing Date: 2017-07-20 16:08:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: UNM 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-07-20
+🍩 Cross Inside Bands: (2017-07-19) K(74.66) D(72.22)
+🍫 K Divergence - Point.1[Date(2017-06-19) K(-)] Point.2[Date(2017-07-13) K(80.12)
+🍫 Price Divergence - Point.1[Date(2017-06-19) Price(-)] Point.2[Date(2017-07-13) Price(48.15)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  HUBB
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-07-20 16:13:09
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-07-20 16:13:09
-Cross Bar - Date: 2017-07-25 16:13:09 --> K: 74.80807440462588 --> D: 74.24832248151004
-✅ Sell -- Engulfing Date: 2017-07-26 16:13:09
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: HUBB 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-07-26
+🍩 Cross Inside Bands: (2017-07-25) K(74.81) D(74.25)
+🍫 K Divergence - Point.1[Date(2017-06-14) K(-)] Point.2[Date(2017-07-20) K(81.45)
+🍫 Price Divergence - Point.1[Date(2017-06-12) Price(-)] Point.2[Date(2017-07-25) Price(120.65)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  RLGY
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-07-19 16:43:51
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-07-19 16:43:51
-Cross Bar - Date: 2017-07-25 16:43:51 --> K: 78.89963427263852 --> D: 77.2802739567855
-✅ Sell -- Engulfing Date: 2017-07-26 16:43:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: RLGY 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-07-26
+🍩 Cross Inside Bands: (2017-07-25) K(78.90) D(77.28)
+🍫 K Divergence - Point.1[Date(2017-07-03) K(-)] Point.2[Date(2017-07-19) K(81.36)
+🍫 Price Divergence - Point.1[Date(2017-07-03) Price(-)] Point.2[Date(2017-07-20) Price(33.99)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  FHI
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-07-20 16:48:58
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-07-20 16:48:58
-Cross Bar - Date: 2017-07-25 16:48:58 --> K: 77.25708186197267 --> D: 77.09146835744296
-✅ Sell -- Engulfing Date: 2017-07-26 16:48:58
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: FHI 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-07-26
+🍩 Cross Inside Bands: (2017-07-25) K(77.26) D(77.09)
+🍫 K Divergence - Point.1[Date(2017-06-15) K(-)] Point.2[Date(2017-07-20) K(87.34)
+🍫 Price Divergence - Point.1[Date(2017-06-14) Price(-)] Point.2[Date(2017-07-25) Price(29.79)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  OCGN
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-07-24 15:16:03
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-07-24 15:16:03
-Cross Bar - Date: 2017-07-25 15:16:03 --> K: 79.55257554993685 --> D: 79.16185046073242
-✅ Sell -- Engulfing Date: 2017-07-27 15:16:03
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: OCGN 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-07-27
+🍩 Cross Inside Bands: (2017-07-25) K(79.55) D(79.16)
+🍫 K Divergence - Point.1[Date(2017-06-27) K(-)] Point.2[Date(2017-07-24) K(80.51)
+🍫 Price Divergence - Point.1[Date(2017-06-13) Price(-)] Point.2[Date(2017-07-20) Price(117.96)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  VUZI
-💎 💎 💎 Oversold Divergence Found -- Date: 2017-08-07 16:21:03
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2017-08-07 16:21:03
-Cross Bar - Date: 2017-08-10 16:21:03 --> K: 25.63714063714059 --> D: 26.39083139083135
-✅ Buy -- Engulfing Date: 2017-08-11 16:21:03
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: VUZI 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2017-08-11
+🍩 Cross Inside Bands: (2017-08-10) K(25.64) D(26.39)
+🍫 K Divergence - Point.1[Date(2017-07-21) K(-)] Point.2[Date(2017-08-07) K(12.22)
+🍫 Price Divergence - Point.1[Date(2017-06-27) Price(-)] Point.2[Date(2017-08-10) Price(5.60)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  AYX
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-08-09 15:53:54
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-08-09 15:53:54
-Cross Bar - Date: 2017-08-14 15:53:54 --> K: 73.04280250136603 --> D: 72.9922894784773
-✅ Sell -- Engulfing Date: 2017-08-15 15:53:54
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: AYX 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-08-15
+🍩 Cross Inside Bands: (2017-08-14) K(73.04) D(72.99)
+🍫 K Divergence - Point.1[Date(2017-07-18) K(-)] Point.2[Date(2017-08-09) K(80.76)
+🍫 Price Divergence - Point.1[Date(2017-08-04) Price(-)] Point.2[Date(2017-08-14) Price(23.44)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  LE
-💎 💎 💎 Oversold Divergence Found -- Date: 2017-08-23 17:41:27
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2017-08-23 17:41:27
-Cross Bar - Date: 2017-08-24 17:41:27 --> K: 20.791902888014427 --> D: 23.868449720980923
-✅ Buy -- Engulfing Date: 2017-08-28 17:41:27
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: LE 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2017-08-28
+🍩 Cross Inside Bands: (2017-08-24) K(20.79) D(23.87)
+🍫 K Divergence - Point.1[Date(2017-08-07) K(-)] Point.2[Date(2017-08-23) K(19.97)
+🍫 Price Divergence - Point.1[Date(2017-08-10) Price(-)] Point.2[Date(2017-08-23) Price(11.85)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  MNKD
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-08-30 17:23:09
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-08-30 17:23:09
-Cross Bar - Date: 2017-08-31 17:23:09 --> K: 79.9982217575807 --> D: 79.97425974313747
-✅ Sell -- Engulfing Date: 2017-09-01 17:23:09
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: MNKD 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-09-01
+🍩 Cross Inside Bands: (2017-08-31) K(80.00) D(79.97)
+🍫 K Divergence - Point.1[Date(2017-08-18) K(-)] Point.2[Date(2017-08-30) K(81.02)
+🍫 Price Divergence - Point.1[Date(2017-07-18) Price(-)] Point.2[Date(2017-08-31) Price(2.07)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  PSO
-💎 💎 💎 Oversold Divergence Found -- Date: 2017-09-08 18:03:09
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2017-09-08 18:03:09
-Cross Bar - Date: 2017-09-11 18:03:09 --> K: 20.18578778792425 --> D: 21.367794187321945
-✅ Buy -- Engulfing Date: 2017-09-12 18:03:09
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: PSO 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2017-09-12
+🍩 Cross Inside Bands: (2017-09-11) K(20.19) D(21.37)
+🍫 K Divergence - Point.1[Date(2017-08-18) K(-)] Point.2[Date(2017-09-08) K(19.54)
+🍫 Price Divergence - Point.1[Date(2017-08-18) Price(-)] Point.2[Date(2017-09-08) Price(7.67)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  INVA
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-10-03 17:34:27
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-10-03 17:34:27
-Cross Bar - Date: 2017-10-05 17:34:27 --> K: 78.81368750405026 --> D: 78.00926346957496
-✅ Sell -- Engulfing Date: 2017-10-06 17:34:27
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: INVA 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-10-06
+🍩 Cross Inside Bands: (2017-10-05) K(78.81) D(78.01)
+🍫 K Divergence - Point.1[Date(2017-08-31) K(-)] Point.2[Date(2017-10-03) K(80.13)
+🍫 Price Divergence - Point.1[Date(2017-09-06) Price(-)] Point.2[Date(2017-10-05) Price(14.75)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  AEL
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-10-11 17:07:21
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-10-11 17:07:21
-Cross Bar - Date: 2017-10-16 17:07:21 --> K: 76.63364945948341 --> D: 76.4790391556288
-✅ Sell -- Engulfing Date: 2017-10-17 17:07:21
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: AEL 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-10-17
+🍩 Cross Inside Bands: (2017-10-16) K(76.63) D(76.48)
+🍫 K Divergence - Point.1[Date(2017-09-28) K(-)] Point.2[Date(2017-10-11) K(83.14)
+🍫 Price Divergence - Point.1[Date(2017-09-01) Price(-)] Point.2[Date(2017-10-16) Price(30.13)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  IEP
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-10-20 17:09:52
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-10-20 17:09:52
-Cross Bar - Date: 2017-10-23 17:09:52 --> K: 79.36719888205053 --> D: 78.99727450222515
-✅ Sell -- Engulfing Date: 2017-10-25 17:09:52
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: IEP 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-10-25
+🍩 Cross Inside Bands: (2017-10-23) K(79.37) D(79.00)
+🍫 K Divergence - Point.1[Date(2017-10-09) K(-)] Point.2[Date(2017-10-20) K(82.51)
+🍫 Price Divergence - Point.1[Date(2017-10-09) Price(-)] Point.2[Date(2017-10-20) Price(57.49)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  AMN
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-10-25 16:32:51
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-10-25 16:32:51
-Cross Bar - Date: 2017-10-31 16:32:51 --> K: 61.260134407063696 --> D: 59.76435291128221
-✅ Sell -- Engulfing Date: 2017-11-01 16:32:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: AMN 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-11-01
+🍩 Cross Inside Bands: (2017-10-31) K(61.26) D(59.76)
+🍫 K Divergence - Point.1[Date(2017-10-03) K(-)] Point.2[Date(2017-10-25) K(80.35)
+🍫 Price Divergence - Point.1[Date(2017-10-20) Price(-)] Point.2[Date(2017-10-31) Price(43.90)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  CB
-💎 💎 💎 Oversold Divergence Found -- Date: 2017-11-22 15:05:56
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2017-11-22 15:05:56
-Cross Bar - Date: 2017-11-24 15:05:56 --> K: 23.30107261143299 --> D: 24.77123690599183
-✅ Buy -- Engulfing Date: 2017-11-27 15:05:56
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: CB 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2017-11-27
+🍩 Cross Inside Bands: (2017-11-24) K(23.30) D(24.77)
+🍫 K Divergence - Point.1[Date(2017-11-06) K(-)] Point.2[Date(2017-11-22) K(18.11)
+🍫 Price Divergence - Point.1[Date(2017-11-03) Price(-)] Point.2[Date(2017-11-22) Price(148.25)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  ASB
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-11-24 16:23:03
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-11-24 16:23:03
-Cross Bar - Date: 2017-11-29 16:23:03 --> K: 77.20760080008426 --> D: 76.663368755219
-✅ Sell -- Engulfing Date: 2017-11-30 16:23:03
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: ASB 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-11-30
+🍩 Cross Inside Bands: (2017-11-29) K(77.21) D(76.66)
+🍫 K Divergence - Point.1[Date(2017-10-26) K(-)] Point.2[Date(2017-11-24) K(82.27)
+🍫 Price Divergence - Point.1[Date(2017-10-20) Price(-)] Point.2[Date(2017-11-29) Price(26.10)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  TTEK
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-11-28 16:26:03
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-11-28 16:26:03
-Cross Bar - Date: 2017-11-29 16:26:03 --> K: 76.67077175697867 --> D: 76.55332608589977
-✅ Sell -- Engulfing Date: 2017-11-30 16:26:03
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: TTEK 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-11-30
+🍩 Cross Inside Bands: (2017-11-29) K(76.67) D(76.55)
+🍫 K Divergence - Point.1[Date(2017-10-27) K(-)] Point.2[Date(2017-11-28) K(80.15)
+🍫 Price Divergence - Point.1[Date(2017-11-13) Price(-)] Point.2[Date(2017-11-24) Price(50.70)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  SNA
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-12-04 15:40:50
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-12-04 15:40:50
-Cross Bar - Date: 2017-12-08 15:40:50 --> K: 79.34706305329523 --> D: 78.5912461074745
-✅ Sell -- Engulfing Date: 2017-12-11 15:40:50
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: SNA 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-12-11
+🍩 Cross Inside Bands: (2017-12-08) K(79.35) D(78.59)
+🍫 K Divergence - Point.1[Date(2017-10-25) K(-)] Point.2[Date(2017-12-04) K(88.86)
+🍫 Price Divergence - Point.1[Date(2017-11-06) Price(-)] Point.2[Date(2017-12-04) Price(173.32)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  BOOT
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-12-04 16:25:10
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-12-04 16:25:10
-Cross Bar - Date: 2017-12-08 16:25:10 --> K: 78.23455111487569 --> D: 76.3016334578201
-✅ Sell -- Engulfing Date: 2017-12-11 16:25:10
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: BOOT 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-12-11
+🍩 Cross Inside Bands: (2017-12-08) K(78.23) D(76.30)
+🍫 K Divergence - Point.1[Date(2017-11-13) K(-)] Point.2[Date(2017-12-04) K(85.09)
+🍫 Price Divergence - Point.1[Date(2017-10-26) Price(-)] Point.2[Date(2017-12-04) Price(15.35)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  FUV
-💎 💎 💎 Oversold Divergence Found -- Date: 2017-12-05 16:47:03
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2017-12-05 16:47:03
-Cross Bar - Date: 2017-12-08 16:47:03 --> K: 20.223623853211006 --> D: 22.272199513462635
-✅ Buy -- Engulfing Date: 2017-12-11 16:47:03
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: FUV 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2017-12-11
+🍩 Cross Inside Bands: (2017-12-08) K(20.22) D(22.27)
+🍫 K Divergence - Point.1[Date(2017-11-22) K(-)] Point.2[Date(2017-12-05) K(19.75)
+🍫 Price Divergence - Point.1[Date(2017-10-19) Price(-)] Point.2[Date(2017-12-08) Price(2.69)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  HXL
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-12-21 16:26:15
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-12-21 16:26:15
-Cross Bar - Date: 2017-12-22 16:26:15 --> K: 78.79595361460647 --> D: 78.70627356671575
-✅ Sell -- Engulfing Date: 2017-12-26 16:26:15
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: HXL 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-12-26
+🍩 Cross Inside Bands: (2017-12-22) K(78.80) D(78.71)
+🍫 K Divergence - Point.1[Date(2017-11-30) K(-)] Point.2[Date(2017-12-21) K(80.60)
+🍫 Price Divergence - Point.1[Date(2017-11-30) Price(-)] Point.2[Date(2017-12-22) Price(62.46)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  ITT
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-12-22 16:22:09
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-12-22 16:22:09
-Cross Bar - Date: 2017-12-26 16:22:09 --> K: 79.12776364703572 --> D: 77.43468336268172
-✅ Sell -- Engulfing Date: 2017-12-28 16:22:09
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: ITT 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-12-28
+🍩 Cross Inside Bands: (2017-12-26) K(79.13) D(77.43)
+🍫 K Divergence - Point.1[Date(2017-11-27) K(-)] Point.2[Date(2017-12-22) K(80.62)
+🍫 Price Divergence - Point.1[Date(2017-11-30) Price(-)] Point.2[Date(2017-12-21) Price(54.31)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  BOKF
-💎 💎 💎 Overbought Divergence Found -- Date: 2017-12-22 17:27:10
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2017-12-22 17:27:10
-Cross Bar - Date: 2017-12-28 17:27:10 --> K: 77.71746915600158 --> D: 77.42855953522911
-✅ Sell -- Engulfing Date: 2017-12-29 17:27:10
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: BOKF 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2017-12-29
+🍩 Cross Inside Bands: (2017-12-28) K(77.72) D(77.43)
+🍫 K Divergence - Point.1[Date(2017-12-04) K(-)] Point.2[Date(2017-12-22) K(81.51)
+🍫 Price Divergence - Point.1[Date(2017-12-04) Price(-)] Point.2[Date(2017-12-28) Price(93.49)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  AUY
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-01-18 16:05:33
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-01-18 16:05:33
-Cross Bar - Date: 2018-01-24 16:05:33 --> K: 68.54703072398976 --> D: 68.3588938882141
-✅ Sell -- Engulfing Date: 2018-01-25 16:05:33
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: AUY 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-01-25
+🍩 Cross Inside Bands: (2018-01-24) K(68.55) D(68.36)
+🍫 K Divergence - Point.1[Date(2017-12-22) K(-)] Point.2[Date(2018-01-18) K(82.66)
+🍫 Price Divergence - Point.1[Date(2018-01-02) Price(-)] Point.2[Date(2018-01-24) Price(3.68)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  VNOM
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-01-25 17:54:39
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-01-25 17:54:39
-Cross Bar - Date: 2018-01-26 17:54:39 --> K: 79.28315104402058 --> D: 78.68045712807368
-✅ Sell -- Engulfing Date: 2018-01-30 17:54:39
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: VNOM 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-01-30
+🍩 Cross Inside Bands: (2018-01-26) K(79.28) D(78.68)
+🍫 K Divergence - Point.1[Date(2017-12-28) K(-)] Point.2[Date(2018-01-25) K(81.50)
+🍫 Price Divergence - Point.1[Date(2017-12-28) Price(-)] Point.2[Date(2018-01-24) Price(25.77)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  LPSN
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-02-08 16:27:09
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-02-08 16:27:09
-Cross Bar - Date: 2018-02-09 16:27:09 --> K: 20.53215303215306 --> D: 23.815967982634664
-✅ Buy -- Engulfing Date: 2018-02-13 16:27:09
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: LPSN 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-02-13
+🍩 Cross Inside Bands: (2018-02-09) K(20.53) D(23.82)
+🍫 K Divergence - Point.1[Date(2018-01-24) K(-)] Point.2[Date(2018-02-08) K(18.89)
+🍫 Price Divergence - Point.1[Date(2017-12-11) Price(-)] Point.2[Date(2018-02-08) Price(10.93)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  TWTR
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-02-16 14:55:50
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-02-16 14:55:50
-Cross Bar - Date: 2018-02-20 14:55:50 --> K: 79.95052767215975 --> D: 79.67508789116708
-✅ Sell -- Engulfing Date: 2018-02-22 14:55:50
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: TWTR 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-02-22
+🍩 Cross Inside Bands: (2018-02-20) K(79.95) D(79.68)
+🍫 K Divergence - Point.1[Date(2018-02-01) K(-)] Point.2[Date(2018-02-16) K(80.64)
+🍫 Price Divergence - Point.1[Date(2018-01-12) Price(-)] Point.2[Date(2018-02-14) Price(33.75)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  BAC
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-02-21 14:52:52
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-02-21 14:52:52
-Cross Bar - Date: 2018-02-26 14:52:52 --> K: 79.24032695768469 --> D: 78.910240076016
-✅ Sell -- Engulfing Date: 2018-02-28 14:52:52
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: BAC 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-02-28
+🍩 Cross Inside Bands: (2018-02-26) K(79.24) D(78.91)
+🍫 K Divergence - Point.1[Date(2018-01-26) K(-)] Point.2[Date(2018-02-21) K(88.42)
+🍫 Price Divergence - Point.1[Date(2018-02-15) Price(-)] Point.2[Date(2018-02-26) Price(32.42)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  LILA
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-03-28 18:02:58
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-03-28 18:02:58
-Cross Bar - Date: 2018-03-29 18:02:58 --> K: 20.124230581030474 --> D: 22.187222225726767
-✅ Buy -- Engulfing Date: 2018-04-02 18:02:58
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: LILA 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-04-02
+🍩 Cross Inside Bands: (2018-03-29) K(20.12) D(22.19)
+🍫 K Divergence - Point.1[Date(2018-03-02) K(-)] Point.2[Date(2018-03-28) K(18.56)
+🍫 Price Divergence - Point.1[Date(2018-03-01) Price(-)] Point.2[Date(2018-03-29) Price(19.45)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  ICPT
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-04-10 17:26:09
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-04-10 17:26:09
-Cross Bar - Date: 2018-04-16 17:26:09 --> K: 78.75396371254277 --> D: 77.90404618694568
-✅ Sell -- Engulfing Date: 2018-04-17 17:26:09
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: ICPT 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-04-17
+🍩 Cross Inside Bands: (2018-04-16) K(78.75) D(77.90)
+🍫 K Divergence - Point.1[Date(2018-03-08) K(-)] Point.2[Date(2018-04-10) K(85.96)
+🍫 Price Divergence - Point.1[Date(2018-03-12) Price(-)] Point.2[Date(2018-04-10) Price(75.09)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  PPG
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-04-25 15:19:39
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-04-25 15:19:39
-Cross Bar - Date: 2018-04-26 15:19:39 --> K: 21.690576778024244 --> D: 23.502291795879646
-✅ Buy -- Engulfing Date: 2018-04-27 15:19:39
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: PPG 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-04-27
+🍩 Cross Inside Bands: (2018-04-26) K(21.69) D(23.50)
+🍫 K Divergence - Point.1[Date(2018-03-23) K(-)] Point.2[Date(2018-04-25) K(19.29)
+🍫 Price Divergence - Point.1[Date(2018-04-11) Price(-)] Point.2[Date(2018-04-24) Price(105.77)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  VRSK
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-05-15 15:26:52
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-05-15 15:26:52
-Cross Bar - Date: 2018-05-21 15:26:52 --> K: 75.4684285246736 --> D: 74.65473098657459
-✅ Sell -- Engulfing Date: 2018-05-22 15:26:52
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: VRSK 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-05-22
+🍩 Cross Inside Bands: (2018-05-21) K(75.47) D(74.65)
+🍫 K Divergence - Point.1[Date(2018-04-16) K(-)] Point.2[Date(2018-05-15) K(83.76)
+🍫 Price Divergence - Point.1[Date(2018-05-10) Price(-)] Point.2[Date(2018-05-21) Price(107.16)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  PGR
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-05-30 15:09:51
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-05-30 15:09:51
-Cross Bar - Date: 2018-06-05 15:09:51 --> K: 69.36102418842334 --> D: 67.52216521477014
-✅ Sell -- Engulfing Date: 2018-06-06 15:09:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: PGR 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-06-06
+🍩 Cross Inside Bands: (2018-06-05) K(69.36) D(67.52)
+🍫 K Divergence - Point.1[Date(2018-05-11) K(-)] Point.2[Date(2018-05-30) K(80.66)
+🍫 Price Divergence - Point.1[Date(2018-05-11) Price(-)] Point.2[Date(2018-05-30) Price(63.00)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  UPS
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-06-05 14:59:20
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-06-05 14:59:20
-Cross Bar - Date: 2018-06-06 14:59:20 --> K: 79.1326805538553 --> D: 76.87672513349928
-✅ Sell -- Engulfing Date: 2018-06-07 14:59:20
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: UPS 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-06-07
+🍩 Cross Inside Bands: (2018-06-06) K(79.13) D(76.88)
+🍫 K Divergence - Point.1[Date(2018-05-16) K(-)] Point.2[Date(2018-06-05) K(81.12)
+🍫 Price Divergence - Point.1[Date(2018-05-21) Price(-)] Point.2[Date(2018-06-01) Price(117.25)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  GRPN
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-06-12 16:54:51
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-06-12 16:54:51
-Cross Bar - Date: 2018-06-13 16:54:51 --> K: 20.30158730158729 --> D: 20.925925925925924
-✅ Buy -- Engulfing Date: 2018-06-14 16:54:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: GRPN 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-06-14
+🍩 Cross Inside Bands: (2018-06-13) K(20.30) D(20.93)
+🍫 K Divergence - Point.1[Date(2018-05-23) K(-)] Point.2[Date(2018-06-12) K(18.86)
+🍫 Price Divergence - Point.1[Date(2018-05-22) Price(-)] Point.2[Date(2018-06-13) Price(90.40)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  CLVS
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-06-12 16:41:52
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-06-12 16:41:52
-Cross Bar - Date: 2018-06-13 16:41:52 --> K: 21.498401797198124 --> D: 21.62127351430021
-✅ Buy -- Engulfing Date: 2018-06-15 16:41:52
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: CLVS 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-06-15
+🍩 Cross Inside Bands: (2018-06-13) K(21.50) D(21.62)
+🍫 K Divergence - Point.1[Date(2018-05-30) K(-)] Point.2[Date(2018-06-12) K(18.53)
+🍫 Price Divergence - Point.1[Date(2018-05-08) Price(-)] Point.2[Date(2018-06-12) Price(42.06)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  PPG
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-06-20 15:19:39
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-06-20 15:19:39
-Cross Bar - Date: 2018-06-26 15:19:39 --> K: 77.34849951790531 --> D: 75.2661465242965
-✅ Sell -- Engulfing Date: 2018-06-27 15:19:39
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: PPG 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-06-27
+🍩 Cross Inside Bands: (2018-06-26) K(77.35) D(75.27)
+🍫 K Divergence - Point.1[Date(2018-06-12) K(-)] Point.2[Date(2018-06-20) K(82.60)
+🍫 Price Divergence - Point.1[Date(2018-05-21) Price(-)] Point.2[Date(2018-06-26) Price(105.83)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  DVAX
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-06-27 16:40:53
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-06-27 16:40:53
-Cross Bar - Date: 2018-06-28 16:40:53 --> K: 21.33513071895424 --> D: 22.245648518307004
-✅ Buy -- Engulfing Date: 2018-07-02 16:40:53
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: DVAX 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-07-02
+🍩 Cross Inside Bands: (2018-06-28) K(21.34) D(22.25)
+🍫 K Divergence - Point.1[Date(2018-05-30) K(-)] Point.2[Date(2018-06-27) K(19.90)
+🍫 Price Divergence - Point.1[Date(2018-06-04) Price(-)] Point.2[Date(2018-06-27) Price(15.15)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  SWX
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-07-11 16:30:04
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-07-11 16:30:04
-Cross Bar - Date: 2018-07-12 16:30:04 --> K: 79.52173913043491 --> D: 79.4145922037511
-✅ Sell -- Engulfing Date: 2018-07-13 16:30:04
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: SWX 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-07-13
+🍩 Cross Inside Bands: (2018-07-12) K(79.52) D(79.41)
+🍫 K Divergence - Point.1[Date(2018-06-22) K(-)] Point.2[Date(2018-07-11) K(80.38)
+🍫 Price Divergence - Point.1[Date(2018-06-21) Price(-)] Point.2[Date(2018-07-12) Price(80.08)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  CENX
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-07-16 16:54:09
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-07-16 16:54:09
-Cross Bar - Date: 2018-07-20 16:54:09 --> K: 26.029523168969625 --> D: 27.088342767653767
-✅ Buy -- Engulfing Date: 2018-07-23 16:54:09
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: CENX 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-07-23
+🍩 Cross Inside Bands: (2018-07-20) K(26.03) D(27.09)
+🍫 K Divergence - Point.1[Date(2018-07-05) K(-)] Point.2[Date(2018-07-16) K(17.50)
+🍫 Price Divergence - Point.1[Date(2018-06-19) Price(-)] Point.2[Date(2018-07-20) Price(12.96)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  HTH
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-07-18 17:09:03
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-07-18 17:09:03
-Cross Bar - Date: 2018-07-19 17:09:03 --> K: 20.933453778982187 --> D: 21.074579718543454
-✅ Buy -- Engulfing Date: 2018-07-23 17:09:03
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: HTH 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-07-23
+🍩 Cross Inside Bands: (2018-07-19) K(20.93) D(21.07)
+🍫 K Divergence - Point.1[Date(2018-07-03) K(-)] Point.2[Date(2018-07-18) K(19.41)
+🍫 Price Divergence - Point.1[Date(2018-06-29) Price(-)] Point.2[Date(2018-07-17) Price(21.51)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  ENS
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-07-31 17:01:33
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-07-31 17:01:33
-Cross Bar - Date: 2018-08-01 17:01:33 --> K: 79.1691668103603 --> D: 77.18024592325017
-✅ Sell -- Engulfing Date: 2018-08-03 17:01:33
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: ENS 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-08-03
+🍩 Cross Inside Bands: (2018-08-01) K(79.17) D(77.18)
+🍫 K Divergence - Point.1[Date(2018-07-19) K(-)] Point.2[Date(2018-07-31) K(80.71)
+🍫 Price Divergence - Point.1[Date(2018-07-18) Price(-)] Point.2[Date(2018-07-31) Price(82.07)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  BSQR
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-09-14 16:42:53
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-09-14 16:42:53
-Cross Bar - Date: 2018-09-17 16:42:53 --> K: 21.142857142857103 --> D: 23.80952380952375
-✅ Buy -- Engulfing Date: 2018-09-18 16:42:53
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: BSQR 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-09-18
+🍩 Cross Inside Bands: (2018-09-17) K(21.14) D(23.81)
+🍫 K Divergence - Point.1[Date(2018-07-31) K(-)] Point.2[Date(2018-09-14) K(19.43)
+🍫 Price Divergence - Point.1[Date(2018-08-29) Price(-)] Point.2[Date(2018-09-13) Price(2.15)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  ADBE
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-09-14 14:54:02
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-09-14 14:54:02
-Cross Bar - Date: 2018-09-17 14:54:02 --> K: 79.51914534309819 --> D: 78.01819345256649
-✅ Sell -- Engulfing Date: 2018-09-19 14:54:02
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: ADBE 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-09-19
+🍩 Cross Inside Bands: (2018-09-17) K(79.52) D(78.02)
+🍫 K Divergence - Point.1[Date(2018-08-29) K(-)] Point.2[Date(2018-09-14) K(81.90)
+🍫 Price Divergence - Point.1[Date(2018-08-29) Price(-)] Point.2[Date(2018-09-14) Price(274.69)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  LNTH
-💎 💎 💎 Overbought Divergence Found -- Date: 2018-09-18 17:07:09
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2018-09-18 17:07:09
-Cross Bar - Date: 2018-09-19 17:07:09 --> K: 78.75268817204297 --> D: 78.53046594982077
-✅ Sell -- Engulfing Date: 2018-09-21 17:07:09
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: LNTH 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2018-09-21
+🍩 Cross Inside Bands: (2018-09-19) K(78.75) D(78.53)
+🍫 K Divergence - Point.1[Date(2018-08-31) K(-)] Point.2[Date(2018-09-18) K(81.07)
+🍫 Price Divergence - Point.1[Date(2018-08-31) Price(-)] Point.2[Date(2018-09-14) Price(16.35)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  W
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-10-30 15:02:51
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-10-30 15:02:51
-Cross Bar - Date: 2018-11-02 15:02:51 --> K: 20.094723113193336 --> D: 21.644254774893824
-✅ Buy -- Engulfing Date: 2018-11-05 15:02:51
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: W 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-11-05
+🍩 Cross Inside Bands: (2018-11-02) K(20.09) D(21.64)
+🍫 K Divergence - Point.1[Date(2018-10-11) K(-)] Point.2[Date(2018-10-30) K(16.87)
+🍫 Price Divergence - Point.1[Date(2018-10-11) Price(-)] Point.2[Date(2018-11-02) Price(92.96)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  BKR
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-12-11 15:23:08
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-12-11 15:23:08
-Cross Bar - Date: 2018-12-12 15:23:08 --> K: 20.40220600162204 --> D: 24.47219616572619
-✅ Buy -- Engulfing Date: 2018-12-13 15:23:08
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: BKR 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-12-13
+🍩 Cross Inside Bands: (2018-12-12) K(20.40) D(24.47)
+🍫 K Divergence - Point.1[Date(2018-11-15) K(-)] Point.2[Date(2018-12-11) K(19.85)
+🍫 Price Divergence - Point.1[Date(2018-11-01) Price(-)] Point.2[Date(2018-12-10) Price(21.27)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  GSL
-💎 💎 💎 Oversold Divergence Found -- Date: 2018-12-24 17:25:09
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2018-12-24 17:25:09
-Cross Bar - Date: 2018-12-26 17:25:09 --> K: 23.189070498348457 --> D: 23.847125148290854
-✅ Buy -- Engulfing Date: 2018-12-28 17:25:09
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: GSL 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2018-12-28
+🍩 Cross Inside Bands: (2018-12-26) K(23.19) D(23.85)
+🍫 K Divergence - Point.1[Date(2018-12-03) K(-)] Point.2[Date(2018-12-24) K(18.23)
+🍫 Price Divergence - Point.1[Date(2018-09-21) Price(-)] Point.2[Date(2018-12-24) Price(4.26)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  LYB
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-02-04 15:21:14
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-02-04 15:21:14
-Cross Bar - Date: 2019-02-05 15:21:14 --> K: 79.29279462461258 --> D: 79.00698265373732
-✅ Sell -- Engulfing Date: 2019-02-06 15:21:14
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: LYB 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-02-06
+🍩 Cross Inside Bands: (2019-02-05) K(79.29) D(79.01)
+🍫 K Divergence - Point.1[Date(2019-01-10) K(-)] Point.2[Date(2019-02-04) K(80.99)
+🍫 Price Divergence - Point.1[Date(2019-01-18) Price(-)] Point.2[Date(2019-02-01) Price(88.89)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑
 
-🎃 🎃 Stoch 🎃 🎃  BSMX
-💎 💎 💎 Oversold Divergence Found -- Date: 2019-03-11 18:03:16
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2019-03-11 18:03:16
-Cross Bar - Date: 2019-03-12 18:03:16 --> K: 20.593117933279597 --> D: 21.483889336180386
-✅ Buy -- Engulfing Date: 2019-03-14 18:03:16
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: BSMX 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2019-03-14
+🍩 Cross Inside Bands: (2019-03-12) K(20.59) D(21.48)
+🍫 K Divergence - Point.1[Date(2019-02-13) K(-)] Point.2[Date(2019-03-11) K(19.92)
+🍫 Price Divergence - Point.1[Date(2019-02-13) Price(-)] Point.2[Date(2019-03-08) Price(6.51)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  CMS
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-03-27 15:25:56
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-03-27 15:25:56
-Cross Bar - Date: 2019-03-28 15:25:56 --> K: 79.32530634900306 --> D: 78.62320598533583
-✅ Sell -- Engulfing Date: 2019-04-01 15:25:56
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: CMS 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-04-01
+🍩 Cross Inside Bands: (2019-03-28) K(79.33) D(78.62)
+🍫 K Divergence - Point.1[Date(2019-03-14) K(-)] Point.2[Date(2019-03-27) K(83.48)
+🍫 Price Divergence - Point.1[Date(2019-02-28) Price(-)] Point.2[Date(2019-03-26) Price(56.23)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  EL
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-04-01 15:07:20
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-04-01 15:07:20
-Cross Bar - Date: 2019-04-02 15:07:20 --> K: 79.5692937239731 --> D: 77.97759037982291
-✅ Sell -- Engulfing Date: 2019-04-04 15:07:20
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: EL 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-04-04
+🍩 Cross Inside Bands: (2019-04-02) K(79.57) D(77.98)
+🍫 K Divergence - Point.1[Date(2019-03-18) K(-)] Point.2[Date(2019-04-01) K(81.22)
+🍫 Price Divergence - Point.1[Date(2019-03-18) Price(-)] Point.2[Date(2019-03-29) Price(165.55)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  COOP
-💎 💎 💎 Oversold Divergence Found -- Date: 2019-04-24 16:51:27
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2019-04-24 16:51:27
-Cross Bar - Date: 2019-04-25 16:51:27 --> K: 20.1796298195242 --> D: 21.41519087562983
-✅ Buy -- Engulfing Date: 2019-04-26 16:51:27
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: COOP 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2019-04-26
+🍩 Cross Inside Bands: (2019-04-25) K(20.18) D(21.42)
+🍫 K Divergence - Point.1[Date(2019-04-15) K(-)] Point.2[Date(2019-04-24) K(19.79)
+🍫 Price Divergence - Point.1[Date(2019-02-14) Price(-)] Point.2[Date(2019-04-25) Price(8.29)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  LEA
-💎 💎 💎 Oversold Divergence Found -- Date: 2019-05-24 15:59:09
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2019-05-24 15:59:09
-Cross Bar - Date: 2019-05-31 15:59:09 --> K: 25.344984050274515 --> D: 26.073208383560807
-✅ Buy -- Engulfing Date: 2019-06-03 15:59:09
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: LEA 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2019-06-03
+🍩 Cross Inside Bands: (2019-05-31) K(25.34) D(26.07)
+🍫 K Divergence - Point.1[Date(2019-04-30) K(-)] Point.2[Date(2019-05-24) K(11.31)
+🍫 Price Divergence - Point.1[Date(2019-03-22) Price(-)] Point.2[Date(2019-05-31) Price(119.03)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  TRI
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-06-11 16:17:57
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-06-11 16:17:57
-Cross Bar - Date: 2019-06-12 16:17:57 --> K: 78.64571476666174 --> D: 77.3619309828779
-✅ Sell -- Engulfing Date: 2019-06-13 16:17:57
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: TRI 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-06-13
+🍩 Cross Inside Bands: (2019-06-12) K(78.65) D(77.36)
+🍫 K Divergence - Point.1[Date(2019-05-16) K(-)] Point.2[Date(2019-06-11) K(81.16)
+🍫 Price Divergence - Point.1[Date(2019-05-21) Price(-)] Point.2[Date(2019-06-07) Price(66.87)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  BPMC
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-07-08 16:05:15
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-07-08 16:05:15
-Cross Bar - Date: 2019-07-09 16:05:15 --> K: 79.68617521515009 --> D: 79.43481081165991
-✅ Sell -- Engulfing Date: 2019-07-11 16:05:15
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: BPMC 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-07-11
+🍩 Cross Inside Bands: (2019-07-09) K(79.69) D(79.43)
+🍫 K Divergence - Point.1[Date(2019-06-11) K(-)] Point.2[Date(2019-07-08) K(80.57)
+🍫 Price Divergence - Point.1[Date(2019-06-18) Price(-)] Point.2[Date(2019-07-03) Price(98.49)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  SPWH
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-07-08 17:41:53
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-07-08 17:41:53
-Cross Bar - Date: 2019-07-12 17:41:53 --> K: 77.92824537662538 --> D: 76.30553525971479
-✅ Sell -- Engulfing Date: 2019-07-15 17:41:53
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: SPWH 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-07-15
+🍩 Cross Inside Bands: (2019-07-12) K(77.93) D(76.31)
+🍫 K Divergence - Point.1[Date(2019-06-21) K(-)] Point.2[Date(2019-07-08) K(83.88)
+🍫 Price Divergence - Point.1[Date(2019-06-18) Price(-)] Point.2[Date(2019-07-12) Price(4.55)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  OTEX
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-07-09 16:52:09
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-07-09 16:52:09
-Cross Bar - Date: 2019-07-15 16:52:09 --> K: 76.13982314230665 --> D: 75.73137776033683
-✅ Sell -- Engulfing Date: 2019-07-16 16:52:09
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: OTEX 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-07-16
+🍩 Cross Inside Bands: (2019-07-15) K(76.14) D(75.73)
+🍫 K Divergence - Point.1[Date(2019-06-13) K(-)] Point.2[Date(2019-07-09) K(81.79)
+🍫 Price Divergence - Point.1[Date(2019-06-24) Price(-)] Point.2[Date(2019-07-11) Price(42.95)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  UHAL
-💎 💎 💎 Oversold Divergence Found -- Date: 2019-08-26 16:18:52
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2019-08-26 16:18:52
-Cross Bar - Date: 2019-08-27 16:18:52 --> K: 21.196323387236152 --> D: 21.36386023628245
-✅ Buy -- Engulfing Date: 2019-08-28 16:18:52
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: UHAL 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2019-08-28
+🍩 Cross Inside Bands: (2019-08-27) K(21.20) D(21.36)
+🍫 K Divergence - Point.1[Date(2019-08-07) K(-)] Point.2[Date(2019-08-26) K(18.32)
+🍫 Price Divergence - Point.1[Date(2019-07-10) Price(-)] Point.2[Date(2019-08-26) Price(340.21)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  ARNA
-💎 💎 💎 Oversold Divergence Found -- Date: 2019-09-03 16:57:51
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2019-09-03 16:57:51
-Cross Bar - Date: 2019-09-09 16:57:51 --> K: 20.173871617063384 --> D: 21.70315421118804
-✅ Buy -- Engulfing Date: 2019-09-10 16:57:51
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: ARNA 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2019-09-10
+🍩 Cross Inside Bands: (2019-09-09) K(20.17) D(21.70)
+🍫 K Divergence - Point.1[Date(2019-08-14) K(-)] Point.2[Date(2019-09-03) K(16.09)
+🍫 Price Divergence - Point.1[Date(2019-08-12) Price(-)] Point.2[Date(2019-09-09) Price(50.18)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  ZEN
-💎 💎 💎 Oversold Divergence Found -- Date: 2019-09-09 15:30:15
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2019-09-09 15:30:15
-Cross Bar - Date: 2019-09-13 15:30:15 --> K: 21.270944826562797 --> D: 21.678884634839815
-✅ Buy -- Engulfing Date: 2019-09-16 15:30:15
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: ZEN 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2019-09-16
+🍩 Cross Inside Bands: (2019-09-13) K(21.27) D(21.68)
+🍫 K Divergence - Point.1[Date(2019-08-06) K(-)] Point.2[Date(2019-09-09) K(19.58)
+🍫 Price Divergence - Point.1[Date(2019-08-12) Price(-)] Point.2[Date(2019-09-13) Price(73.46)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  ARCB
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-11-08 16:41:51
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-11-08 16:41:51
-Cross Bar - Date: 2019-11-11 16:41:51 --> K: 77.5163427113682 --> D: 76.79153175289792
-✅ Sell -- Engulfing Date: 2019-11-12 16:41:51
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: ARCB 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-11-12
+🍩 Cross Inside Bands: (2019-11-11) K(77.52) D(76.79)
+🍫 K Divergence - Point.1[Date(2019-10-18) K(-)] Point.2[Date(2019-11-08) K(80.38)
+🍫 Price Divergence - Point.1[Date(2019-10-25) Price(-)] Point.2[Date(2019-11-05) Price(31.61)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  ABM
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-11-14 16:53:27
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-11-14 16:53:27
-Cross Bar - Date: 2019-11-20 16:53:27 --> K: 79.15409035206186 --> D: 78.92117918787113
-✅ Sell -- Engulfing Date: 2019-11-21 16:53:27
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: ABM 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-11-21
+🍩 Cross Inside Bands: (2019-11-20) K(79.15) D(78.92)
+🍫 K Divergence - Point.1[Date(2019-10-22) K(-)] Point.2[Date(2019-11-14) K(84.56)
+🍫 Price Divergence - Point.1[Date(2019-10-22) Price(-)] Point.2[Date(2019-11-19) Price(38.76)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  MOSY
-💎 💎 💎 Oversold Divergence Found -- Date: 2019-11-18 16:32:33
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2019-11-18 16:32:33
-Cross Bar - Date: 2019-11-22 16:32:33 --> K: 20.068951852253342 --> D: 21.07462527137656
-✅ Buy -- Engulfing Date: 2019-11-25 16:32:33
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: MOSY 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2019-11-25
+🍩 Cross Inside Bands: (2019-11-22) K(20.07) D(21.07)
+🍫 K Divergence - Point.1[Date(2019-10-25) K(-)] Point.2[Date(2019-11-18) K(18.55)
+🍫 Price Divergence - Point.1[Date(2019-10-25) Price(-)] Point.2[Date(2019-11-18) Price(1.54)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  ATEC
-💎 💎 💎 Overbought Divergence Found -- Date: 2019-11-20 17:46:54
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2019-11-20 17:46:54
-Cross Bar - Date: 2019-11-21 17:46:54 --> K: 79.2315424929277 --> D: 78.52608934392613
-✅ Sell -- Engulfing Date: 2019-11-25 17:46:54
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: ATEC 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2019-11-25
+🍩 Cross Inside Bands: (2019-11-21) K(79.23) D(78.53)
+🍫 K Divergence - Point.1[Date(2019-11-04) K(-)] Point.2[Date(2019-11-20) K(80.34)
+🍫 Price Divergence - Point.1[Date(2019-11-05) Price(-)] Point.2[Date(2019-11-20) Price(7.53)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  RRC
-💎 💎 💎 Oversold Divergence Found -- Date: 2019-12-03 15:56:21
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2019-12-03 15:56:21
-Cross Bar - Date: 2019-12-04 15:56:21 --> K: 22.963847280810327 --> D: 23.083829198297735
-✅ Buy -- Engulfing Date: 2019-12-06 15:56:21
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: RRC 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2019-12-06
+🍩 Cross Inside Bands: (2019-12-04) K(22.96) D(23.08)
+🍫 K Divergence - Point.1[Date(2019-11-21) K(-)] Point.2[Date(2019-12-03) K(19.23)
+🍫 Price Divergence - Point.1[Date(2019-11-21) Price(-)] Point.2[Date(2019-12-02) Price(3.36)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  MRVL
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-01-17 15:03:26
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-01-17 15:03:26
-Cross Bar - Date: 2020-01-23 15:03:26 --> K: 72.47725002152774 --> D: 71.97998239502992
-✅ Sell -- Engulfing Date: 2020-01-24 15:03:26
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: MRVL 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-01-24
+🍩 Cross Inside Bands: (2020-01-23) K(72.48) D(71.98)
+🍫 K Divergence - Point.1[Date(2019-12-26) K(-)] Point.2[Date(2020-01-17) K(82.64)
+🍫 Price Divergence - Point.1[Date(2020-01-02) Price(-)] Point.2[Date(2020-01-17) Price(28.49)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  OTEX
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-01-22 16:52:09
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-01-22 16:52:09
-Cross Bar - Date: 2020-01-28 16:52:09 --> K: 71.3947491672466 --> D: 71.36657252853283
-✅ Sell -- Engulfing Date: 2020-01-29 16:52:09
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: OTEX 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-01-29
+🍩 Cross Inside Bands: (2020-01-28) K(71.39) D(71.37)
+🍫 K Divergence - Point.1[Date(2020-01-10) K(-)] Point.2[Date(2020-01-22) K(89.38)
+🍫 Price Divergence - Point.1[Date(2020-01-17) Price(-)] Point.2[Date(2020-01-28) Price(47.07)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  RDNT
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-02-20 17:48:27
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-02-20 17:48:27
-Cross Bar - Date: 2020-02-21 17:48:27 --> K: 79.04094438846604 --> D: 77.86256126117478
-✅ Sell -- Engulfing Date: 2020-02-25 17:48:27
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: RDNT 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-02-25
+🍩 Cross Inside Bands: (2020-02-21) K(79.04) D(77.86)
+🍫 K Divergence - Point.1[Date(2020-01-28) K(-)] Point.2[Date(2020-02-20) K(81.21)
+🍫 Price Divergence - Point.1[Date(2020-01-29) Price(-)] Point.2[Date(2020-02-21) Price(23.11)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  FMC
-💎 💎 💎 Oversold Divergence Found -- Date: 2020-03-12 15:48:32
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2020-03-12 15:48:32
-Cross Bar - Date: 2020-03-18 15:48:32 --> K: 24.945255555028005 --> D: 27.54800629894083
-✅ Buy -- Engulfing Date: 2020-03-19 15:48:32
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: FMC 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2020-03-19
+🍩 Cross Inside Bands: (2020-03-18) K(24.95) D(27.55)
+🍫 K Divergence - Point.1[Date(2020-02-28) K(-)] Point.2[Date(2020-03-12) K(18.55)
+🍫 Price Divergence - Point.1[Date(2020-02-27) Price(-)] Point.2[Date(2020-03-18) Price(59.82)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  APA
-💎 💎 💎 Oversold Divergence Found -- Date: 2020-04-02 15:30:52
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2020-04-02 15:30:52
-Cross Bar - Date: 2020-04-03 15:30:52 --> K: 20.03705332746879 --> D: 20.332910581923347
-✅ Buy -- Engulfing Date: 2020-04-06 15:30:52
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: APA 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2020-04-06
+🍩 Cross Inside Bands: (2020-04-03) K(20.04) D(20.33)
+🍫 K Divergence - Point.1[Date(2020-03-17) K(-)] Point.2[Date(2020-04-02) K(16.61)
+🍫 Price Divergence - Point.1[Date(2020-02-26) Price(-)] Point.2[Date(2020-04-01) Price(4.02)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  TAC
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-04-13 17:59:10
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-04-13 17:59:10
-Cross Bar - Date: 2020-04-14 17:59:10 --> K: 79.94635142192469 --> D: 79.86970258056995
-✅ Sell -- Engulfing Date: 2020-04-16 17:59:10
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: TAC 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-04-16
+🍩 Cross Inside Bands: (2020-04-14) K(79.95) D(79.87)
+🍫 K Divergence - Point.1[Date(2020-03-31) K(-)] Point.2[Date(2020-04-13) K(80.47)
+🍫 Price Divergence - Point.1[Date(2020-03-26) Price(-)] Point.2[Date(2020-04-09) Price(5.78)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  LKFN
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-04-30 17:05:09
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-04-30 17:05:09
-Cross Bar - Date: 2020-05-01 17:05:09 --> K: 78.7843204497295 --> D: 76.59353578073647
-✅ Sell -- Engulfing Date: 2020-05-05 17:05:09
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: LKFN 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-05-05
+🍩 Cross Inside Bands: (2020-05-01) K(78.78) D(76.59)
+🍫 K Divergence - Point.1[Date(2020-04-13) K(-)] Point.2[Date(2020-04-30) K(80.43)
+🍫 Price Divergence - Point.1[Date(2020-04-13) Price(-)] Point.2[Date(2020-04-29) Price(43.60)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  IART
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-05-05 16:43:10
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-05-05 16:43:10
-Cross Bar - Date: 2020-05-11 16:43:10 --> K: 76.12137085505124 --> D: 75.54393328908155
-✅ Sell -- Engulfing Date: 2020-05-12 16:43:10
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: IART 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-05-12
+🍩 Cross Inside Bands: (2020-05-11) K(76.12) D(75.54)
+🍫 K Divergence - Point.1[Date(2020-04-13) K(-)] Point.2[Date(2020-05-05) K(84.28)
+🍫 Price Divergence - Point.1[Date(2020-04-17) Price(-)] Point.2[Date(2020-05-11) Price(52.53)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  XLNX
-💎 💎 💎 Oversold Divergence Found -- Date: 2020-05-07 15:06:57
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2020-05-07 15:06:57
-Cross Bar - Date: 2020-05-13 15:06:57 --> K: 36.57753463504968 --> D: 37.58104176621638
-✅ Buy -- Engulfing Date: 2020-05-14 15:06:57
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: XLNX 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2020-05-14
+🍩 Cross Inside Bands: (2020-05-13) K(36.58) D(37.58)
+🍫 K Divergence - Point.1[Date(2020-03-12) K(-)] Point.2[Date(2020-05-07) K(19.16)
+🍫 Price Divergence - Point.1[Date(2020-05-01) Price(-)] Point.2[Date(2020-05-13) Price(82.07)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  KBR
-💎 💎 💎 Oversold Divergence Found -- Date: 2020-05-07 16:13:09
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2020-05-07 16:13:09
-Cross Bar - Date: 2020-05-13 16:13:09 --> K: 28.924034064550362 --> D: 29.006577326729353
-✅ Buy -- Engulfing Date: 2020-05-14 16:13:09
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: KBR 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2020-05-14
+🍩 Cross Inside Bands: (2020-05-13) K(28.92) D(29.01)
+🍫 K Divergence - Point.1[Date(2020-04-21) K(-)] Point.2[Date(2020-05-07) K(16.52)
+🍫 Price Divergence - Point.1[Date(2020-04-21) Price(-)] Point.2[Date(2020-05-13) Price(17.46)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  AMN
-💎 💎 💎 Oversold Divergence Found -- Date: 2020-05-07 16:32:51
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2020-05-07 16:32:51
-Cross Bar - Date: 2020-05-13 16:32:51 --> K: 22.894161677020854 --> D: 24.90159115442901
-✅ Buy -- Engulfing Date: 2020-05-14 16:32:51
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: AMN 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2020-05-14
+🍩 Cross Inside Bands: (2020-05-13) K(22.89) D(24.90)
+🍫 K Divergence - Point.1[Date(2020-04-27) K(-)] Point.2[Date(2020-05-07) K(13.27)
+🍫 Price Divergence - Point.1[Date(2020-03-27) Price(-)] Point.2[Date(2020-05-13) Price(37.54)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  VNOM
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-06-08 17:54:39
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-06-08 17:54:39
-Cross Bar - Date: 2020-06-09 17:54:39 --> K: 78.9222770997738 --> D: 77.71458390416683
-✅ Sell -- Engulfing Date: 2020-06-10 17:54:39
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: VNOM 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-06-10
+🍩 Cross Inside Bands: (2020-06-09) K(78.92) D(77.71)
+🍫 K Divergence - Point.1[Date(2020-05-26) K(-)] Point.2[Date(2020-06-08) K(80.49)
+🍫 Price Divergence - Point.1[Date(2020-04-30) Price(-)] Point.2[Date(2020-06-08) Price(13.70)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  FNKO
-💎 💎 💎 Oversold Divergence Found -- Date: 2020-07-10 17:22:09
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2020-07-10 17:22:09
-Cross Bar - Date: 2020-07-13 17:22:09 --> K: 20.080977642486683 --> D: 20.39739161743724
-✅ Buy -- Engulfing Date: 2020-07-14 17:22:09
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: FNKO 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2020-07-14
+🍩 Cross Inside Bands: (2020-07-13) K(20.08) D(20.40)
+🍫 K Divergence - Point.1[Date(2020-06-22) K(-)] Point.2[Date(2020-07-10) K(18.12)
+🍫 Price Divergence - Point.1[Date(2020-06-26) Price(-)] Point.2[Date(2020-07-09) Price(4.93)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  GIII
-💎 💎 💎 Oversold Divergence Found -- Date: 2020-08-04 17:30:53
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2020-08-04 17:30:53
-Cross Bar - Date: 2020-08-05 17:30:53 --> K: 20.2120760027858 --> D: 20.30087882489452
-✅ Buy -- Engulfing Date: 2020-08-07 17:30:53
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: GIII 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2020-08-07
+🍩 Cross Inside Bands: (2020-08-05) K(20.21) D(20.30)
+🍫 K Divergence - Point.1[Date(2020-07-14) K(-)] Point.2[Date(2020-08-04) K(19.26)
+🍫 Price Divergence - Point.1[Date(2020-07-20) Price(-)] Point.2[Date(2020-08-03) Price(9.63)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  AMD
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-08-26 14:51:56
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-08-26 14:51:56
-Cross Bar - Date: 2020-09-01 14:51:56 --> K: 78.30764762793444 --> D: 76.89880166149918
-✅ Sell -- Engulfing Date: 2020-09-02 14:51:56
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: AMD 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-09-02
+🍩 Cross Inside Bands: (2020-09-01) K(78.31) D(76.90)
+🍫 K Divergence - Point.1[Date(2020-08-06) K(-)] Point.2[Date(2020-08-26) K(83.17)
+🍫 Price Divergence - Point.1[Date(2020-08-06) Price(-)] Point.2[Date(2020-09-01) Price(92.18)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  TXRH
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-08-28 15:49:52
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-08-28 15:49:52
-Cross Bar - Date: 2020-09-03 15:49:52 --> K: 77.01141557589416 --> D: 73.29424107903763
-✅ Sell -- Engulfing Date: 2020-09-04 15:49:52
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: TXRH 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-09-04
+🍩 Cross Inside Bands: (2020-09-03) K(77.01) D(73.29)
+🍫 K Divergence - Point.1[Date(2020-08-04) K(-)] Point.2[Date(2020-08-28) K(80.45)
+🍫 Price Divergence - Point.1[Date(2020-07-15) Price(-)] Point.2[Date(2020-09-03) Price(65.37)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  BKI
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-09-18 15:53:02
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-09-18 15:53:02
-Cross Bar - Date: 2020-09-21 15:53:02 --> K: 79.00323833870394 --> D: 78.10281628687723
-✅ Sell -- Engulfing Date: 2020-09-23 15:53:02
-🎃 🎃 🎃 🎃 
 
 
+💎 Stochastic Divergence Found: BKI 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-09-23
+🍩 Cross Inside Bands: (2020-09-21) K(79.00) D(78.10)
+🍫 K Divergence - Point.1[Date(2020-08-28) K(-)] Point.2[Date(2020-09-18) K(80.63)
+🍫 Price Divergence - Point.1[Date(2020-09-02) Price(-)] Point.2[Date(2020-09-16) Price(86.21)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-🎃 🎃 Stoch 🎃 🎃  NUAN
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-10-13 15:11:52
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-10-13 15:11:52
-Cross Bar - Date: 2020-10-15 15:11:52 --> K: 79.49174559044388 --> D: 79.37253497743076
-✅ Sell -- Engulfing Date: 2020-10-19 15:11:52
-🎃 🎃 🎃 🎃 
 
-🎃 🎃 Stoch 🎃 🎃  BAND
-💎 💎 💎 Oversold Divergence Found -- Date: 2020-11-13 16:36:51
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2020-11-13 16:36:51
-Cross Bar - Date: 2020-11-16 16:36:51 --> K: 22.009524770593636 --> D: 23.323239327200394
-✅ Buy -- Engulfing Date: 2020-11-17 16:36:51
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: NUAN 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-10-19
+🍩 Cross Inside Bands: (2020-10-15) K(79.49) D(79.37)
+🍫 K Divergence - Point.1[Date(2020-09-18) K(-)] Point.2[Date(2020-10-13) K(80.01)
+🍫 Price Divergence - Point.1[Date(2020-09-22) Price(-)] Point.2[Date(2020-10-13) Price(35.20)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  COF
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-11-11 15:00:20
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-11-11 15:00:20
-Cross Bar - Date: 2020-11-16 15:00:20 --> K: 74.92687709247551 --> D: 74.3858612201592
-✅ Sell -- Engulfing Date: 2020-11-18 15:00:20
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: BAND 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2020-11-17
+🍩 Cross Inside Bands: (2020-11-16) K(22.01) D(23.32)
+🍫 K Divergence - Point.1[Date(2020-10-26) K(-)] Point.2[Date(2020-11-13) K(19.70)
+🍫 Price Divergence - Point.1[Date(2020-10-26) Price(-)] Point.2[Date(2020-11-16) Price(141.65)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  AMP
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-11-11 15:24:08
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-11-11 15:24:08
-Cross Bar - Date: 2020-11-16 15:24:08 --> K: 79.62843981102728 --> D: 78.49364440352308
-✅ Sell -- Engulfing Date: 2020-11-18 15:24:08
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: COF 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-11-18
+🍩 Cross Inside Bands: (2020-11-16) K(74.93) D(74.39)
+🍫 K Divergence - Point.1[Date(2020-10-08) K(-)] Point.2[Date(2020-11-11) K(80.54)
+🍫 Price Divergence - Point.1[Date(2020-10-12) Price(-)] Point.2[Date(2020-11-16) Price(88.61)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  CNP PRB
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-11-11 17:46:51
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-11-11 17:46:51
-Cross Bar - Date: 2020-11-17 17:46:51 --> K: 78.60535610933806 --> D: 76.32512762462301
-✅ Sell -- Engulfing Date: 2020-11-18 17:46:51
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: AMP 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-11-18
+🍩 Cross Inside Bands: (2020-11-16) K(79.63) D(78.49)
+🍫 K Divergence - Point.1[Date(2020-10-09) K(-)] Point.2[Date(2020-11-11) K(82.39)
+🍫 Price Divergence - Point.1[Date(2020-10-23) Price(-)] Point.2[Date(2020-11-16) Price(185.97)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  NTRS
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-11-19 15:42:53
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-11-19 15:42:53
-Cross Bar - Date: 2020-11-25 15:42:53 --> K: 77.34141448497215 --> D: 76.74649557375139
-✅ Sell -- Engulfing Date: 2020-11-27 15:42:53
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: CNP PRB 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-11-18
+🍩 Cross Inside Bands: (2020-11-17) K(78.61) D(76.33)
+🍫 K Divergence - Point.1[Date(2020-10-27) K(-)] Point.2[Date(2020-11-11) K(84.17)
+🍫 Price Divergence - Point.1[Date(2020-10-27) Price(-)] Point.2[Date(2020-11-17) Price(44.81)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  RCI
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-12-01 17:11:04
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-12-01 17:11:04
-Cross Bar - Date: 2020-12-04 17:11:04 --> K: 75.43413779813133 --> D: 73.5168155827406
-✅ Sell -- Engulfing Date: 2020-12-07 17:11:04
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: NTRS 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-11-27
+🍩 Cross Inside Bands: (2020-11-25) K(77.34) D(76.75)
+🍫 K Divergence - Point.1[Date(2020-10-09) K(-)] Point.2[Date(2020-11-19) K(85.22)
+🍫 Price Divergence - Point.1[Date(2020-10-16) Price(-)] Point.2[Date(2020-11-24) Price(97.61)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  MYGN
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-12-07 17:00:52
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-12-07 17:00:52
-Cross Bar - Date: 2020-12-11 17:00:52 --> K: 78.67258820626691 --> D: 77.5346150682938
-✅ Sell -- Engulfing Date: 2020-12-14 17:00:52
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: RCI 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-12-07
+🍩 Cross Inside Bands: (2020-12-04) K(75.43) D(73.52)
+🍫 K Divergence - Point.1[Date(2020-11-16) K(-)] Point.2[Date(2020-12-01) K(80.05)
+🍫 Price Divergence - Point.1[Date(2020-11-11) Price(-)] Point.2[Date(2020-12-04) Price(47.79)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  LYB
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-12-21 15:21:14
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-12-21 15:21:14
-Cross Bar - Date: 2020-12-22 15:21:14 --> K: 78.67684313213805 --> D: 77.76146277189646
-✅ Sell -- Engulfing Date: 2020-12-24 15:21:14
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: MYGN 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-12-14
+🍩 Cross Inside Bands: (2020-12-11) K(78.67) D(77.53)
+🍫 K Divergence - Point.1[Date(2020-11-12) K(-)] Point.2[Date(2020-12-07) K(82.30)
+🍫 Price Divergence - Point.1[Date(2020-10-22) Price(-)] Point.2[Date(2020-12-11) Price(19.72)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  NGVT
-💎 💎 💎 Overbought Divergence Found -- Date: 2020-12-30 17:03:15
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2020-12-30 17:03:15
-Cross Bar - Date: 2021-01-06 17:03:15 --> K: 67.03179039594525 --> D: 65.59501506956201
-✅ Sell -- Engulfing Date: 2021-01-07 17:03:15
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: LYB 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2020-12-24
+🍩 Cross Inside Bands: (2020-12-22) K(78.68) D(77.76)
+🍫 K Divergence - Point.1[Date(2020-11-25) K(-)] Point.2[Date(2020-12-21) K(80.98)
+🍫 Price Divergence - Point.1[Date(2020-12-04) Price(-)] Point.2[Date(2020-12-18) Price(90.93)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  LNT
-💎 💎 💎 Oversold Divergence Found -- Date: 2021-01-13 15:49:32
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2021-01-13 15:49:32
-Cross Bar - Date: 2021-01-14 15:49:32 --> K: 21.69678699644636 --> D: 22.211813313085585
-✅ Buy -- Engulfing Date: 2021-01-15 15:49:32
-🎃 🎃 🎃 🎃 
 
+💎 Stochastic Divergence Found: NGVT 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-01-07
+🍩 Cross Inside Bands: (2021-01-06) K(67.03) D(65.60)
+🍫 K Divergence - Point.1[Date(2020-12-11) K(-)] Point.2[Date(2020-12-30) K(84.04)
+🍫 Price Divergence - Point.1[Date(2020-12-15) Price(-)] Point.2[Date(2021-01-06) Price(78.37)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
 
-🎃 🎃 Stoch 🎃 🎃  RGEN
-💎 💎 💎 Overbought Divergence Found -- Date: 2021-01-13 15:39:02
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2021-01-13 15:39:02
-Cross Bar - Date: 2021-01-19 15:39:02 --> K: 79.75553168887087 --> D: 79.61582027973544
-✅ Sell -- Engulfing Date: 2021-01-20 15:39:02
-🎃 🎃 🎃 🎃 
+
+💎 Stochastic Divergence Found: LNT 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2021-01-15
+🍩 Cross Inside Bands: (2021-01-14) K(21.70) D(22.21)
+🍫 K Divergence - Point.1[Date(2020-12-14) K(-)] Point.2[Date(2021-01-13) K(17.53)
+🍫 Price Divergence - Point.1[Date(2020-12-23) Price(-)] Point.2[Date(2021-01-12) Price(48.03)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
+
+
+
+
+💎 Stochastic Divergence Found: RGEN 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-01-20
+🍩 Cross Inside Bands: (2021-01-19) K(79.76) D(79.62)
+🍫 K Divergence - Point.1[Date(2020-12-23) K(-)] Point.2[Date(2021-01-13) K(84.25)
+🍫 Price Divergence - Point.1[Date(2020-12-23) Price(-)] Point.2[Date(2021-01-19) Price(222.19)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🤑 13%
 
 
-🎃 🎃 Stoch 🎃 🎃  GRWG
-💎 💎 💎 Overbought Divergence Found -- Date: 2021-01-12 16:06:52
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2021-01-12 16:06:52
-Cross Bar - Date: 2021-01-19 16:06:52 --> K: 78.68396896349896 --> D: 78.43173711359613
-✅ Sell -- Engulfing Date: 2021-01-20 16:06:52
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: GRWG 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-01-20
+🍩 Cross Inside Bands: (2021-01-19) K(78.68) D(78.43)
+🍫 K Divergence - Point.1[Date(2020-12-22) K(-)] Point.2[Date(2021-01-12) K(81.88)
+🍫 Price Divergence - Point.1[Date(2020-12-22) Price(-)] Point.2[Date(2021-01-19) Price(52.31)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 ❌
 
 
-🎃 🎃 Stoch 🎃 🎃  ZG
-💎 💎 💎 Overbought Divergence Found -- Date: 2021-01-13 16:09:10
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2021-01-13 16:09:10
-Cross Bar - Date: 2021-01-20 16:09:10 --> K: 72.45344815036435 --> D: 72.36386919328596
-✅ Sell -- Engulfing Date: 2021-01-21 16:09:10
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: ZG 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-01-21
+🍩 Cross Inside Bands: (2021-01-20) K(72.45) D(72.36)
+🍫 K Divergence - Point.1[Date(2020-12-17) K(-)] Point.2[Date(2021-01-13) K(83.98)
+🍫 Price Divergence - Point.1[Date(2020-12-22) Price(-)] Point.2[Date(2021-01-20) Price(156.64)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🤑 11%
 
 
-🎃 🎃 Stoch 🎃 🎃  TKR
-💎 💎 💎 Oversold Divergence Found -- Date: 2021-02-10 16:22:52
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2021-02-10 16:22:52
-Cross Bar - Date: 2021-02-11 16:22:52 --> K: 21.465052918061804 --> D: 21.652044194788914
-✅ Buy -- Engulfing Date: 2021-02-12 16:22:52
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: TKR 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2021-02-12
+🍩 Cross Inside Bands: (2021-02-11) K(21.47) D(21.65)
+🍫 K Divergence - Point.1[Date(2021-01-29) K(-)] Point.2[Date(2021-02-10) K(17.24)
+🍫 Price Divergence - Point.1[Date(2021-01-04) Price(-)] Point.2[Date(2021-02-05) Price(72.79)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🤑 6%
 
 
-🎃 🎃 Stoch 🎃 🎃  DCI
-💎 💎 💎 Overbought Divergence Found -- Date: 2021-02-08 16:40:15
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2021-02-08 16:40:15
-Cross Bar - Date: 2021-02-12 16:40:15 --> K: 79.63850449328444 --> D: 79.19206959400235
-✅ Sell -- Engulfing Date: 2021-02-16 16:40:15
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: DCI 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-02-16
+🍩 Cross Inside Bands: (2021-02-12) K(79.64) D(79.19)
+🍫 K Divergence - Point.1[Date(2021-01-12) K(-)] Point.2[Date(2021-02-08) K(86.24)
+🍫 Price Divergence - Point.1[Date(2021-01-14) Price(-)] Point.2[Date(2021-02-12) Price(62.31)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🤑 5%
 
 
-🎃 🎃 Stoch 🎃 🎃  ORCL
-💎 💎 💎 Overbought Divergence Found -- Date: 2021-03-03 14:55:08
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2021-03-03 14:55:08
-Cross Bar - Date: 2021-03-09 14:55:08 --> K: 78.78462252382576 --> D: 78.03218636701489
-✅ Sell -- Engulfing Date: 2021-03-10 14:55:08
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: ORCL 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-03-10
+🍩 Cross Inside Bands: (2021-03-09) K(78.78) D(78.03)
+🍫 K Divergence - Point.1[Date(2021-02-10) K(-)] Point.2[Date(2021-03-03) K(82.23)
+🍫 Price Divergence - Point.1[Date(2021-02-09) Price(-)] Point.2[Date(2021-03-09) Price(72.64)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
+
 
 🚨 - No dia Seguinte abriu com um gap de 8%. Nao faz sentido comprar position
 
 
-🎃 🎃 Stoch 🎃 🎃  HA
-💎 💎 💎 Overbought Divergence Found -- Date: 2021-03-12 16:47:57
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2021-03-12 16:47:57
-Cross Bar - Date: 2021-03-15 16:47:57 --> K: 79.689051676899 --> D: 77.70821240871582
-✅ Sell -- Engulfing Date: 2021-03-16 16:47:57
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: HA 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-03-16
+🍩 Cross Inside Bands: (2021-03-15) K(79.69) D(77.71)
+🍫 K Divergence - Point.1[Date(2021-02-24) K(-)] Point.2[Date(2021-03-12) K(80.00)
+🍫 Price Divergence - Point.1[Date(2021-02-24) Price(-)] Point.2[Date(2021-03-15) Price(29.06)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🤑
 
 
-🎃 🎃 Stoch 🎃 🎃  MMSI
-💎 💎 💎 Overbought Divergence Found -- Date: 2021-04-27 17:07:15
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2021-04-27 17:07:15
-Cross Bar - Date: 2021-04-28 17:07:15 --> K: 77.97761345300523 --> D: 77.27641341386385
-✅ Sell -- Engulfing Date: 2021-04-29 17:07:15
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: MMSI 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-04-29
+🍩 Cross Inside Bands: (2021-04-28) K(77.98) D(77.28)
+🍫 K Divergence - Point.1[Date(2021-04-06) K(-)] Point.2[Date(2021-04-27) K(80.86)
+🍫 Price Divergence - Point.1[Date(2021-03-16) Price(-)] Point.2[Date(2021-04-23) Price(64.02)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🤑 - Tinha Earnings
 
 
-🎃 🎃 Stoch 🎃 🎃  TPX
-💎 💎 💎 Overbought Divergence Found -- Date: 2021-04-27 15:50:03
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2021-04-27 15:50:03
-Cross Bar - Date: 2021-04-28 15:50:03 --> K: 78.4730706419745 --> D: 75.95608795164439
-✅ Sell -- Engulfing Date: 2021-04-30 15:50:03
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: TPX 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-04-30
+🍩 Cross Inside Bands: (2021-04-28) K(78.47) D(75.96)
+🍫 K Divergence - Point.1[Date(2021-04-15) K(-)] Point.2[Date(2021-04-27) K(80.47)
+🍫 Price Divergence - Point.1[Date(2021-03-19) Price(-)] Point.2[Date(2021-04-27) Price(40.64)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🤑
 
 
-🎃 🎃 Stoch 🎃 🎃  IONS
-💎 💎 💎 Oversold Divergence Found -- Date: 2021-05-25 16:05:03
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2021-05-25 16:05:03
-Cross Bar - Date: 2021-05-26 16:05:03 --> K: 21.101542628325003 --> D: 22.158285801111216
-✅ Buy -- Engulfing Date: 2021-05-27 16:05:03
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: IONS 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2021-05-27
+🍩 Cross Inside Bands: (2021-05-26) K(21.10) D(22.16)
+🍫 K Divergence - Point.1[Date(2021-05-10) K(-)] Point.2[Date(2021-05-25) K(19.10)
+🍫 Price Divergence - Point.1[Date(2021-05-10) Price(-)] Point.2[Date(2021-05-25) Price(35.28)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
+
 
 ❌ - Lose
 
 
-🎃 🎃 Stoch 🎃 🎃  CMRE
-💎 💎 💎 Overbought Divergence Found -- Date: 2021-06-11 17:58:04
-💎 💎 💎 Overbought above 80 💎 💎 💎 -- Date: 2021-06-11 17:58:04
-Cross Bar - Date: 2021-06-16 17:58:04 --> K: 78.59336987347731 --> D: 77.34847351849942
-✅ Sell -- Engulfing Date: 2021-06-17 17:58:04
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: CMRE 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-06-17
+🍩 Cross Inside Bands: (2021-06-16) K(78.59) D(77.35)
+🍫 K Divergence - Point.1[Date(2021-05-03) K(-)] Point.2[Date(2021-06-11) K(82.15)
+🍫 Price Divergence - Point.1[Date(2021-05-03) Price(-)] Point.2[Date(2021-06-16) Price(12.29)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🚨 - Divergence muito curta
 
 
-🎃 🎃 Stoch 🎃 🎃  LW
-💎 💎 💎 Oversold Divergence Found -- Date: 2021-07-19 15:55:03
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2021-07-19 15:55:03
-Cross Bar - Date: 2021-07-22 15:55:03 --> K: 21.880981436184324 --> D: 23.53546517455807
-✅ Buy -- Engulfing Date: 2021-07-26 15:55:03
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: LW 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2021-07-26
+🍩 Cross Inside Bands: (2021-07-22) K(21.88) D(23.54)
+🍫 K Divergence - Point.1[Date(2021-06-21) K(-)] Point.2[Date(2021-07-19) K(16.62)
+🍫 Price Divergence - Point.1[Date(2021-06-18) Price(-)] Point.2[Date(2021-07-19) Price(74.10)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🚨 - Tinha Earnings no dia seguinte ao engulfing
 
 
-🎃 🎃 Stoch 🎃 🎃  COUR
-💎 💎 💎 Oversold Divergence Found -- Date: 2021-08-19 16:14:27
-💎 💎 💎 Oversold below 20 💎 💎 💎 -- Date: 2021-08-19 16:14:27
-Cross Bar - Date: 2021-08-20 16:14:27 --> K: 22.083719464959067 --> D: 22.16198203989749
-✅ Buy -- Engulfing Date: 2021-08-24 16:14:27
-🎃 🎃 🎃 🎃 
+💎 Stochastic Divergence Found: COUR 💎 
+🔧 Order Type: Long 🔧 
+🍪 Engulfing Candle: 2021-08-24
+🍩 Cross Inside Bands: (2021-08-20) K(22.08) D(22.16)
+🍫 K Divergence - Point.1[Date(2021-08-03) K(-)] Point.2[Date(2021-08-19) K(19.65)
+🍫 Price Divergence - Point.1[Date(2021-07-30) Price(-)] Point.2[Date(2021-08-19) Price(35.45)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 🔧 Still Going
