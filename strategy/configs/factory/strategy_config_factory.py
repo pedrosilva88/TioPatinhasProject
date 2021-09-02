@@ -63,7 +63,7 @@ class StrategyConfigFactory:
                   market.country)
 
         openTime = (market.openTime.astimezone(
-            tz)-timedelta(seconds=constants.runStrategyBeforeHours)).time()
+            tz)-timedelta(hours=constants.runStrategyBeforeHours)).time()
 
         return StrategyStochDivergeConfig(market=market, runStrategyTime=openTime,
                                     kPeriod=constants.kPeriod, dPeriod=constants.dPeriod,
