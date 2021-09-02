@@ -60,6 +60,8 @@ class VaultZigZag(Vault):
 
     async def runMainStrategy(self):
         log("🕐 Run ZigZag Strategy for %s market now 🕐" % self.strategyConfig.market.country.code)
+        config: StrategyZigZagConfig = self.strategyConfig
+
         self.setupVault()
 
         await self.syncProviderData()
@@ -69,11 +71,11 @@ class VaultZigZag(Vault):
         
         for contract in self.contracts:
             events = self.allContractsEvents[contract.symbol]
-            if len(events) >= 5:
+            if len(events) >= config.daysBefore:
                 currentEvent = events[-1]
                 previousEvents = [] 
                 index = -2
-                while index >= -5:
+                while index >= -config.daysBefore:
                     event = events[index]
                     previousEvents.insert(0, event)
                     index -= 1
