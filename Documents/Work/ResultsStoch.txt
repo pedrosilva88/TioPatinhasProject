@@ -1,0 +1,16 @@
+Wins        - 6
+Loses       - 6
+Ignores     - 2
+
+Sum Wins    - 50
+Sum Loses   - 21
+
+Last Checked
+
+💎 Stochastic Divergence Found: NGVT 💎 
+🔧 Order Type: Short 🔧 
+🍪 Engulfing Candle: 2021-01-07
+🍩 Cross Inside Bands: (2021-01-06) K(67.03) D(65.60)
+🍫 K Divergence - Point.1[Date(2020-12-11) K(-)] Point.2[Date(2020-12-30) K(84.04)
+🍫 Price Divergence - Point.1[Date(2020-12-15) Price(-)] Point.2[Date(2021-01-06) Price(78.37)
+💎 💎 💎 💎 💎 💎 💎 💎 💎 

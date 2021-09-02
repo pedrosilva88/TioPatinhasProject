@@ -1183,7 +1183,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-15) Price(-)] Point.2[Date(2021-01-06) Price(78.37)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 7%
 
 
 💎 Stochastic Divergence Found: LNT 💎 
@@ -1194,7 +1194,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-23) Price(-)] Point.2[Date(2021-01-12) Price(48.03)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+❌ 1%
 
 
 💎 Stochastic Divergence Found: RGEN 💎 
@@ -1216,7 +1216,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-22) Price(-)] Point.2[Date(2021-01-19) Price(52.31)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌
+❌ 10%
 
 
 💎 Stochastic Divergence Found: ZG 💎 
@@ -1227,7 +1227,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-22) Price(-)] Point.2[Date(2021-01-20) Price(156.64)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 11%
+🤑 10%
 
 
 💎 Stochastic Divergence Found: TKR 💎 
@@ -1238,7 +1238,7 @@
 🍫 Price Divergence - Point.1[Date(2021-01-04) Price(-)] Point.2[Date(2021-02-05) Price(72.79)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 6%
+🤑 14%
 
 
 💎 Stochastic Divergence Found: DCI 💎 
@@ -1249,7 +1249,7 @@
 🍫 Price Divergence - Point.1[Date(2021-01-14) Price(-)] Point.2[Date(2021-02-12) Price(62.31)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 5%
+❌ 2%
 
 
 💎 Stochastic Divergence Found: ORCL 💎 
@@ -1272,7 +1272,7 @@
 🍫 Price Divergence - Point.1[Date(2021-02-24) Price(-)] Point.2[Date(2021-03-15) Price(29.06)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑
+❌ 3% A divergencia é muito curta. Teria dificuldade em definir StoopLoss e TakeProfit
 
 
 💎 Stochastic Divergence Found: MMSI 💎 
@@ -1283,7 +1283,7 @@
 🍫 Price Divergence - Point.1[Date(2021-03-16) Price(-)] Point.2[Date(2021-04-23) Price(64.02)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 - Tinha Earnings
+🤑 1% Tinha Earnings
 
 
 💎 Stochastic Divergence Found: TPX 💎 
@@ -1294,7 +1294,7 @@
 🍫 Price Divergence - Point.1[Date(2021-03-19) Price(-)] Point.2[Date(2021-04-27) Price(40.64)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑
+🤑 5%
 
 
 💎 Stochastic Divergence Found: IONS 💎 
@@ -1306,7 +1306,7 @@
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-❌ - Lose
+❌ - Lose 1%
 
 
 💎 Stochastic Divergence Found: CMRE 💎 
@@ -1317,7 +1317,7 @@
 🍫 Price Divergence - Point.1[Date(2021-05-03) Price(-)] Point.2[Date(2021-06-16) Price(12.29)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🚨 - Divergence muito curta
+❌ - Lose 4%
 
 
 💎 Stochastic Divergence Found: LW 💎 
@@ -1328,7 +1328,7 @@
 🍫 Price Divergence - Point.1[Date(2021-06-18) Price(-)] Point.2[Date(2021-07-19) Price(74.10)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🚨 - Tinha Earnings no dia seguinte ao engulfing
+🚨 - Tinha Earnings no dia seguinte ao engulfing. E o Gap é muito grande
 
 
 💎 Stochastic Divergence Found: COUR 💎 
