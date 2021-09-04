@@ -941,7 +941,7 @@
 🍫 Price Divergence - Point.1[Date(2020-02-26) Price(-)] Point.2[Date(2020-04-01) Price(4.02)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 100%  (6.53) (13.26)
 
 
 💎 Stochastic Divergence Found: TAC 💎 
@@ -952,7 +952,7 @@
 🍫 Price Divergence - Point.1[Date(2020-03-26) Price(-)] Point.2[Date(2020-04-09) Price(5.78)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+❌  5% (5.48) (5.77)
 
 
 💎 Stochastic Divergence Found: LKFN 💎 
@@ -963,7 +963,7 @@
 🍫 Price Divergence - Point.1[Date(2020-04-13) Price(-)] Point.2[Date(2020-04-29) Price(43.60)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 11% () ()
 
 
 💎 Stochastic Divergence Found: IART 💎 
@@ -974,7 +974,7 @@
 🍫 Price Divergence - Point.1[Date(2020-04-17) Price(-)] Point.2[Date(2020-05-11) Price(52.53)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-
+🤑 6% () ()
 
 
 💎 Stochastic Divergence Found: XLNX 💎 
@@ -985,7 +985,7 @@
 🍫 Price Divergence - Point.1[Date(2020-05-01) Price(-)] Point.2[Date(2020-05-13) Price(82.07)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 13%
+🤑 13% () ()
 
 
 💎 Stochastic Divergence Found: KBR 💎 
@@ -996,7 +996,7 @@
 🍫 Price Divergence - Point.1[Date(2020-04-21) Price(-)] Point.2[Date(2020-05-13) Price(17.46)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 20%
+🤑 20% () ()
 
 
 💎 Stochastic Divergence Found: AMN 💎 
@@ -1007,7 +1007,7 @@
 🍫 Price Divergence - Point.1[Date(2020-03-27) Price(-)] Point.2[Date(2020-05-13) Price(37.54)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 24%
+🤑 24% () ()
 
 
 💎 Stochastic Divergence Found: VNOM 💎 
@@ -1018,7 +1018,7 @@
 🍫 Price Divergence - Point.1[Date(2020-04-30) Price(-)] Point.2[Date(2020-06-08) Price(13.70)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 8%
+❌ 8% () ()
 
 
 💎 Stochastic Divergence Found: FNKO 💎 
@@ -1029,7 +1029,7 @@
 🍫 Price Divergence - Point.1[Date(2020-06-26) Price(-)] Point.2[Date(2020-07-09) Price(4.93)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 10%
+🤑 10% () ()
 
 
 💎 Stochastic Divergence Found: GIII 💎 
@@ -1040,7 +1040,7 @@
 🍫 Price Divergence - Point.1[Date(2020-07-20) Price(-)] Point.2[Date(2020-08-03) Price(9.63)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 3%
+🤑 3% () ()
 
 
 💎 Stochastic Divergence Found: AMD 💎 
@@ -1062,7 +1062,7 @@
 🍫 Price Divergence - Point.1[Date(2020-07-15) Price(-)] Point.2[Date(2020-09-03) Price(65.37)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 4%
+❌ 4% () ()
 
 
 💎 Stochastic Divergence Found: BKI 💎 
@@ -1073,7 +1073,7 @@
 🍫 Price Divergence - Point.1[Date(2020-09-02) Price(-)] Point.2[Date(2020-09-16) Price(86.21)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 2%
+❌ 2% () ()
 
 
 💎 Stochastic Divergence Found: NUAN 💎 
@@ -1084,7 +1084,7 @@
 🍫 Price Divergence - Point.1[Date(2020-09-22) Price(-)] Point.2[Date(2020-10-13) Price(35.20)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 7%
+🤑 7% () ()
 
 
 💎 Stochastic Divergence Found: BAND 💎 
@@ -1095,7 +1095,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-26) Price(-)] Point.2[Date(2020-11-16) Price(141.65)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 14%
+🤑 14% () ()
 
 
 💎 Stochastic Divergence Found: COF 💎 
@@ -1106,7 +1106,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-12) Price(-)] Point.2[Date(2020-11-16) Price(88.61)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 7%
+❌ 7% () ()
 
 
 💎 Stochastic Divergence Found: AMP 💎 
@@ -1117,7 +1117,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-23) Price(-)] Point.2[Date(2020-11-16) Price(185.97)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 6%
+❌ 6% () ()
 
 
 💎 Stochastic Divergence Found: CNP PRB 💎 
@@ -1139,7 +1139,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-16) Price(-)] Point.2[Date(2020-11-24) Price(97.61)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 5%
+🤑 5% () ()
 
 
 💎 Stochastic Divergence Found: RCI 💎 
@@ -1150,7 +1150,7 @@
 🍫 Price Divergence - Point.1[Date(2020-11-11) Price(-)] Point.2[Date(2020-12-04) Price(47.79)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 1%
+🤑 1% () ()
 
 
 💎 Stochastic Divergence Found: MYGN 💎 
@@ -1161,7 +1161,7 @@
 🍫 Price Divergence - Point.1[Date(2020-10-22) Price(-)] Point.2[Date(2020-12-11) Price(19.72)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 10%
+❌ 10% () ()
 
 
 💎 Stochastic Divergence Found: LYB 💎 
@@ -1172,7 +1172,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-04) Price(-)] Point.2[Date(2020-12-18) Price(90.93)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 4%
+❌ 4% () ()
 
 
 💎 Stochastic Divergence Found: NGVT 💎 
@@ -1183,7 +1183,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-15) Price(-)] Point.2[Date(2021-01-06) Price(78.37)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 7%
+🤑 7% () ()
 
 
 💎 Stochastic Divergence Found: LNT 💎 
@@ -1194,7 +1194,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-23) Price(-)] Point.2[Date(2021-01-12) Price(48.03)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 1%
+❌ 1% () ()
 
 
 💎 Stochastic Divergence Found: RGEN 💎 
@@ -1205,7 +1205,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-23) Price(-)] Point.2[Date(2021-01-19) Price(222.19)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 13%
+🤑 13% () ()
 
 
 💎 Stochastic Divergence Found: GRWG 💎 
@@ -1216,7 +1216,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-22) Price(-)] Point.2[Date(2021-01-19) Price(52.31)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 10%
+❌ 10% () ()
 
 
 💎 Stochastic Divergence Found: ZG 💎 
@@ -1227,7 +1227,7 @@
 🍫 Price Divergence - Point.1[Date(2020-12-22) Price(-)] Point.2[Date(2021-01-20) Price(156.64)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 10%
+🤑 10% () ()
 
 
 💎 Stochastic Divergence Found: TKR 💎 
@@ -1238,7 +1238,7 @@
 🍫 Price Divergence - Point.1[Date(2021-01-04) Price(-)] Point.2[Date(2021-02-05) Price(72.79)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 14%
+🤑 14% () ()
 
 
 💎 Stochastic Divergence Found: DCI 💎 
@@ -1249,7 +1249,7 @@
 🍫 Price Divergence - Point.1[Date(2021-01-14) Price(-)] Point.2[Date(2021-02-12) Price(62.31)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 2%
+❌ 2% () ()
 
 
 💎 Stochastic Divergence Found: ORCL 💎 
@@ -1272,7 +1272,7 @@
 🍫 Price Divergence - Point.1[Date(2021-02-24) Price(-)] Point.2[Date(2021-03-15) Price(29.06)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ 3% A divergencia é muito curta. Teria dificuldade em definir StoopLoss e TakeProfit
+❌ 3% (27.71) (28.67)  A divergencia é muito curta. Teria dificuldade em definir StoopLoss e TakeProfit
 
 
 💎 Stochastic Divergence Found: MMSI 💎 
@@ -1283,7 +1283,7 @@
 🍫 Price Divergence - Point.1[Date(2021-03-16) Price(-)] Point.2[Date(2021-04-23) Price(64.02)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 1% Tinha Earnings
+🤑 1% (62.91) (62.08) Tinha Earnings
 
 
 💎 Stochastic Divergence Found: TPX 💎 
@@ -1294,7 +1294,7 @@
 🍫 Price Divergence - Point.1[Date(2021-03-19) Price(-)] Point.2[Date(2021-04-27) Price(40.64)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-🤑 5%
+🤑 5% (39) (36.81)
 
 
 💎 Stochastic Divergence Found: IONS 💎 
@@ -1306,7 +1306,7 @@
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
 
-❌ - Lose 1%
+❌ 1% (37.06) (36.71)
 
 
 💎 Stochastic Divergence Found: CMRE 💎 
@@ -1317,7 +1317,7 @@
 🍫 Price Divergence - Point.1[Date(2021-05-03) Price(-)] Point.2[Date(2021-06-16) Price(12.29)
 💎 💎 💎 💎 💎 💎 💎 💎 💎 
 
-❌ - Lose 4%
+❌ 4% (11.84) (12.35)
 
 
 💎 Stochastic Divergence Found: LW 💎 

@@ -1,9 +1,9 @@
-Wins        - 15
-Loses       - 13
+Wins        - 18
+Loses       - 14
 Ignores     - 4
 
-Sum Wins    - 147
-Sum Loses   - 64
+Sum Wins    - 264
+Sum Loses   - 69
 
 Last Checked
 
