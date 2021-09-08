@@ -59,7 +59,7 @@ class StrategyResult:
     position: Position
 
     def __str__(self):
-        if self.bracketOrder.parentOrder is not None:
+        if self.bracketOrder is not None and self.bracketOrder.parentOrder is not None:
             return "Result for %s: %s %s size(%d) price(%.2f)\n" % (self.contract.symbol, 
                                                                     self.event.datetime.date(), 
                                                                     self.type, 

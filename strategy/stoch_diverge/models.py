@@ -19,9 +19,15 @@ class StrategyStochDivergeData(StrategyData):
         self.previousEvents = previousEvents
         
 class StrategyStochDivergeResult(StrategyResult):
-    priority: int
+    targetPrice: float
+    targetPercentage: float
+    candlesToHold: int
 
-    def __init__(self, contract: Contract, event: EventStochDiverge, type: StrategyResultType, priority: int = None, 
+    def __init__(self, contract: Contract, event: EventStochDiverge, type: StrategyResultType,
+                targetPrice: float = None, targetPercentage: float = None,
+                candlesToHold: int = None,
                 order: BracketOrder = None, position: Position = None):
         super().__init__(contract, event, type, order, position)
-        self.priority = priority
+        self.targetPrice = targetPrice
+        self.targetPercentage = targetPercentage
+        self.candlesToHold = candlesToHold

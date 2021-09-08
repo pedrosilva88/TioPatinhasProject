@@ -1,7 +1,7 @@
 from strategy.stoch_diverge.models import StrategyStochDivergeData, StrategyStochDivergeResult
 from models.stoch_diverge.models import EventStochDiverge
 from database.model import FillDB
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from strategy.configs.models import StrategyConfig
 from typing import List, Tuple
 from helpers import log
@@ -44,19 +44,67 @@ class StrategyStochDiverge(Strategy):
         if isEngulfing and isInsideBands:
             didCrossInsideBands, crossData, position = self.didCrossInsideBands(orderAction)
             if didCrossInsideBands:
-                hasDivergences, barKDivergence, barPriceDivergence = self.hasDivergences(orderAction, position)
+                hasDivergences, barKDivergenceTuple, barPriceDivergenceTuple = self.hasDivergences(orderAction, position)
                 if hasDivergences:
-                    print("💎 Stochastic Divergence Found: %s 💎 " % self.currentBar.contract.symbol)
-                    print("🔧 Order Type: %s 🔧 " % orderAction.code)
-                    print("🍪 Engulfing Candle: %s" % self.currentBar.datetime.date())
-                    print("🍩 Cross Inside Bands: (%s) K(%.2f) D(%.2f)" % (crossData.datetime.date(), crossData.k, crossData.d))
-                    kDivergenceDate = barKDivergence.kDivergenceOverbought if orderAction == OrderAction.Sell else barKDivergence.kDivergenceOversold
-                    print("🍫 K Divergence - Point.1[Date(%s) K(-)] Point.2[Date(%s) K(%.2f)" % (kDivergenceDate.date(), barKDivergence.datetime.date(), barKDivergence.k))
-                    priceDivergenceDate = barPriceDivergence.priceDivergenceOverbought if orderAction == OrderAction.Sell else barPriceDivergence.priceDivergenceOversold
-                    print("🍫 Price Divergence - Point.1[Date(%s) Price(-)] Point.2[Date(%s) Price(%.2f)" % (priceDivergenceDate.date(), barPriceDivergence.datetime.date(), barPriceDivergence.close))                    
-                    print("💎 💎 💎 💎 💎 💎 💎 💎 💎 \n\n\n\n")
+                    kDivergenceDate = barKDivergenceTuple[1].kDivergenceOverbought if orderAction == OrderAction.Sell else barKDivergenceTuple[1].kDivergenceOversold
+                    barKDivergence_Position_Start, barKDivergence_Data1 = self.getPreviousBar(kDivergenceDate)
+                    barKDivergence_Position_Finish, barKDivergence_Data2 = barKDivergenceTuple
 
-    def hasDivergences(self, orderAction: OrderAction, barPosition: int) -> Tuple[bool, EventStochDiverge, EventStochDiverge]:
+                    priceDivergenceDate = barPriceDivergenceTuple[1].priceDivergenceOverbought if orderAction == OrderAction.Sell else barPriceDivergenceTuple[1].priceDivergenceOversold
+                    barPriceDivergence_Position_Start, barPriceDivergence_Data1 = self.getPreviousBar(priceDivergenceDate)
+                    barPriceDivergence_Position_Finish, barPriceDivergence_Data2 = barPriceDivergenceTuple
+
+                    percentage, targetPrice = self.getTakeProfitPrice(orderAction, (barKDivergence_Position_Start, barKDivergence_Position_Finish), (barPriceDivergence_Position_Start, barPriceDivergence_Position_Finish))
+                    
+                    if abs(percentage) >= 0.03:
+                        print("💎 Stochastic Divergence Found: %s 💎 " % self.currentBar.contract.symbol)
+                        print("🔧 Order Type: %s 🔧 " % orderAction.code)
+                        print("🍪 Engulfing Candle: %s" % self.currentBar.datetime.date())
+                        print("🍩 Cross Inside Bands: (%s) K(%.2f) D(%.2f)" % (crossData.datetime.date(), crossData.k, crossData.d))
+                        print("🍫 K Divergence - Point.1[Date(%s) K(-)] Point.2[Date(%s) K(%.2f)" % (kDivergenceDate.date(), barKDivergence_Data2.datetime.date(), barKDivergence_Data2.k))
+                        print("🍫 Price Divergence - Point.1[Date(%s) Price(-)] Point.2[Date(%s) Price(%.2f)" % (priceDivergenceDate.date(), barPriceDivergence_Data2.datetime.date(), barPriceDivergence_Data2.close))
+                        print("🍫 Take Profit Data: Percentage(%.2f) Price(%.2f)" % (percentage, targetPrice))
+                        print("💎 💎 💎 💎 💎 💎 💎 💎 💎 \n\n\n\n")
+                        resultType = StrategyResultType.Buy if orderAction == OrderAction.Buy else StrategyResultType.Sell
+                        candlesToHold = max(barKDivergence_Position_Start-barKDivergence_Position_Finish, barPriceDivergence_Position_Start-barPriceDivergence_Position_Finish)
+                        return StrategyStochDivergeResult(self.currentBar.contract, self.currentBar, resultType, targetPrice, percentage, min(candlesToHold, 15))
+
+        return StrategyStochDivergeResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
+
+    def getTakeProfitPrice(self, orderAction: OrderAction, kPosition: Tuple[int, int], pricePosition: Tuple[int, int]) -> Tuple[float, float]:
+        startPosition = kPosition[0] if kPosition[0] > pricePosition[0] else pricePosition[0]
+        finishPosition = kPosition[1] if kPosition[1] < pricePosition[1] else pricePosition[1]
+
+        if orderAction == OrderAction.Buy:
+            higherPrice = self.currentBar.high
+            for i in range(finishPosition, startPosition):
+                previousBar = self.previousBars[-i]
+                if previousBar.high > higherPrice:
+                    higherPrice = previousBar.high
+            higherPrice = higherPrice - higherPrice*0.015
+            percentageValue = (self.currentBar.high/higherPrice)-1
+            return (percentageValue, higherPrice)
+
+        elif orderAction == OrderAction.Sell:
+            lowerPrice = self.currentBar.low
+            for i in range(finishPosition, startPosition):
+                previousBar = self.previousBars[-i]
+                if previousBar.low < lowerPrice:
+                    lowerPrice = previousBar.low
+            lowerPrice = lowerPrice + lowerPrice*0.015
+            percentageValue = (lowerPrice/self.currentBar.low)-1
+            return (percentageValue, lowerPrice)
+        
+        return None            
+
+    def getPreviousBar(self, datetime: datetime) -> Tuple[int, EventStochDiverge]:
+        for i in range(0, len(self.previousBars)):
+            previousBar = self.previousBars[-i]
+            if previousBar.datetime == datetime:
+                return (i, previousBar)
+        return (-1, None)
+
+    def hasDivergences(self, orderAction: OrderAction, barPosition: int) -> Tuple[bool, Tuple[int, EventStochDiverge], Tuple[int, EventStochDiverge]]:
         priceDivergenceFound = False
         kDivergenceFound = False
         kOutsideBands = False
@@ -64,32 +112,38 @@ class StrategyStochDiverge(Strategy):
         barPriceDivergence = None
         for j in range(barPosition, self.divergenceMaxPeriods):
             previousBar = self.previousBars[-j]
+            positionK = j
+            positionPrice = j
 
             if orderAction == OrderAction.Sell:
                 if previousBar.kDivergenceOverbought is not None:
                     kDivergenceFound = True
                     barKDivergence = previousBar
+                    positionK = j
                     if previousBar.k >= self.maxStochK:
                         kOutsideBands = True
 
                 if previousBar.priceDivergenceOverbought is not None:
                     priceDivergenceFound = True
                     barPriceDivergence = previousBar
+                    positionPrice = j
 
             elif orderAction == OrderAction.Buy:
                 if previousBar.kDivergenceOversold is not None:
                     kDivergenceFound = True
                     barKDivergence = previousBar
+                    positionK = j
                     if previousBar.k <= self.minStochK:
                         kOutsideBands = True
 
                 if previousBar.priceDivergenceOversold is not None:
                     priceDivergenceFound = True
                     barPriceDivergence = previousBar
+                    positionPrice = j
 
             if priceDivergenceFound and kDivergenceFound:
                 if kOutsideBands:
-                    return (True, barKDivergence, barPriceDivergence)
+                    return (True, (positionK ,barKDivergence), (positionPrice, barPriceDivergence))
 
         return (False, None, None)
 
