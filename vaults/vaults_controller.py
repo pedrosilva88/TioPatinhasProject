@@ -60,6 +60,7 @@ class VaultsController(VaultsControllerProtocol):
     async def scheduleNextOperation(self):
         vaultToRun = None
         action = None
+        actionToRun = None
         vaultToRunDatetime = None
         self.nextVaultToRun = None
         self.nextActionToRun = None
@@ -71,11 +72,12 @@ class VaultsController(VaultsControllerProtocol):
             if vaultToRunDatetime == None or operationDatetime <= vaultToRunDatetime:
                 vaultToRun = vault
                 vaultToRunDatetime = operationDatetime
+                actionToRun = action
 
         
         if vaultToRun is not None and vaultToRunDatetime is not None:
             self.nextVaultToRun = vaultToRun
-            self.nextActionToRun = action
+            self.nextActionToRun = actionToRun
             await self.createAsyncTask(vaultToRunDatetime)
             await self.runNextVaultOperation()
 
