@@ -9,9 +9,9 @@ from backtest.reports.report_module import ReportModule
 
 class ReportStochDivergeModule(ReportModule):
     def getHeaderRowForTradesReport(self) -> List[str]:
-        return["Date", "Order Date", "Symbol", "Result", "Action", "PnL", 
+        return["Date", "Order Date", "Symbol", "Result" "PnL", 
                 "Price CreateTrade", "Price CloseTrade", "Size", 
-                "Total Invested", "Cash", 
+                "Total Invested", "Action", "Cash", 
                 "Candles To Hold", "TP Target", "SL Target"]
                 
     def getRowForTradesReport(self, item: BacktestResult) -> List[Any]:

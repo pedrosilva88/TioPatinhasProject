@@ -19,8 +19,14 @@ class StrategyStochDivergeConfig(StrategyConfig):
     # The number of days to send to the strategy module
     daysBefore: int
 
+    maxPeriodsToHoldPosition: int
+    takeProfitSafeMargin: float
+    minTakeProfitToEnterPosition: float
+    winLossRatio: float
+
     def __init__(self, market: Market,
                         runStrategyTime: time,
+                        willingToLose: float,
                         kPeriod: int, dPeriod: int,
                         smooth: int,
                         minStochK: float,
@@ -29,10 +35,14 @@ class StrategyStochDivergeConfig(StrategyConfig):
                         divergenceMaxPeriods: int,
                         daysBeforeToDownload: int,
                         daysBefore: int,
-                        barSize: str):
+                        barSize: str,
+                        maxPeriodsToHoldPosition: int,
+                        takeProfitSafeMargin: float,
+                        minTakeProfitToEnterPosition: float,
+                        winLossRatio: float):
 
         StrategyConfig.__init__(self, market= market, runStrategyTime=runStrategyTime, 
-                                willingToLose=None, stopToLosePercentage= None, profitPercentage= None, 
+                                willingToLose=willingToLose, stopToLosePercentage= None, profitPercentage= None, 
                                 maxToInvestPerStockPercentage=None,
                                 maxToInvestPerStrategy= None,
                                 orderType= None)
@@ -51,6 +61,11 @@ class StrategyStochDivergeConfig(StrategyConfig):
         self.daysBefore = daysBefore
 
         self.barSize = barSize
+
+        self.maxPeriodsToHoldPosition = maxPeriodsToHoldPosition
+        self.takeProfitSafeMargin = takeProfitSafeMargin
+        self.minTakeProfitToEnterPosition = minTakeProfitToEnterPosition
+        self.winLossRatio = winLossRatio
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
         currentTime = now.time()

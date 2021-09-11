@@ -194,6 +194,7 @@ class BacktestStochDivergeModule(BacktestModule):
 
     def validateCurrentDay(self, event: Event):
         model: BacktestStochDivergeModule.RunStrategyStochDivergeModel = self.strategyModel
+        strategyConfig: StrategyStochDivergeConfig = model.strategyConfig
         if model.currentDay != event.datetime.date():
             balance = self.getBalance()
             model.tradesAvailable = 0
@@ -213,14 +214,13 @@ class BacktestStochDivergeModule(BacktestModule):
             result: StrategyStochDivergeResult = model.nextDayTrades[event.contract.symbol]
             gapPrice = result.targetPrice/event.open if result.type == StrategyResultType.Sell else event.open/result.targetPrice
             profitPercentage = abs(gapPrice-1)
-            stopLossPercentage = profitPercentage/2
-            print(profitPercentage)
-            if profitPercentage >= 0.02:
+            stopLossPercentage = profitPercentage/strategyConfig.winLossRatio
+            if profitPercentage >= strategyConfig.minTakeProfitToEnterPosition:
                 balance = self.getBalance()
                 size = self.positonSizing(balance, event.open, stopLossPercentage)
                 totalOrderCost = event.open * size
                 if size > 0:
-                    identifier = self.uniqueIdentifier(result.contract.symbol, result.event.datetime.date())
+                    identifier = self.uniqueIdentifier(result.contract.symbol, event.datetime.date())
                     action = OrderAction.Sell if result.type == StrategyResultType.Sell else OrderAction.Buy
                     parentOrder = Order(action, OrderType.MarketOrder, size, event.open)
                     profitOrder = Order(action.reverse, OrderType.LimitOrder, size, result.targetPrice)
@@ -242,7 +242,8 @@ class BacktestStochDivergeModule(BacktestModule):
             model.nextDayTrades.pop(event.contract.symbol)
 
     def positonSizing(self, balance: float, price: float, stopLossPercentage: float) -> int:
-        value = (balance*0.04)/(price*stopLossPercentage)
+        strategyConfig: StrategyStochDivergeConfig = self.strategyModel.strategyConfig
+        value = (balance*strategyConfig.willingToLose)/(price*stopLossPercentage)
         return int(round_down(value, 0))
 
     def handleEndOfDayIfNecessary(self, event: Event, events: List[Event], currentPosition: int):
@@ -266,10 +267,10 @@ class BacktestStochDivergeModule(BacktestModule):
                     stopOrder: Order = bracketOrder.stopLossOrder
                     loss = abs(stopOrder.price*stopOrder.size -
                                 mainOrder.price*mainOrder.size)
-                    stochDate = model.positionStochDates[key]
+                    candlesHold = model.positionStochHolds[key]
 
                     reportModule.createStopLossResult(
-                        event, bracketOrder, positionDate, loss, model.cashAvailable, stochDate)
+                        event, bracketOrder, positionDate, loss, model.cashAvailable, candlesHold)
 
                     model.positions.pop(key)
                     model.positionStochDates.pop(key)
@@ -282,9 +283,10 @@ class BacktestStochDivergeModule(BacktestModule):
                     profitOrder: Order = bracketOrder.takeProfitOrder
                     profit = abs(profitOrder.price*profitOrder.size -
                                     mainOrder.price*mainOrder.size)
-                    stochDate = model.positionStochDates[key]
+                    candlesHold = model.positionStochHolds[key]
+
                     reportModule.createTakeProfitResult(
-                        event, bracketOrder, positionDate, profit, model.cashAvailable, stochDate)
+                        event, bracketOrder, positionDate, profit, model.cashAvailable, candlesHold)
 
                     model.positions.pop(key)
                     model.positionStochDates.pop(key)
@@ -306,10 +308,10 @@ class BacktestStochDivergeModule(BacktestModule):
                         mainOrder: Order = bracketOrder.parentOrder
                         profit = abs(event.close*mainOrder.size -
                                         mainOrder.price*mainOrder.size)
-                        stochDate = model.positionStochDates[key]
+                        candlesHold = model.positionStochHolds[key]
 
                         reportModule.createProfitResult(
-                            event, bracketOrder, positionDate, profit, model.cashAvailable, stochDate)
+                            event, bracketOrder, positionDate, profit, model.cashAvailable, candlesHold)
 
                         if model.isForStockPerformance == False:
                             model.cashAvailable += profit
@@ -317,16 +319,15 @@ class BacktestStochDivergeModule(BacktestModule):
                         mainOrder: Order = bracketOrder.parentOrder
                         loss = abs(event.close*mainOrder.size -
                                     mainOrder.price*mainOrder.size)
-                        stochDate = model.positionStochDates[key]
+                        candlesHold = model.positionStochHolds[key]
 
                         reportModule.createLossResult(
-                            event, bracketOrder, positionDate, loss, model.cashAvailable, stochDate)
+                            event, bracketOrder, positionDate, loss, model.cashAvailable, candlesHold)
 
                         if model.isForStockPerformance == False:
                             model.cashAvailable -= loss
 
-                    identifier = self.uniqueIdentifier(
-                        event.contract.symbol, positionDate)
+                    identifier = self.uniqueIdentifier(event.contract.symbol, positionDate)
                     model.positions.pop(identifier)
                     model.positionStochDates.pop(identifier)
                     model.positionStochHolds.pop(key)
