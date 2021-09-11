@@ -66,12 +66,16 @@ class StrategyConfigFactory:
             tz)-timedelta(hours=constants.runStrategyBeforeHours)).time()
 
         return StrategyStochDivergeConfig(market=market, runStrategyTime=openTime,
+                                    willingToLose=constants.willingToLose,
                                     kPeriod=constants.kPeriod, dPeriod=constants.dPeriod,
                                     smooth=constants.smooth,
                                     minStochK=constants.minStochK, maxStochK=constants.maxStochK,
                                     crossMaxPeriods= constants.crossMaxPeriods, divergenceMaxPeriods=constants.divergenceMaxPeriods,
                                     daysBeforeToDownload=constants.daysBeforeToDownload, daysBefore=constants.daysBefore,
-                                    barSize=constants.barSize)
+                                    barSize=constants.barSize,
+                                    maxPeriodsToHoldPosition=constants.maxPeriodsToHoldPosition, takeProfitSafeMargin=constants.takeProfitSafeMargin,
+                                    minTakeProfitToEnterPosition=constants.minTakeProfitToEnterPosition,
+                                    winLossRatio=constants.winLossRatio)
 
 
 class Constants:
@@ -114,6 +118,7 @@ class Constants:
         class Default:
             runStrategyBeforeHours = 3
             daysBeforeToDownload = 200
+            willingToLose = 0.04
             daysBefore = 40
             barSize = "1 day"
             kPeriod = 8
@@ -123,6 +128,11 @@ class Constants:
             minStochK = 20
             crossMaxPeriods = 3
             divergenceMaxPeriods = 6
+
+            maxPeriodsToHoldPosition = 15
+            takeProfitSafeMargin = 0.01
+            minTakeProfitToEnterPosition = 0.01
+            winLossRatio = 2
 
             def __init__(self):
                 None

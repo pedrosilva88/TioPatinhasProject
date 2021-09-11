@@ -30,6 +30,10 @@ class StrategyStochDiverge(Strategy):
 
     timezone: timezone = None
 
+    maxPeriodsToHoldPosition: int
+    takeProfitSafeMargin: float
+    minTakeProfitToEnterPosition: int
+
     def run(self, strategyData: StrategyData, strategyConfig: StrategyConfig) -> StrategyResult:
         self.strategyData = strategyData
         self.strategyConfig = strategyConfig
@@ -56,7 +60,7 @@ class StrategyStochDiverge(Strategy):
 
                     percentage, targetPrice = self.getTakeProfitPrice(orderAction, (barKDivergence_Position_Start, barKDivergence_Position_Finish), (barPriceDivergence_Position_Start, barPriceDivergence_Position_Finish))
                     
-                    if abs(percentage) >= 0.03:
+                    if abs(percentage) >= self.minTakeProfitToEnterPosition:
                         print("💎 Stochastic Divergence Found: %s 💎 " % self.currentBar.contract.symbol)
                         print("🔧 Order Type: %s 🔧 " % orderAction.code)
                         print("🍪 Engulfing Candle: %s" % self.currentBar.datetime.date())
@@ -67,7 +71,7 @@ class StrategyStochDiverge(Strategy):
                         print("💎 💎 💎 💎 💎 💎 💎 💎 💎 \n\n\n\n")
                         resultType = StrategyResultType.Buy if orderAction == OrderAction.Buy else StrategyResultType.Sell
                         candlesToHold = max(barKDivergence_Position_Start-barKDivergence_Position_Finish, barPriceDivergence_Position_Start-barPriceDivergence_Position_Finish)
-                        return StrategyStochDivergeResult(self.currentBar.contract, self.currentBar, resultType, targetPrice, percentage, min(candlesToHold, 15))
+                        return StrategyStochDivergeResult(self.currentBar.contract, self.currentBar, resultType, targetPrice, percentage, min(candlesToHold, self.maxPeriodsToHoldPosition))
 
         return StrategyStochDivergeResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 
@@ -81,7 +85,7 @@ class StrategyStochDiverge(Strategy):
                 previousBar = self.previousBars[-i]
                 if previousBar.high > higherPrice:
                     higherPrice = previousBar.high
-            higherPrice = higherPrice - higherPrice*0.015
+            higherPrice = higherPrice - higherPrice*self.takeProfitSafeMargin
             percentageValue = (self.currentBar.high/higherPrice)-1
             return (percentageValue, higherPrice)
 
@@ -91,7 +95,7 @@ class StrategyStochDiverge(Strategy):
                 previousBar = self.previousBars[-i]
                 if previousBar.low < lowerPrice:
                     lowerPrice = previousBar.low
-            lowerPrice = lowerPrice + lowerPrice*0.015
+            lowerPrice = lowerPrice + lowerPrice*self.takeProfitSafeMargin
             percentageValue = (lowerPrice/self.currentBar.low)-1
             return (percentageValue, lowerPrice)
         
@@ -210,6 +214,10 @@ class StrategyStochDiverge(Strategy):
 
         self.crossMaxPeriods = strategyConfig.crossMaxPeriods
         self.divergenceMaxPeriods = strategyConfig.divergenceMaxPeriods
+
+        self.maxPeriodsToHoldPosition = strategyConfig.maxPeriodsToHoldPosition
+        self.takeProfitSafeMargin = strategyConfig.takeProfitSafeMargin
+        self.minTakeProfitToEnterPosition = strategyConfig.minTakeProfitToEnterPosition
 
     # Validations
 
