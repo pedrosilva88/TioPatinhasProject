@@ -63,10 +63,15 @@ class HistoricalData:
         if stochOscillatorsValues is None:
             return []
 
-        hhCloseValues = HistoricalData.getHigherHighs(stochDF['close'].values)
-        llCloseValues = HistoricalData.getLowerLows(stochDF['close'].values)
-        hlStochValues = HistoricalData.getHigherLows(stochDF['%K'].values)
-        lhStochValues = HistoricalData.getLowerHighs(stochDF['%K'].values)
+        try:
+            hhCloseValues = HistoricalData.getHigherHighs(stochDF['close'].values)
+            llCloseValues = HistoricalData.getLowerLows(stochDF['close'].values)
+            hlStochValues = HistoricalData.getHigherLows(stochDF['%K'].values)
+            lhStochValues = HistoricalData.getLowerHighs(stochDF['%K'].values)
+
+        except KeyError as e:            
+            print(e)
+            return []
 
         stochDivergeEvents = []
         for j, event in enumerate(events):
