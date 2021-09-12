@@ -120,11 +120,10 @@ class BacktestStochDivergeModule(BacktestModule):
         strategyConfig: StrategyStochDivergeConfig = StrategyConfigFactory.createStochasticDivergeStrategyFor(
             MarketManager.getMarketFor(config.country), config.timezone)
         if dynamicParameters is not None:
-            strategyConfig.profitPercentage = float(dynamicParameters[0])
-            strategyConfig.stopToLosePercentage = float(dynamicParameters[1])
-            strategyConfig.kPeriod = float(dynamicParameters[2])
-            strategyConfig.dPeriod = int(dynamicParameters[4])
-            strategyConfig.daysToHold = float(dynamicParameters[3])
+            strategyConfig.willingToLose = float(dynamicParameters[0])
+            strategyConfig.winLossRatio = float(dynamicParameters[1])
+            strategyConfig.minTakeProfitToEnterPosition = float(dynamicParameters[2])
+            strategyConfig.takeProfitSafeMargin = float(dynamicParameters[3])
         self.strategyModel = self.RunStrategyStochDivergeModel(
             StrategyStochDiverge(), strategyConfig, isForStockPerformance)
         for event in events:

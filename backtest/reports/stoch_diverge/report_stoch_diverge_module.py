@@ -4,21 +4,47 @@ from models.stoch_diverge.models import EventStochDiverge
 from backtest.models.stoch_diverge.stoch_diverge_models import BacktestStochDivergeResult
 from backtest.models.base_models import BacktestResult, BacktestResultType
 from typing import Any, List
-from backtest.reports.report_module import ReportModule
+from backtest.reports.report_module import ReportModule, StrategyResultModel
 
+class StrategyStochDivergeResultModel(StrategyResultModel):
+    willingToLose: float
+    winLossTarget: float
+    minTakeProfit: float
+    takeProfitSafeMargin: float
+
+    def __init__(self, numberOfTrades: int, pnl: float, totalReturn: float, battingAverage: float, winLossRatio: float, 
+                averageReturnPerTrade: float, standardDeviation: float, sharpRatio: float,
+                willingToLose: float, winLossTarget: float, minTakeProfit: float, takeProfitSafeMargin: float) -> None:
+        super().__init__(numberOfTrades, pnl, totalReturn, battingAverage, winLossRatio, averageReturnPerTrade, standardDeviation, sharpRatio)
+        self.willingToLose = willingToLose
+        self.winLossTarget= winLossTarget
+        self.minTakeProfit = minTakeProfit 
+        self.takeProfitSafeMargin = takeProfitSafeMargin
 
 class ReportStochDivergeModule(ReportModule):
     def getHeaderRowForTradesReport(self) -> List[str]:
-        return["Date", "Order Date", "Symbol", "Result" "PnL", 
+        return["Date", "Order Date", "Symbol", "Result", "PnL", 
                 "Price CreateTrade", "Price CloseTrade", "Size", 
                 "Total Invested", "Action", "Cash", 
                 "Candles To Hold", "TP Target", "SL Target"]
                 
     def getRowForTradesReport(self, item: BacktestResult) -> List[Any]:
         item: BacktestStochDivergeResult = item 
-        return[item.closeTradeDate, item.createTradeDate, item.contract.symbol, item.type.emoji, item.action.code, 
-                item.pnl, item.priceCreateTrade, item.priceCloseTrade, item.size, item.totalInvested, item.cash,
+        return[item.closeTradeDate, item.createTradeDate, item.contract.symbol, item.type.emoji, 
+                item.pnl, item.priceCreateTrade, item.priceCloseTrade, item.size, item.totalInvested, item.action.code, item.cash,
                 item.candlesToHold, item.profitTarget, item.stopLossTarget]
+
+    def getHeaderRowForStrategyReport(self) -> List[str]:
+        return["Take Profit", "Stop Loss", "PnL", "Total Return", "Batting Average", "Win/Loss Ratio", 
+                "Avg. return Per Trade", "Stand Deviation", "Sharp Ratio", "Number Of Trades","Willing To Lose", 
+                "WinLoss Target", "Min TakeProfit", "TakeProfit Margin"]
+
+    def getRowForStrategyReport(self, item: StrategyResultModel) -> List[Any]:
+        item: StrategyStochDivergeResultModel = item
+        return [item.profitPercentage, item.losePercentage, item.pnl, item.totalReturn, item.battingAverage, item.winLossRatio,
+                item.averageReturnPerTrade, item.standardDeviation, item.sharpRatio, item.numberOfTrades, 
+                item.willingToLose, item.winLossTarget, item.minTakeProfit, item.takeProfitSafeMargin]
+
     
     def createStopLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float,
                             candlesToHold: int):
@@ -113,5 +139,21 @@ class ReportStochDivergeModule(ReportModule):
                                         profitTarget=round(profitTarget, 3),
                                         stopLossTarget=round(stopLossTarget, 3))
         self.results.append(result)
+
+
+    def createStrategyResult(self, dynamicParameters: List[List[float]]) -> StrategyResultModel:
+        result: StrategyResultModel = super().createStrategyResult(dynamicParameters)
+        item = StrategyStochDivergeResultModel(result.numberOfTrades,
+                                        round(result.pnl, 4), 
+                                        round(result.totalReturn, 4), 
+                                        round(result.battingAverage, 4), 
+                                        round(result.winLossRatio, 4),
+                                        round(result.averageReturnPerTrade, 4), 
+                                        round(result.standardDeviation, 4), 
+                                        round(result.sharpRatio, 4), 
+                                        dynamicParameters[0], dynamicParameters[1], dynamicParameters[2], 
+                                        dynamicParameters[3])
+        self.strategyResults.append(item)
+        return item
 
     
