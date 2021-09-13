@@ -28,8 +28,8 @@ class EventImpulsePullback(Event):
         self.stochK = stochK
         self.stochD = stochD
         self.ema50 = ema50
-        self.ema50 = ema100
-        self.ema50 = ema200
+        self.ema100 = ema100
+        self.ema200 = ema200
         self.ema6 = ema6
         self.ema18 = ema18
         self.bollingerBandHigh = bollingerBandHigh
@@ -41,4 +41,15 @@ class EventImpulsePullback(Event):
         dict: Union[str, Any] = super().to_dict() 
         dict['stochK'] = self.stochK
         dict['stochD'] = self.stochD
+
+        dict['ema50'] = self.ema50
+        dict['ema100'] = self.ema100
+        dict['ema200'] = self.ema200
+        dict['ema6'] = self.ema6
+        dict['ema18'] = self.ema18
+        dict['bollingerBandHigh'] = self.bollingerBandHigh
+        dict['bollingerBandLow'] = self.bollingerBandLow
+        dict['macd'] = self.macd
+        dict['macdEMA'] = self.macdEMA
+
         return dict
