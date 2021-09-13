@@ -118,7 +118,7 @@ class Constants:
         class Default:
             runStrategyBeforeHours = 3
             daysBeforeToDownload = 200
-            willingToLose = 0.05
+            willingToLose = 0.02
             daysBefore = 40
             barSize = "1 day"
             kPeriod = 8
@@ -129,9 +129,9 @@ class Constants:
             crossMaxPeriods = 3
             divergenceMaxPeriods = 6
 
-            maxPeriodsToHoldPosition = 15
-            takeProfitSafeMargin = 0.01
-            minTakeProfitToEnterPosition = 0.00
+            maxPeriodsToHoldPosition = 12
+            takeProfitSafeMargin = 0.02
+            minTakeProfitToEnterPosition = 0.07
             winLossRatio = 2.5
 
             def __init__(self):

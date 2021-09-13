@@ -35,13 +35,13 @@ class ReportStochDivergeModule(ReportModule):
                 item.candlesToHold, item.profitTarget, item.stopLossTarget]
 
     def getHeaderRowForStrategyReport(self) -> List[str]:
-        return["Take Profit", "Stop Loss", "PnL", "Total Return", "Batting Average", "Win/Loss Ratio", 
+        return["PnL", "Total Return", "Batting Average", "Win/Loss Ratio", 
                 "Avg. return Per Trade", "Stand Deviation", "Sharp Ratio", "Number Of Trades","Willing To Lose", 
                 "WinLoss Target", "Min TakeProfit", "TakeProfit Margin"]
 
     def getRowForStrategyReport(self, item: StrategyResultModel) -> List[Any]:
         item: StrategyStochDivergeResultModel = item
-        return [item.profitPercentage, item.losePercentage, item.pnl, item.totalReturn, item.battingAverage, item.winLossRatio,
+        return [item.pnl, item.totalReturn, item.battingAverage, item.winLossRatio,
                 item.averageReturnPerTrade, item.standardDeviation, item.sharpRatio, item.numberOfTrades, 
                 item.willingToLose, item.winLossTarget, item.minTakeProfit, item.takeProfitSafeMargin]
 
