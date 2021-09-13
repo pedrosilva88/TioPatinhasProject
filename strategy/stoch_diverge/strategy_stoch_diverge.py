@@ -61,14 +61,14 @@ class StrategyStochDiverge(Strategy):
                     percentage, targetPrice = self.getTakeProfitPrice(orderAction, (barKDivergence_Position_Start, barKDivergence_Position_Finish), (barPriceDivergence_Position_Start, barPriceDivergence_Position_Finish))
                     
                     if abs(percentage) >= self.minTakeProfitToEnterPosition:
-                        print("💎 Stochastic Divergence Found: %s 💎 " % self.currentBar.contract.symbol)
-                        print("🔧 Order Type: %s 🔧 " % orderAction.code)
-                        print("🍪 Engulfing Candle: %s" % self.currentBar.datetime.date())
-                        print("🍩 Cross Inside Bands: (%s) K(%.2f) D(%.2f)" % (crossData.datetime.date(), crossData.k, crossData.d))
-                        print("🍫 K Divergence - Point.1[Date(%s) K(-)] Point.2[Date(%s) K(%.2f)" % (kDivergenceDate.date(), barKDivergence_Data2.datetime.date(), barKDivergence_Data2.k))
-                        print("🍫 Price Divergence - Point.1[Date(%s) Price(-)] Point.2[Date(%s) Price(%.2f)" % (priceDivergenceDate.date(), barPriceDivergence_Data2.datetime.date(), barPriceDivergence_Data2.close))
-                        print("🍫 Take Profit Data: Percentage(%.2f) Price(%.2f)" % (percentage, targetPrice))
-                        print("💎 💎 💎 💎 💎 💎 💎 💎 💎 \n\n\n\n")
+                        log("💎 Stochastic Divergence Found: %s 💎 " % self.currentBar.contract.symbol)
+                        log("🔧 Order Type: %s 🔧 " % orderAction.code)
+                        log("🍪 Engulfing Candle: %s" % self.currentBar.datetime.date())
+                        log("🍩 Cross Inside Bands: (%s) K(%.2f) D(%.2f)" % (crossData.datetime.date(), crossData.k, crossData.d))
+                        log("🍫 K Divergence - Point.1[Date(%s) K(-)] Point.2[Date(%s) K(%.2f)" % (kDivergenceDate.date(), barKDivergence_Data2.datetime.date(), barKDivergence_Data2.k))
+                        log("🍫 Price Divergence - Point.1[Date(%s) Price(-)] Point.2[Date(%s) Price(%.2f)" % (priceDivergenceDate.date(), barPriceDivergence_Data2.datetime.date(), barPriceDivergence_Data2.close))
+                        log("🍫 Take Profit Data: Percentage(%.2f) Price(%.2f)" % (percentage, targetPrice))
+                        log("💎 💎 💎 💎 💎 💎 💎 💎 💎 \n\n\n\n")
                         resultType = StrategyResultType.Buy if orderAction == OrderAction.Buy else StrategyResultType.Sell
                         candlesToHold = max(barKDivergence_Position_Start-barKDivergence_Position_Finish, barPriceDivergence_Position_Start-barPriceDivergence_Position_Finish)
                         return StrategyStochDivergeResult(self.currentBar.contract, self.currentBar, resultType, targetPrice, percentage, min(candlesToHold, self.maxPeriodsToHoldPosition))
