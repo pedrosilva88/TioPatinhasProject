@@ -161,6 +161,23 @@ class BacktestStochDivergeModule(BacktestModule):
         previousDays.reverse()
         return previousDays
 
+    def getFill(self, contract: Contract):
+        model: BacktestStochDivergeModule.RunStrategyStochDivergeModel = self.strategyModel
+        fills = model.databaseModule.getFills()
+        filteredFills = list(
+            filter(lambda x: contract.symbol == x.symbol, fills))
+        filteredFills.sort(key=lambda x: x.date, reverse=True)
+        if len(filteredFills) > 0:
+            return filteredFills[0]
+        return None
+
+    def clearOldFills(self, event: Event):
+        model: BacktestStochDivergeModule.RunStrategyStochDivergeModel = self.strategyModel
+        fills = model.databaseModule.getFills()
+        limitDate = event.datetime.date()-timedelta(days=40)
+        filteredFills = list(filter(lambda x: x.date < limitDate, fills))
+        model.databaseModule.deleteFills(filteredFills)
+
     def handleStrategyResult(self, event: Event, events: List[Event], result: StrategyResult, currentPosition: int):
         result: StrategyStochDivergeResult = result
         model: BacktestStochDivergeModule.RunStrategyStochDivergeModel = self.strategyModel
@@ -189,6 +206,7 @@ class BacktestStochDivergeModule(BacktestModule):
                 else:
                     model.tradesAvailable = total
 
+            self.clearOldFills(event)
             model.currentDay = None
         
         if event.contract.symbol in model.nextDayTrades:

@@ -1,5 +1,4 @@
-from datetime import date, datetime
-from enum import Enum
+from datetime import datetime
 from typing import Any, Union
 from models.base_models import Contract, Event
 
