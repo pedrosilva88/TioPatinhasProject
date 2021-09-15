@@ -14,7 +14,6 @@ class StrategyStochDiverge(Strategy):
     # Properties
     currentBar: EventStochDiverge = None
     previousBars: List[EventStochDiverge] = None
-    fill: FillDB = None
 
     # Strategy Parameters
     profitPercentage: float = None

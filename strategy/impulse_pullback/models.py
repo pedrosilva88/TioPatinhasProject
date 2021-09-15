@@ -5,7 +5,7 @@ from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from models.base_models import BracketOrder, Contract, Position
 from datetime import date, datetime
 
-class StrategyStochDivergeData(StrategyData):
+class StrategyImpulsePullbackData(StrategyData):
     previousEvents: List[EventImpulsePullback]
 
     def __init__(self, contract: Contract, 
@@ -27,7 +27,7 @@ class StrategyImpulsePullbackResult(StrategyResult):
     ipType: StrategyImpulsePullbackResultResultType
 
     def __init__(self, contract: Contract, event: EventImpulsePullback, type: StrategyResultType,
-                ipType: StrategyImpulsePullbackResultResultType,
+                ipType: StrategyImpulsePullbackResultResultType = StrategyImpulsePullbackResultResultType.none,
                 order: BracketOrder = None, position: Position = None):
         super().__init__(contract, event, type, order, position)
         self.ipType = ipType

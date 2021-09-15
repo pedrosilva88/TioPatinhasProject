@@ -1,10 +1,14 @@
-from datetime import date
+from datetime import date, timedelta
 import csv
+from strategy.impulse_pullback.strategy_impulse_pullback import StrategyImpulsePullback
 from models.base_models import Contract, Event
 from strategy.strategy import Strategy
 from strategy.configs.models import StrategyConfig
+from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
-from strategy.impulse_pullback.models import StrategyImpulsePullbackResult
+from country_config.market_manager import MarketManager
+from strategy.configs.factory.strategy_config_factory import StrategyConfigFactory
+from strategy.impulse_pullback.models import StrategyImpulsePullbackData, StrategyImpulsePullbackResult
 from models.impulse_pullback.models import EventImpulsePullback
 from typing import Any, List, Tuple, Union
 from backtest.backtest_module import BacktestModule
@@ -99,16 +103,68 @@ class BacktestImpulsePullbackModule(BacktestModule):
 
                 k = None if not row[6] else float(row[6])
                 d = None if not row[7] else float(row[7])
-                datetimeStr = None if not row[8] else row[8]
-                priceDivergenceOverbought = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateSystemFormat)
-                datetimeStr = None if not row[9] else row[9]
-                priceDivergenceOversold = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateSystemFormat)
-                datetimeStr = None if not row[10] else row[10]
-                kDivergenceOversold = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateSystemFormat)
-                datetimeStr = None if not row[11] else row[11]
-                kDivergenceOverbought = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateSystemFormat)
 
-                event = EventImpulsePullback(contract, datetime, open, close, high, low, k, d, priceDivergenceOverbought, kDivergenceOverbought, priceDivergenceOversold, kDivergenceOversold)
+                ema6 = None if not row[8] else float(row[8])
+                ema18 = None if not row[9] else float(row[9])
+                ema50 = None if not row[10] else float(row[10])
+                ema100 = None if not row[11] else float(row[11])
+                ema200 = None if not row[12] else float(row[12])
+
+                bb_high = None if not row[13] else float(row[13])
+                bb_low = None if not row[14] else float(row[14])
+
+                macd = None if not row[15] else float(row[15])
+                macd_signal = None if not row[16] else float(row[16])
+                
+                event = EventImpulsePullback(contract, datetime, open, close, high, low, k, d, 
+                                            ema50, ema100, ema200, ema6, ema18,
+                                            bb_high, bb_low,
+                                            macd, macd_signal)
                 contractEvents.append(event)
             line_count += 1
         return contractEvents
+
+    def setupRunStrategy(self, events: List[Event], dynamicParameters: List[List[float]]):
+        config = BacktestConfigs()
+        isForStockPerformance = True if config.action == BacktestAction.runStrategyPerformance or config.action == BacktestAction.runStrategyPerformanceWithDynamicParameters else False
+        strategyConfig: StrategyImpulsePullbackConfig = StrategyConfigFactory.createImpulsePullbackStrategyFor(
+            MarketManager.getMarketFor(config.country), config.timezone)
+        if dynamicParameters is not None:
+            strategyConfig.willingToLose = float(dynamicParameters[0])
+            strategyConfig.winLossRatio = float(dynamicParameters[1])
+        self.strategyModel = self.RunStrategyImpulsePullbackModel(
+            StrategyImpulsePullback(), strategyConfig, isForStockPerformance)
+        for event in events:
+            identifier = self.uniqueIdentifier(
+                event.contract.symbol, event.datetime.date())
+            self.strategyModel.eventsMapper[identifier] = event
+
+    def getStrategyData(self, event: Event, events: List[Event], index: int) -> StrategyData:
+        strategyConfig: StrategyImpulsePullbackConfig = self.strategyModel.strategyConfig
+        event: EventImpulsePullback = event
+        events: List[EventImpulsePullback] = events
+        previousEvents = self.getPreviousEvents(
+            event, strategyConfig.daysBeforeToDownload)
+        if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
+            return None
+        previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
+        balance = min(30000, self.getBalance())
+        return StrategyImpulsePullbackData(contract=event.contract,
+                                            totalCash=balance,
+                                            event=event,
+                                            previousEvents=previousEventsFiltered,
+                                            today=event.datetime.date(),
+                                            now=event.datetime)
+
+    def getPreviousEvents(self, event: EventImpulsePullback, daysBefore: int = 5):
+        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        previousDays: List[EventImpulsePullback] = []
+        for x in range(1, daysBefore):
+            previousDate = event.datetime.date()+timedelta(days=-x)
+            identifier = self.uniqueIdentifier(
+                event.contract.symbol, previousDate)
+            if identifier in model.eventsMapper:
+                previousDays.append(model.eventsMapper[identifier])
+
+        previousDays.reverse()
+        return previousDays
