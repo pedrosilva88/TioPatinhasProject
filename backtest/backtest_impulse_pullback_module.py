@@ -1,23 +1,29 @@
 from datetime import date
-from typing import Union
+import csv
+from models.base_models import Contract, Event
+from strategy.strategy import Strategy
+from strategy.configs.models import StrategyConfig
+from strategy.models import StrategyData, StrategyResult, StrategyResultType
+from strategy.impulse_pullback.models import StrategyImpulsePullbackResult
+from models.impulse_pullback.models import EventImpulsePullback
+from typing import Any, List, Tuple, Union
 from backtest.backtest_module import BacktestModule
-
+from backtest.models.base_models import BacktestAction, ContractSymbol
+from backtest.configs.models import BacktestConfigs
+from helpers.date_timezone import DateSystemFormat, Helpers
+from strategy.historical_data import HistoricalData
 
 class BacktestImpulsePullbackModule(BacktestModule):
     class RunStrategyImpulsePullbackModel(BacktestModule.RunStrategyModel):
-        positionStochDates: Union[str, date]
-        positionStochHolds: Union[str, int]
-        eventsMapper: Union[str, EventStochDiverge]
+        positionIPDates: Union[str, date]
+        positionIPHolds: Union[str, int]
+        eventsMapper: Union[str, EventImpulsePullback]
         currentDay: date
         tradesAvailable: int
-        nextDayTrades: Union[str, StrategyStochDivergeResult]
+        nextDayTrades: Union[str, StrategyImpulsePullbackResult]
 
         def __init__(self, strategy: Strategy, strategyConfig: StrategyConfig, isForStockPerformance: bool) -> None:
             super().__init__(strategy, strategyConfig, isForStockPerformance)
-            self.databaseModule = DatabaseModule()
-            self.databaseModule.openDatabaseConnectionForBacktest()
-            self.databaseModule.deleteFills(self.databaseModule.getFills())
-
             self.currentDay = None
             self.tradesAvailable = 0
             self.positionStochDates = dict()
@@ -27,22 +33,25 @@ class BacktestImpulsePullbackModule(BacktestModule):
 
     def __init__(self) -> None:
         super().__init__()
-        self.reportModule = ReportStochDivergeModule()
+        #self.reportModule = ReportStochDivergeModule()
 
     #### READ/WRITE IN CSV FILES ####
 
     def addIndicatorsToStocksData(self, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
         newData: Union[str, Tuple[Contract, List[Event]]] = dict()
         for stockSymbol, (stock, bars) in stocksData.items():
-            events = HistoricalData.computeEventsForStochDivergeStrategy(bars, config.strategy)
+            events = HistoricalData.computeEventsForImpulsePullbackStrategy(bars, config.strategy)
             if events is not None:
                 newData[stockSymbol] = (stock, events)
         return newData
 
     def getStockFileHeaderRow(self) -> List[str]:
-        return ["Symbol", "Date", "Open", "Close", "High", "Low", "%K", "%D", "HH_Close", "LL_Close", "HL_Stoch", "LH_Stoch"]
+        return ["Symbol", "Date", "Open", "Close", "High", "Low", "Stoch_K", "Stoch_D", 
+                "EMA6", "EMA18", "EMA50", "EMA100", "EMA200",
+                "BB_High", "BB_Low"
+                "MACD", "MACD_Signal"]
 
-    def getStockFileDataRow(self, contract: Contract, data: EventStochDiverge) -> List[Any]:
+    def getStockFileDataRow(self, contract: Contract, data: EventImpulsePullback) -> List[Any]:
         symbol = contract.symbol
         date = Helpers.dateToString(data.datetime, format=DateSystemFormat)
 
@@ -51,14 +60,25 @@ class BacktestImpulsePullbackModule(BacktestModule):
         high = 0 if not data.high else round(data.high, 2)
         low = 0 if not data.low else round(data.low, 2)
 
-        k = None if data.k is None else data.k
-        d = None if data.d is None else data.d
-        priceDivergenceOverbought = None if data.priceDivergenceOverbought is None else Helpers.dateToString(data.priceDivergenceOverbought, format=DateSystemFormat)
-        kDivergenceOverbought = None if data.kDivergenceOverbought is None else Helpers.dateToString(data.kDivergenceOverbought, format=DateSystemFormat)
-        priceDivergenceOversold = None if data.priceDivergenceOversold is None else Helpers.dateToString(data.priceDivergenceOversold, format=DateSystemFormat)
-        kDivergenceOversold = None if data.kDivergenceOversold is None else Helpers.dateToString(data.kDivergenceOversold, format=DateSystemFormat)
+        k = None if data.stochK is None else round(data.stochK, 2)
+        d = None if data.stochD is None else round(data.stochD, 2)
 
-        return [symbol, date, open, close, high, low, k, d, priceDivergenceOverbought, priceDivergenceOversold, kDivergenceOversold, kDivergenceOverbought]
+        ema6 = None if data.ema6 is None else round(data.ema6, 2)
+        ema18 = None if data.ema18 is None else round(data.ema18, 2)
+        ema50 = None if data.ema50 is None else round(data.ema50, 2)
+        ema100 = None if data.ema100 is None else round(data.ema100, 2)
+        ema200 = None if data.ema200 is None else round(data.ema200, 2)
+
+        bb_high = None if data.bollingerBandHigh is None else round(data.bollingerBandHigh, 2)
+        bb_low = None if data.bollingerBandLow is None else round(data.bollingerBandLow, 2)
+
+        macd = None if data.macd is None else round(data.macd, 2)
+        macd_signal = None if data.macdEMA is None else round(data.macdEMA, 2)
+
+        return [symbol, date, open, close, high, low, k, d, 
+                ema6, ema18, ema50, ema100, ema200,
+                bb_high, bb_low,
+                macd, macd_signal]
 
     def parseCSVFile(self, reader: csv.reader) -> List[Event]:
         configs = BacktestConfigs()
@@ -88,7 +108,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
                 datetimeStr = None if not row[11] else row[11]
                 kDivergenceOverbought = None if not datetimeStr else Helpers.stringToDate(datetimeStr, DateSystemFormat)
 
-                event = EventStochDiverge(contract, datetime, open, close, high, low, k, d, priceDivergenceOverbought, kDivergenceOverbought, priceDivergenceOversold, kDivergenceOversold)
+                event = EventImpulsePullback(contract, datetime, open, close, high, low, k, d, priceDivergenceOverbought, kDivergenceOverbought, priceDivergenceOversold, kDivergenceOversold)
                 contractEvents.append(event)
             line_count += 1
         return contractEvents

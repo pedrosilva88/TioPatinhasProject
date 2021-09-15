@@ -41,7 +41,6 @@ class EventImpulsePullback(Event):
         dict: Union[str, Any] = super().to_dict() 
         dict['stochK'] = self.stochK
         dict['stochD'] = self.stochD
-
         dict['ema50'] = self.ema50
         dict['ema100'] = self.ema100
         dict['ema200'] = self.ema200

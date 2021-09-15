@@ -1,4 +1,5 @@
 from datetime import timedelta
+from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
 from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
 from models.base_models import OrderType
 from pytz import timezone
@@ -16,9 +17,10 @@ class StrategyConfigFactory:
             return StrategyConfigFactory.createStochasticDivergeStrategyFor(market, tz)
         elif strategyType == StrategyType.stoch_sma:
             return StrategyConfigFactory.createStochasticDivergeStrategyFor(market, tz)
+        elif strategyType == StrategyType.impulse_pullback:
+            return StrategyConfigFactory.createImpulsePullbackStrategyFor(market, tz)    
         else:
             return None
-
 
     def createZigZagStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
         constants = Constants.ZigZag.Default()
@@ -77,7 +79,29 @@ class StrategyConfigFactory:
                                     minTakeProfitToEnterPosition=constants.minTakeProfitToEnterPosition,
                                     winLossRatio=constants.winLossRatio)
 
+    def createImpulsePullbackStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
+        constants = Constants.ImpulsePullback.Default()
 
+        if market.country == market.country.USA:
+            constants = Constants.ImpulsePullback.US()
+        elif market.country == market.country.UK:
+            constants = Constants.ImpulsePullback.UK()
+        else:
+            print("🚨 Cant Create Impulse Pullback Strategy for this country - %s 🚨" %
+                  market.country)
+
+        openTime = (market.openTime.astimezone(
+            tz)-timedelta(hours=constants.runStrategyBeforeHours)).time()
+
+        return StrategyImpulsePullbackConfig(market=market, runStrategyTime=openTime,
+                                    willingToLose=constants.willingToLose,
+                                    kPeriod=constants.kPeriod, dPeriod=constants.dPeriod,
+                                    smooth=constants.smooth,
+                                    daysBeforeToDownload=constants.daysBeforeToDownload, daysBefore=constants.daysBefore,
+                                    barSize=constants.barSize,
+                                    maxPeriodsToHoldPosition=constants.maxPeriodsToHoldPosition,
+                                    winLossRatio=constants.winLossRatio)
+ 
 class Constants:
     class ZigZag:
         class Default:
@@ -137,6 +161,30 @@ class Constants:
             def __init__(self):
                 None
 
+        class US(Default):
+            def __init__(self):
+                Constants.StochasticDivergence.Default.__init__(self)
+
+        class UK(Default):
+            def __init__(self):
+                Constants.StochasticDivergence.Default.__init__(self)
+
+    class ImpulsePullback:
+        class Default:
+            runStrategyBeforeHours = 4
+            daysBeforeToDownload = 1000
+            willingToLose = 0.02
+            kPeriod = 5
+            dPeriod = 3
+            smooth = 3
+            daysBefore = 50
+            barSize = "1 day"
+
+            maxPeriodsToHoldPosition = 6
+            winLossRatio = 2.5
+
+            def __init__(self):
+                None
 
         class US(Default):
             def __init__(self):

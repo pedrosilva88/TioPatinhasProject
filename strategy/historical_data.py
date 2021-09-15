@@ -1,8 +1,11 @@
 from datetime import datetime
+from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
 import numpy as np
 from numpy.lib import npyio
+import pandas
 from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
 from models.stoch_diverge.models import EventStochDiverge
+from models.impulse_pullback.models import EventImpulsePullback
 from typing import Any, List, Tuple, Union
 from pandas import DataFrame
 import pandas_ta as ta
@@ -53,11 +56,61 @@ class HistoricalData:
     def computeEventsForOPGStrategy(events: List[Event]) -> Tuple[Any, List[Any]]: #Tuple[ContractDetails, List[PriceIncrement]]
         pass
 
+    def computeEventsForImpulsePullbackStrategy(events: List[Event], strategyConfigs: StrategyImpulsePullbackConfig) -> List[EventImpulsePullback]:
+        if len(events) <= 0:
+            return []
+        
+        stochDF: DataFrame = HistoricalData.calculateStochasticOscillators(events, strategyConfigs.kPeriod, strategyConfigs.dPeriod, strategyConfigs.smooth)
+        stochOscillatorsValues: Union[datetime, Union[str, float]] = HistoricalData.getStochasticOscillatorsValues(stochDF)
+
+        if stochOscillatorsValues is None:
+            return []
+
+        ema6 = HistoricalData.calculateEMA(events, 6)
+        ema18 = HistoricalData.calculateEMA(events, 18)
+        ema50 = HistoricalData.calculateEMA(events, 50)
+        ema100 = HistoricalData.calculateEMA(events, 100)
+        ema200 = HistoricalData.calculateEMA(events, 200)
+
+        if ema6 is None or ema18 is None or ema50 is None or ema100 is None or ema200 is None:
+            return []
+
+        bollingerBands = HistoricalData.calculateBollingerBands(events)
+
+        if bollingerBands is None:
+            return []
+
+        macd = HistoricalData.calculateMACD(events)
+
+        if macd is None:
+            return []
+
+        impulsePullbackEvents = []
+        for j, event in enumerate(events):
+            stochiValues = stochOscillatorsValues[event.datetime]
+
+
+            impulsePullbackEvent = EventImpulsePullback(contract=event.contract,
+                                                        datetime=event.datetime,
+                                                        open=event.open,
+                                                        high=event.high,
+                                                        low=event.low,
+                                                        close=event.close,
+                                                        stochK=None if np.isnan(stochiValues['%K']) else stochiValues['%K'],
+                                                        stochD=None if np.isnan(stochiValues['%D']) else stochiValues['%D'],
+                                                        ema50=ema50[j], ema100=ema100[j], ema200=ema200[j], ema6=ema6[j], ema18=ema18[j],
+                                                        bollingerBandHigh=bollingerBands[j][0], bollingerBandLow=bollingerBands[j][1],
+                                                        macd=macd[j][0], macdEMA=macd[j][1])
+            
+            impulsePullbackEvents.append(impulsePullbackEvent)
+
+        return impulsePullbackEvents
+        
     def computeEventsForStochDivergeStrategy(events: List[Event], strategyConfigs: StrategyStochDivergeConfig) -> List[EventStochDiverge]:
         if len(events) <= 0:
             return []
 
-        stochDF: DataFrame = HistoricalData.calculateStochasticOscillators(events, strategyConfigs)
+        stochDF: DataFrame = HistoricalData.calculateStochasticOscillators(events, strategyConfigs.kPeriod, strategyConfigs.dPeriod, strategyConfigs.smooth)
         stochOscillatorsValues: Union[datetime, Union[str, float]] = HistoricalData.getStochasticOscillatorsValues(stochDF)
 
         if stochOscillatorsValues is None:
@@ -115,14 +168,14 @@ class HistoricalData:
 
         return stochDivergeEvents
     
-    def calculateStochasticOscillators(events: List[Event], strategyConfigs: StrategyStochDivergeConfig) -> DataFrame:
+    def calculateStochasticOscillators(events: List[Event], kPeriod: int, dPeriod: int, smooth: int) -> DataFrame:
         df = ta.DataFrame.from_records([event.to_dict() for event in events], index ="datetime")
-        _kName = f'STOCHk_{strategyConfigs.kPeriod}_{strategyConfigs.dPeriod}_{strategyConfigs.smooth}'
-        _dName = f'STOCHd_{strategyConfigs.kPeriod}_{strategyConfigs.dPeriod}_{strategyConfigs.smooth}'
+        _kName = f'STOCHk_{kPeriod}_{dPeriod}_{smooth}'
+        _dName = f'STOCHd_{kPeriod}_{dPeriod}_{smooth}'
         try:
-            df.ta.stoch(high='high', low='low', k=strategyConfigs.kPeriod, 
-                                            d=strategyConfigs.dPeriod, 
-                                            smooth_k=strategyConfigs.smooth, 
+            df.ta.stoch(high='high', low='low', k=kPeriod, 
+                                            d=dPeriod, 
+                                            smooth_k=smooth, 
                                             append=True)
             return df.rename(columns={_kName: '%K', _dName: '%D'})
         except TypeError as e:
@@ -272,25 +325,61 @@ class HistoricalData:
                 extrema.append(ex_deque.copy())
         return extrema
 
+    def calculateEMA(events: List[Event], period: int) -> List[float]:
+        dfEvents = DataFrame.from_records([event.to_dict() for event in events])
+        dfEvents['ewm'] = dfEvents['close'].ewm(span=period,adjust=False).mean()
+        return dfEvents['ewm']
 
-        # async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple[ContractDetails, List[PriceIncrement]]:
-        #     contractDetails = await ib.reqContractDetailsAsync(stock)
-        #     ruleId = contractDetails[0].marketRuleIds.split(',')[0]
-        #     priceIncrementRules = await ib.reqMarketRuleAsync(ruleId)
-        #     return (contractDetails, priceIncrementRules)
+    def calculateBollingerBands(events: List[Event], period: int=20) -> List[Tuple[float, float]]:
+        dfEvents = DataFrame.from_records([event.to_dict() for event in events])
+        sma = HistoricalData.calculateSMA(dfEvents['close'], period)
+        std = dfEvents['close'].rolling(period).std(ddof=0)
+        bollinger_up = sma + std * 2 # Calculate top band
+        bollinger_down = sma - std * 2 # Calculate bottom band
 
-        # async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
-        #     minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
-        #     value = self.calculateAverageVolume(minute_bars)
-        #     return value
+        ups = bollinger_up.values
+        downs = bollinger_down.values
+        queue = []
+        for i, value in enumerate(ups):
+            queue.append((value, downs[i]))
 
-        # def calculateAverageVolume(self, datas: List[BarData]):
-        #     nBars = len(datas)
-        #     if nBars > 0:
-        #         sum = 0
-        #         for data in datas:
-        #             sum += data.volume
+        return queue
 
-        #         return sum/nBars
-        #     else:
-        #         return None
+    def calculateSMA(prices: DataFrame, period):
+        return prices.rolling(period).mean()
+
+    def calculateMACD(events: List[Event], mark1: int = 12, mark2: int = 26, mark3: int = 9) -> List[Tuple[float, float]]:
+        dfEvents = DataFrame.from_records([event.to_dict() for event in events])
+        exp1 = dfEvents['close'].ewm(span=mark1, adjust=False).mean()
+        exp2 = dfEvents['close'].ewm(span=mark2, adjust=False).mean()
+        macd = exp1 - exp2
+        exp3 = macd.ewm(span=mark3, adjust=False).mean()
+
+        queue = []
+        exp3Values = exp3.values
+        for i, value in enumerate(macd):
+            queue.append((value, exp3Values[i]))
+
+        return queue
+
+    # async def getContractDetails(self, ib: IB, stock: ibContract) -> Tuple[ContractDetails, List[PriceIncrement]]:
+    #     contractDetails = await ib.reqContractDetailsAsync(stock)
+    #     ruleId = contractDetails[0].marketRuleIds.split(',')[0]
+    #     priceIncrementRules = await ib.reqMarketRuleAsync(ruleId)
+    #     return (contractDetails, priceIncrementRules)
+
+    # async def getAverageVolume(self, ib: IB, stock: ibContract, days: int = 5):
+    #     minute_bars = await self.downloadHistoricDataFromIB(ib=ib, stock=stock, days=days)
+    #     value = self.calculateAverageVolume(minute_bars)
+    #     return value
+
+    # def calculateAverageVolume(self, datas: List[BarData]):
+    #     nBars = len(datas)
+    #     if nBars > 0:
+    #         sum = 0
+    #         for data in datas:
+    #             sum += data.volume
+
+    #         return sum/nBars
+    #     else:
+    #         return None

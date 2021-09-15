@@ -1,4 +1,5 @@
 import asyncio
+from logging import error
 from helpers.logs import log
 from vaults.vaults_protocol import VaultsControllerProtocol
 from provider_factory.models import ProviderController
@@ -43,6 +44,9 @@ class VaultsController(VaultsControllerProtocol):
                 self.vaults.append(VaultZigZag(strategyConfig, self.portfolio, self))
             elif strategyConfig.type == StrategyType.stoch_diverge:
                 self.vaults.append(VaultStochDiverge(strategyConfig, self.portfolio, self))
+            elif strategyConfig.type == StrategyType.impulse_pullback:
+                raise error
+                self.vaults.append(VaultImpulsePullback(strategyConfig, self.portfolio, self))
 
     async def start(self):
         await self.scheduleNextOperation()

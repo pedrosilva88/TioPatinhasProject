@@ -1,9 +1,9 @@
+from backtest.backtest_impulse_pullback_module import BacktestImpulsePullbackModule
 from backtest.backtest_stoch_diverge_module import BacktestStochDivergeModule
 from strategy.configs.models import StrategyType
 from backtest.configs.models import BacktestConfigs
 from backtest.backtest_zigzag_module import BacktestZigZagModule
 from backtest.backtest_module import BacktestModule
-
 
 def createBacktestModule() -> BacktestModule:
     config = BacktestConfigs()
@@ -11,6 +11,8 @@ def createBacktestModule() -> BacktestModule:
         return BacktestZigZagModule()
     elif config.strategyType == StrategyType.stoch_diverge:
         return BacktestStochDivergeModule()
+    elif config.strategyType == StrategyType.impulse_pullback:
+        return BacktestImpulsePullbackModule()
     return None
 
 
@@ -232,3 +234,55 @@ if __name__ == '__main__':
 # print(cl('Benchmark profit by investing $10k : {}'.format(total_benchmark_investment_ret), attrs = ['bold']))
 # print(cl('Benchmark Profit percentage : {}%'.format(benchmark_profit_percentage), attrs = ['bold']))
 # print(cl('STOCH Strategy profit is {}% higher than the Benchmark Profit'.format(profit_percentage - benchmark_profit_percentage), attrs = ['bold']))
+
+# import numpy as np
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# import pandas_datareader as web
+# from strategy.historical_data import *
+# from provider_factory.provider_module import ProviderModule
+# from scanner import Scanner
+# from backtest.download_module.download_module import BacktestDownloadModule
+# import matplotlib.dates as mpl_dates
+# from mplfinance import plot
+
+# #symbol = 'MSFT'
+# #df = web.DataReader(symbol, 'yahoo', '2015-01-01', '2016-01-01')
+
+# config = BacktestConfigs()
+# client = ProviderModule.createClient(config.provider, config.providerConfigs)
+# client.connect()
+# stocks = Scanner.contratcsFrom(config.downloadModel.path)
+# stocksData = BacktestDownloadModule.downloadStocks(client, stocks, config.downloadModel.numberOfDays, config.downloadModel.barSize)
+
+# for stockSymbol, (stock, bars) in stocksData.items():
+#     ema = HistoricalData.calculateEMA(bars, 50)
+#     bollingerBands = HistoricalData.calculateBollingerBands(bars)
+#     macd = HistoricalData.calculateMACD(bars)
+#     if stock.symbol == "TSLA":
+#         ohlc = DataFrame.from_records([event.to_dict() for event in bars], columns=['datetime', 'open', 'high', 'low', 'close'])
+#         ohlc.index = pd.DatetimeIndex(ohlc['datetime'])
+#         ohlc['datetime'] = pd.to_datetime(ohlc['datetime'])
+#         ohlc['datetime'] = ohlc['datetime'].apply(mpl_dates.date2num)
+#         ohlc = ohlc.astype(float)
+
+#         import numpy as np
+
+#         items = []
+
+#         for i, event in enumerate(bars):
+#             items.append([event.datetime, macd[i]])
+#             print(event.datetime, macd[i])
+            
+#         lista = dict(alines=items, colors=['b'])
+#         # plt.title(stock.symbol + ' Bollinger Bands')
+#         # plt.xlabel('Days')
+#         # plt.ylabel('Closing Prices')
+#         # plot(ohlc, type='candlestick', style='charles',
+#         #     title='Chart',
+#         #     ylabel='Price',
+#         #     alines=lista)
+
+#         # plt.plot(bollingerBands["high"], label='Bollinger Up', c='g')
+#         # plt.plot(bollingerBands["low"], label='Bollinger Down', c='r')
+#         # plt.show()
