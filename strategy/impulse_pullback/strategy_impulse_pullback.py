@@ -27,6 +27,16 @@ class StrategyImpulsePullback(Strategy):
         if result:
             return result
 
+        self.computeCriteria1()
+    
+    def logmagico(self, data: str):
+        if self.currentBar.datetime.year == 2021 and self.currentBar.datetime.month == 7 and self.currentBar.datetime.day == 45:
+            print(data)
+
+    ## 6x18 or MACD cross
+    ## Swing Candle
+    ## Pullbacks
+    def computeCriteria1(self) -> Tuple[StrategyImpulsePullbackResult]:
         isInsideCandle = self.isInsideBarCandle(self.currentBar, self.previousBars[-1])
         isPullbackCandle, pullbackOrderAction = self.isPullbackCandle(self.currentBar, self.previousBars[-1])
         action: OrderAction = pullbackOrderAction
@@ -34,46 +44,32 @@ class StrategyImpulsePullback(Strategy):
         swingCandlePosition = None
 
         if isPullbackCandle or isInsideCandle:
-            self.logmagico(isPullbackCandle)
-            self.logmagico(isInsideCandle)
             for i in range(1, len(self.previousBars)):
                 bar = self.previousBars[-i]
                 previousBar = self.previousBars[-(i+1)]
                 isPullbackCandle, pullbackOrderAction = self.isPullbackCandle(bar, previousBar)
-                self.logmagico(-i)
                 if pullbacksFound > 0:
                     if action == None:
-                        print("❌ The action shouldn't be None at this point ❌")
+                        # print("❌ The action shouldn't be None at this point ❌")
                         return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
                     if action == OrderAction.Buy:
-                        self.logmagico(self.previousBars[-(i+7):-(i)])
-
-                        hasSwingHigh, swingHighPosition = self.isSwingHighCandle(bar, self.previousBars[-(i+7):-(i)])
-                        self.logmagico("Action Buy")
+                        hasSwingHigh = self.isSwingHighCandle(bar, self.previousBars[-(i+7):-(i)])
                         if hasSwingHigh:
-                            self.logmagico("SwingHigh")
-                            swingCandlePosition = swingHighPosition
-                            #print("Swing High found 😘", bar.datetime, self.currentBar.datetime, action)
+                            swingCandlePosition = i
                             break
                     elif action == OrderAction.Sell:
-                        hasSwingLow, swingLowPosition = self.isSwingLowCandle(bar, self.previousBars[-(i+7):-(i)])
-                        self.logmagico("Action Sell")
+                        hasSwingLow = self.isSwingLowCandle(bar, self.previousBars[-(i+7):-(i)])
                         if hasSwingLow:
-                            self.logmagico("SwingLow")
-                            swingCandlePosition = swingLowPosition
-                            #print("Swing Low found 😘", bar.datetime, self.currentBar.datetime, action)
+                            swingCandlePosition = i
                             break
                     if isPullbackCandle and pullbackOrderAction == action:
-                        self.logmagico("is Pullback")
                         pullbacksFound += 1
                         if pullbacksFound > 2:
                             #print("❌ Too many pullbacks. Ignore Event ❌")
                             return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
                     elif self.isInsideBarCandle(bar, previousBar):
-                        self.logmagico("is Inside Bar")
                         continue
                     else:
-                        self.logmagico("else")
                         #print("❌ Invalid Candle. Ignore Event ❌")
                         return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
                 else:
@@ -86,25 +82,24 @@ class StrategyImpulsePullback(Strategy):
                         return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 
             if swingCandlePosition is not None:
-                self.hasCrossInSwingCandle(action, swingCandlePosition, self.previousBars)
-    
-    def logmagico(self, data: str):
-        if self.currentBar.datetime.year == 2021 and self.currentBar.datetime.month == 7 and self.currentBar.datetime.day == 27:
-            print(data)
+                hasCross = self.hasCrossInSwingCandle(action, swingCandlePosition, self.previousBars)
+                if hasCross:
+                    return
+                else:
+                    return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
+
     def hasCrossInSwingCandle(self, action: OrderAction, swingCandlePosition: int, previousBars: List[EventImpulsePullback]) -> bool:
         if self.hasEMACross(action, swingCandlePosition, previousBars):
-            print("Swing found 😘", self.currentBar.datetime.date(), action, previousBars[-swingCandlePosition].datetime.date())
-            print("BAMOS")
+            print("EMA Swing found 😘", self.currentBar.datetime.date(), action, previousBars[-swingCandlePosition].datetime.date())
             return True
+        if self.hasMACDCross(action, swingCandlePosition, previousBars):
+            print("MACD Swing found 😘", self.currentBar.datetime.date(), action, previousBars[-swingCandlePosition].datetime.date())
+            return True
+
         return False
 
     def hasEMACross(self, action: OrderAction, swingCandlePosition: int, previousBars: List[EventImpulsePullback]) -> bool: 
         if action == OrderAction.Buy:
-            eventA = previousBars[-(swingCandlePosition-1)]
-            eventB = previousBars[-(swingCandlePosition)]
-            if eventA.ema6 > eventA.ema18 and eventB.ema6 <= eventB.ema18:
-                return True    
-
             eventA = previousBars[-(swingCandlePosition)]
             eventB = previousBars[-(swingCandlePosition+1)]
             if eventA.ema6 > eventA.ema18 and eventB.ema6 <= eventB.ema18:
@@ -115,12 +110,7 @@ class StrategyImpulsePullback(Strategy):
             if eventA.ema6 > eventA.ema18 and eventB.ema6 <= eventB.ema18:
                 return True
 
-        elif action == OrderAction.Sell:
-            eventA = previousBars[-(swingCandlePosition-1)]
-            eventB = previousBars[-(swingCandlePosition)]
-            if eventA.ema6 <= eventA.ema18 and eventB.ema6 > eventB.ema18:
-                return True    
-
+        elif action == OrderAction.Sell: 
             eventA = previousBars[-(swingCandlePosition)]
             eventB = previousBars[-(swingCandlePosition+1)]
             if eventA.ema6 <= eventA.ema18 and eventB.ema6 > eventB.ema18:
@@ -130,30 +120,48 @@ class StrategyImpulsePullback(Strategy):
             eventB = previousBars[-(swingCandlePosition+2)]
             if eventA.ema6 <= eventA.ema18 and eventB.ema6 > eventB.ema18:
                 return True
+        
+        return False
 
 
     def hasMACDCross(self, action: OrderAction, swingCandlePosition: int, previousBars: List[EventImpulsePullback]) -> bool:
-        eventA = previousBars[-(swingCandlePosition-1)]
-        eventB = previousBars[-(swingCandlePosition)]
         if action == OrderAction.Buy:
-            pass
-        elif action == OrderAction.Sell:
-            pass
+            eventA = previousBars[-(swingCandlePosition)]
+            eventB = previousBars[-(swingCandlePosition+1)]
+            if eventA.macd > eventA.macdEMA and eventB.macd <= eventB.macdEMA:
+                return True
 
-    def isSwingHighCandle(self, bar: EventImpulsePullback, previousBars: List[EventImpulsePullback]) -> Tuple[bool, int]:
+            eventA = previousBars[-(swingCandlePosition+1)]
+            eventB = previousBars[-(swingCandlePosition+2)]
+            if eventA.macd > eventA.macdEMA and eventB.macd <= eventB.macdEMA:
+                return True
+
+        elif action == OrderAction.Sell: 
+            eventA = previousBars[-(swingCandlePosition)]
+            eventB = previousBars[-(swingCandlePosition+1)]
+            if eventA.macd <= eventA.macdEMA and eventB.macd > eventB.macdEMA:
+                return True
+
+            eventA = previousBars[-(swingCandlePosition+1)]
+            eventB = previousBars[-(swingCandlePosition+2)]
+            if eventA.macd <= eventA.macd and eventB.macdEMA > eventB.macdEMA:
+                return True
+        
+        return False
+
+    def isSwingHighCandle(self, bar: EventImpulsePullback, previousBars: List[EventImpulsePullback]) -> bool:
         previousBars.reverse()
         for i, event in enumerate(previousBars):
-            self.logmagico(event.datetime.date())
             if event.high >= bar.high:
-                return (False, i)
-        return (True, i)
+                return False
+        return True
 
-    def isSwingLowCandle(self, bar: EventImpulsePullback, previousBars: List[EventImpulsePullback]) -> Tuple[bool, int]:
+    def isSwingLowCandle(self, bar: EventImpulsePullback, previousBars: List[EventImpulsePullback]) -> bool:
         previousBars.reverse()
         for i, event in enumerate(previousBars):
             if event.low <= bar.low:
-                return (False, i)
-        return (True, i)
+                return False
+        return True
 
     def isPullbackCandle(self, bar: EventImpulsePullback, previousBar: EventImpulsePullback) -> Tuple[bool, OrderAction]:
         if bar.low < previousBar.low and bar.high < previousBar.high:
