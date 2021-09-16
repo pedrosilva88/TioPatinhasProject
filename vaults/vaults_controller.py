@@ -45,7 +45,7 @@ class VaultsController(VaultsControllerProtocol):
             elif strategyConfig.type == StrategyType.stoch_diverge:
                 self.vaults.append(VaultStochDiverge(strategyConfig, self.portfolio, self))
             elif strategyConfig.type == StrategyType.impulse_pullback:
-                raise error
+                raise
                 self.vaults.append(VaultImpulsePullback(strategyConfig, self.portfolio, self))
 
     async def start(self):

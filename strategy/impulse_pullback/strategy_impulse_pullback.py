@@ -32,22 +32,23 @@ class StrategyImpulsePullback(Strategy):
         action: OrderAction = pullbackOrderAction
         pullbacksFound: int = 1 if isPullbackCandle == True else 0
         if isPullbackCandle or isInsideCandle:
-            for i in range(0, len(self.previousBars)):
+            for i in range(1, len(self.previousBars)):
                 bar = self.previousBars[-i]
                 previousBar = self.previousBars[-(i+1)]
+                isPullbackCandle, pullbackOrderAction = self.isPullbackCandle(bar, previousBar)
+
                 if pullbacksFound > 0:
                     if action == None:
                         print("❌ The action shouldn't be None at this point ❌")
                         return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 
-                    if self.currentBar.contract.symbol == 'TSLA':
-                        print("😘", self.currentBar.datetime, action)
-
-                    if action == OrderAction.Buy and self.isSwingHighCandle(bar, []):
-                        pass
-                    elif action == OrderAction.Sell and self.isSwingLowCandle(bar, []):
-                        pass
-                    elif self.isPullbackCandle(bar, previousBar):
+                    if action == OrderAction.Buy and self.isSwingHighCandle(bar, self.previousBars[-(i+7):-(i)]):
+                        print("Swing High found 😘", bar.datetime, self.currentBar.datetime, action)
+                        break
+                    elif action == OrderAction.Sell and self.isSwingLowCandle(bar, self.previousBars[-(i+7):-(i)]):
+                        print("Swing Low found 😘", bar.datetime, self.currentBar.datetime, action)
+                        break
+                    elif isPullbackCandle and pullbackOrderAction == action:
                         pullbacksFound += 1
                         if pullbacksFound > 2:
                             print("❌ Too many pullbacks. Ignore Event ❌")
@@ -57,15 +58,20 @@ class StrategyImpulsePullback(Strategy):
                     else:
                         print("❌ Invalid Candle. Ignore Event ❌")
                         return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
-
                 else:
                     pass
     
     def isSwingHighCandle(self, bar: EventImpulsePullback, previousBars: List[EventImpulsePullback]) -> bool:
-        return False
+        for event in previousBars:
+            if event.high >= bar.high:
+                return False
+        return True
 
     def isSwingLowCandle(self, bar: EventImpulsePullback, previousBars: List[EventImpulsePullback]) -> bool:
-        return False
+        for event in previousBars:
+            if event.low <= bar.low:
+                return False
+        return True
 
     def isPullbackCandle(self, bar: EventImpulsePullback, previousBar: EventImpulsePullback) -> Tuple[bool, OrderAction]:
         if bar.low < previousBar.low and bar.high < previousBar.high:
