@@ -1,9 +1,13 @@
+from database.model import FillDB
+from database.database_module import DatabaseModule
+from backtest.reports.impulse_pullback.report_impulse_pullback_module import ReportImpulsePullbackModule
 from datetime import date, timedelta
 import csv
+import math
 from strategy.impulse_pullback.strategy_impulse_pullback import StrategyImpulsePullback
-from models.base_models import Contract, Event
+from models.base_models import BracketOrder, Contract, Event, Order, OrderAction, Position
 from strategy.strategy import Strategy
-from strategy.configs.models import StrategyConfig
+from strategy.configs.models import StrategyConfig, StrategyType
 from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from country_config.market_manager import MarketManager
@@ -19,6 +23,7 @@ from strategy.historical_data import HistoricalData
 
 class BacktestImpulsePullbackModule(BacktestModule):
     class RunStrategyImpulsePullbackModel(BacktestModule.RunStrategyModel):
+        databaseModule: DatabaseModule
         positionIPDates: Union[str, date]
         positionIPHolds: Union[str, int]
         eventsMapper: Union[str, EventImpulsePullback]
@@ -28,16 +33,20 @@ class BacktestImpulsePullbackModule(BacktestModule):
 
         def __init__(self, strategy: Strategy, strategyConfig: StrategyConfig, isForStockPerformance: bool) -> None:
             super().__init__(strategy, strategyConfig, isForStockPerformance)
+            self.databaseModule = DatabaseModule()
+            self.databaseModule.openDatabaseConnectionForBacktest()
+            self.databaseModule.deleteFills(self.databaseModule.getFills())
+
             self.currentDay = None
             self.tradesAvailable = 0
-            self.positionStochDates = dict()
+            self.positionIPDates = dict()
             self.eventsMapper = dict()
             self.nextDayTrades = dict()
-            self.positionStochHolds = dict()
+            self.positionIPHolds = dict()
 
     def __init__(self) -> None:
         super().__init__()
-        #self.reportModule = ReportStochDivergeModule()
+        self.reportModule = ReportImpulsePullbackModule()
 
     #### READ/WRITE IN CSV FILES ####
 
@@ -168,3 +177,177 @@ class BacktestImpulsePullbackModule(BacktestModule):
 
         previousDays.reverse()
         return previousDays
+
+    def handleStrategyResult(self, event: Event, events: List[Event], result: StrategyResult, currentPosition: int):
+        result: StrategyImpulsePullbackResult = result
+        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        strategyConfig: StrategyImpulsePullbackConfig = model.strategyConfig
+        if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and model.tradesAvailable > 0):
+            model.nextDayTrades[result.event.contract.symbol] = result
+        else:
+            for key, position in model.positions.items():
+                if key.split("_")[0] == event.contract.symbol:
+                    lista = list(position)
+                    lista[3] = event
+                    model.positions[key] = tuple(lista)
+    
+    def validateCurrentDay(self, event: Event):
+        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        strategyConfig: StrategyImpulsePullbackConfig = model.strategyConfig
+        if model.currentDay != event.datetime.date():
+            balance = self.getBalance()
+            model.tradesAvailable = 0
+            if model.isForStockPerformance:
+                model.tradesAvailable = 9999
+            else:
+                total = math.floor(balance/30000)
+                if balance - (30000*total) >= 2000:
+                    model.tradesAvailable = total+1
+                else:
+                    model.tradesAvailable = total
+
+            model.currentDay = None
+        
+        if event.contract.symbol in model.nextDayTrades:
+            result: StrategyImpulsePullbackResult = model.nextDayTrades[event.contract.symbol]
+            order: BracketOrder = result.bracketOrder
+            if order.parentOrder.size > 0:
+                if order.parentOrder.price < event.high and order.parentOrder.price > event.low:
+                    identifier = self.uniqueIdentifier(result.contract.symbol, event.datetime.date())
+                    model.positions[identifier] = (order,
+                                                    Position(contract=result.contract, size=order.parentOrder.size),
+                                                    event.datetime.date(),
+                                                    event)
+                    print(result)
+                    print("%s Position for %s" % (event.datetime.date(), event.contract.symbol))
+                    model.positionIPDates[identifier] = event.datetime.date()
+                    model.positionIPHolds[identifier] = strategyConfig.maxPeriodsToHoldPosition
+                    model.tradesAvailable -= 1
+                    newFill = FillDB(result.contract.symbol, result.event.datetime.date(
+                    ), result.contract.country, strategyConfig.type)
+                    model.databaseModule.createFill(newFill)
+            model.nextDayTrades.pop(event.contract.symbol)
+
+    def handleEndOfDayIfNecessary(self, event: Event, events: List[Event], currentPosition: int):
+        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        model.currentDay = event.datetime.date()
+
+        if ((len(events) > currentPosition+1 and events[currentPosition+1].datetime.date() != model.currentDay) or
+                (len(events) == currentPosition+1)):
+            self.handleProfitAndStop()
+            self.handleExpiredFills()
+
+    def handleProfitAndStop(self):
+        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        reportModule: ReportImpulsePullbackModule = self.reportModule
+        positions = model.positions.copy()
+        if (len(positions.values()) > 0):
+            for key, (bracketOrder, position, positionDate, event) in positions.items():
+                bracketOrder: BracketOrder = bracketOrder
+                if self.isStopLoss(event, bracketOrder):
+                    mainOrder: Order = bracketOrder.parentOrder
+                    stopOrder: Order = bracketOrder.stopLossOrder
+                    loss = abs(stopOrder.price*stopOrder.size -
+                                mainOrder.price*mainOrder.size)
+                    candlesHold = model.positionIPHolds[key]
+
+                    reportModule.createStopLossResult(
+                        event, bracketOrder, positionDate, loss, model.cashAvailable, candlesHold)
+
+                    model.positions.pop(key)
+                    model.positionIPDates.pop(key)
+                    model.positionIPHolds.pop(key)
+
+                    if model.isForStockPerformance == False:
+                        model.cashAvailable -= loss
+                elif self.isTakeProfit(event, bracketOrder):
+                    mainOrder: Order = bracketOrder.parentOrder
+                    profitOrder: Order = bracketOrder.takeProfitOrder
+                    profit = abs(profitOrder.price*profitOrder.size -
+                                    mainOrder.price*mainOrder.size)
+                    candlesHold = model.positionIPHolds[key]
+
+                    reportModule.createTakeProfitResult(
+                        event, bracketOrder, positionDate, profit, model.cashAvailable, candlesHold)
+
+                    model.positions.pop(key)
+                    model.positionIPDates.pop(key)
+                    model.positionIPHolds.pop(key)
+
+                    if model.isForStockPerformance == False:
+                        model.cashAvailable += profit
+
+    def handleExpiredFills(self):
+        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        reportModule: ReportImpulsePullbackModule = self.reportModule
+        positions = model.positions.copy()
+        if (len(positions.values()) > 0):
+            for key, (bracketOrder, position, positionDate, event) in positions.items():
+                bracketOrder: BracketOrder = bracketOrder
+                ipPostionHold = model.positionIPHolds[key]
+                if self.isPositionExpired(event, positionDate, ipPostionHold):
+                    if self.isProfit(event, bracketOrder):
+                        mainOrder: Order = bracketOrder.parentOrder
+                        profit = abs(event.close*mainOrder.size -
+                                        mainOrder.price*mainOrder.size)
+                        candlesHold = model.positionIPHolds[key]
+
+                        reportModule.createProfitResult(
+                            event, bracketOrder, positionDate, profit, model.cashAvailable, candlesHold)
+
+                        if model.isForStockPerformance == False:
+                            model.cashAvailable += profit
+                    else:
+                        mainOrder: Order = bracketOrder.parentOrder
+                        loss = abs(event.close*mainOrder.size -
+                                    mainOrder.price*mainOrder.size)
+                        candlesHold = model.positionIPHolds[key]
+
+                        reportModule.createLossResult(
+                            event, bracketOrder, positionDate, loss, model.cashAvailable, candlesHold)
+
+                        if model.isForStockPerformance == False:
+                            model.cashAvailable -= loss
+
+                    identifier = self.uniqueIdentifier(event.contract.symbol, positionDate)
+                    model.positions.pop(identifier)
+                    model.positionIPDates.pop(identifier)
+                    model.positionIPHolds.pop(key)
+
+    def isPositionExpired(self, event: EventImpulsePullback, positionDate: date, candlesToHold: int) -> bool:
+        config: StrategyImpulsePullbackConfig = self.strategyModel.strategyConfig
+        return event.datetime.date() >= (positionDate+timedelta(days=candlesToHold))
+
+    def isStopLoss(self, event: EventImpulsePullback, bracketOrder: BracketOrder) -> bool:
+        mainOrder = bracketOrder.parentOrder
+        stopOrder = bracketOrder.stopLossOrder
+        return ((mainOrder.action == OrderAction.Buy and event.low <= stopOrder.price) or
+                (mainOrder.action == OrderAction.Sell and event.high >= stopOrder.price))
+
+    def isTakeProfit(self, event: EventImpulsePullback, bracketOrder: BracketOrder) -> bool:
+        mainOrder = bracketOrder.parentOrder
+        takeProfitOrder = bracketOrder.takeProfitOrder
+        return ((mainOrder.action == OrderAction.Buy and event.high >= takeProfitOrder.price) or
+                (mainOrder.action == OrderAction.Sell and event.low <= takeProfitOrder.price))
+
+    def isProfit(self, event: EventImpulsePullback, bracketOrder: BracketOrder) -> bool:
+        mainOrder = bracketOrder.parentOrder
+        return ((mainOrder.action == OrderAction.Buy and mainOrder.price < event.close) or
+                (mainOrder.action == OrderAction.Sell and mainOrder.price > event.close))
+
+    def clearOldFills(self, event: Event):
+        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        fills = model.databaseModule.getFills()
+        limitDate = event.datetime.date()-timedelta(days=40)
+        filteredFills = list(filter(lambda x: (x.date < limitDate and x.strategy == StrategyType.impulse_pullback), fills))
+        model.databaseModule.deleteFills(filteredFills)
+
+    def getFill(self, contract: Contract):
+        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        fills = model.databaseModule.getFills()
+        filteredFills = list(
+            filter(lambda x: (contract.symbol == x.symbol and x.strategy == StrategyType.impulse_pullback), fills))
+        filteredFills.sort(key=lambda x: x.date, reverse=True)
+        if len(filteredFills) > 0:
+            return filteredFills[0]
+        return None

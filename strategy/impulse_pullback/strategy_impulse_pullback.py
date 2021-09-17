@@ -1,4 +1,5 @@
 from enum import Enum
+from helpers.math import round_down
 from logging import critical
 from models.base_models import OrderAction
 from typing import List, Tuple
@@ -38,30 +39,28 @@ class StrategyImpulsePullback(Strategy):
         if criteriaResult == CriteriaResultType.failure and result:
             return result
 
+        strategyType = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
+        order = self.createOrder(strategyType)
         criteriaResult, result = self.computeCriteria2(action)
 
         if criteriaResult == CriteriaResultType.failure:
-            type = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
             print("(%s) \t⭐️ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
-            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, type, StrategyImpulsePullbackResultResultType.criteria1)
+            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria1, order)
 
         criteriaResult, result = self.computeCriteria3(action, swingPosition)
 
         if criteriaResult == CriteriaResultType.failure:
-            type = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
             print("(%s) \t⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
-            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, type, StrategyImpulsePullbackResultResultType.criteria1)
+            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria2, order)
         else:
             print("(%s) \t⭐️⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
-        
-    def logmagico(self, data: str):
-        if self.currentBar.datetime.year == 2021 and self.currentBar.datetime.month == 7 and self.currentBar.datetime.day == 45:
-            print(data)
+            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria3, order)
 
     ### Criteria 1 ###
     ## 6x18 or MACD cross
     ## Swing Candle
     ## Pullbacks
+
     def computeCriteria1(self) -> Tuple[CriteriaResultType, OrderAction, int, StrategyImpulsePullbackResult]:
         isInsideCandle = self.isInsideBarCandle(self.currentBar, self.previousBars[-1])
         isPullbackCandle, pullbackOrderAction = self.isPullbackCandle(self.currentBar, self.previousBars[-1])
@@ -207,6 +206,7 @@ class StrategyImpulsePullback(Strategy):
 
     ## (Not implemented) Should not have nay resistance/support near the Take profit price
     ## (Not implemented) No earnings in the next 7 days
+
     def computeCriteria2(self, action: OrderAction) -> Tuple[CriteriaResultType, StrategyImpulsePullbackResult]:
         emasValid = self.areEMAsValid(action)
         stochasticValid = self.isStochasticValid(action)
@@ -268,8 +268,8 @@ class StrategyImpulsePullback(Strategy):
         hasCrossMACD = self.hasMACDCross(action,swingCandlePosition, self.previousBars)
         hasPriceCross50EMA = self.hasPriceCrossed50EMA(action,swingCandlePosition)
 
-        if ((hasCrossEMA and hasCrossMACD) or
-            (hasCrossEMA and hasPriceCross50EMA) or
+        if ((hasCrossEMA and hasPriceCross50EMA) or
+            (hasCrossEMA and hasCrossMACD) or
             (hasCrossMACD and hasPriceCross50EMA)):
             return (CriteriaResultType.success, None)
         return (CriteriaResultType.failure, None)
@@ -277,15 +277,13 @@ class StrategyImpulsePullback(Strategy):
     def hasPriceCrossed50EMA(self, action: OrderAction, swingCandlePosition: int) -> bool:
         eventA = self.previousBars[-(swingCandlePosition)]
         eventB = self.previousBars[-(swingCandlePosition+1)]
-        eventAPrice = (eventA.open+eventA.close+eventA.high+eventA.low)/4
-        eventBPrice = (eventB.open+eventB.close+eventB.high+eventB.low)/4
         if action == OrderAction.Buy:
-            return eventAPrice > eventA.ema50 and eventBPrice <= eventA.ema50
+            return eventA.low > eventA.ema50 and eventB.low <= eventA.ema50
         elif action == OrderAction.Sell:
-            return eventAPrice < eventA.ema50 and eventBPrice >= eventA.ema50
+            return eventA.high < eventA.ema50 and eventB.high >= eventA.ema50
         return False
 
-    # # Constructor
+    ## Constructor
 
     def fetchInformation(self):
         strategyData: StrategyImpulsePullbackData = self.strategyData
@@ -301,7 +299,7 @@ class StrategyImpulsePullback(Strategy):
         self.maxPeriodsToHoldPosition = strategyConfig.maxPeriodsToHoldPosition
         self.winLossRatio = strategyConfig.winLossRatio
 
-    # Validations
+    ## Validations
 
     def validateStrategy(self):
         if (not self.isConfigsValid() or not self.isStrategyDataValid()):
@@ -342,3 +340,52 @@ class StrategyImpulsePullback(Strategy):
         return (self.maxPeriodsToHoldPosition > 0 and
                 self.winLossRatio > 0 and
                 self.willingToLose > 0)
+
+    ## Orders & Postion Sizing
+
+    def positonSizing(self, action:OrderAction, balance: float, r: float) -> int:
+        value = (balance*self.willingToLose)/(r)
+        return int(round_down(value, 0))
+
+    def getPriceTarget(self, action: OrderAction) -> float:
+        gap = self.getGap()
+        target = self.currentBar.high if action == OrderAction.Buy else self.currentBar.low
+
+        return target+gap if action == OrderAction.Buy else target-gap
+
+    def getStopLossPrice(self, action: OrderAction) -> float:
+        gap = self.getGap()
+        target = self.currentBar.low if action == OrderAction.Buy else self.currentBar.high
+
+        return target-gap if action == OrderAction.Buy else target+gap
+    
+    def getOrderPrice(self, action: OrderAction):
+        return self.getPriceTarget(action)
+
+    def calculatePnl(self, action: OrderAction):
+        targetPrice = self.getPriceTarget(action)
+        stopLossPrice = self.getStopLossPrice(action)
+        r = (targetPrice-stopLossPrice)*2.5 if action == OrderAction.Buy else (stopLossPrice-targetPrice)*2.5
+        return targetPrice+r if action == OrderAction.Buy else targetPrice-r
+
+    def getSize(self, action: OrderAction):
+        targetPrice = self.getPriceTarget(action)
+        stopLossPrice = self.getStopLossPrice(action)
+        balance = self.strategyData.totalCash
+        r = targetPrice-stopLossPrice if action == OrderAction.Buy else stopLossPrice-targetPrice
+        return self.positonSizing(action, balance, r)
+
+    def getGap(self) -> float:
+        if self.currentBar.close < 5 :
+            return 0.01
+        elif self.currentBar.close >= 5 and self.currentBar.close < 10:
+            return 0.02
+        elif self.currentBar.close >= 10 and self.currentBar.close < 50:
+            return 0.05
+        elif self.currentBar.close >= 50 and self.currentBar.close < 100:
+            return 0.05
+        elif self.currentBar.close >= 100 and self.currentBar.close < 200:
+            return 0.1
+        elif self.currentBar.close >= 200:
+            return 0.15
+        return 0.0
