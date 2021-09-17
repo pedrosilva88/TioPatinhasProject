@@ -42,11 +42,17 @@ class StrategyImpulsePullback(Strategy):
 
         if criteriaResult == CriteriaResultType.failure:
             type = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
-            #print("Criteria 1 Match", self.currentBar.datetime.date(), action, self.previousBars[-swingPosition].datetime.date())
-            #print("(%s) 🚨 Criteria 1 Match Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action))
+            print("(%s) \t⭐️ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
+            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, type, StrategyImpulsePullbackResultResultType.criteria1)
+
+        criteriaResult, result = self.computeCriteria3(action, swingPosition)
+
+        if criteriaResult == CriteriaResultType.failure:
+            type = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
+            print("(%s) \t⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
             return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, type, StrategyImpulsePullbackResultResultType.criteria1)
         else:
-            print("(%s) 🧙‍ Criteria 2 Match Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action))
+            print("(%s) \t⭐️⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
         
     def logmagico(self, data: str):
         if self.currentBar.datetime.year == 2021 and self.currentBar.datetime.month == 7 and self.currentBar.datetime.day == 45:
@@ -249,6 +255,34 @@ class StrategyImpulsePullback(Strategy):
         elif action == OrderAction.Sell:
             percentage = abs(self.currentBar.low-self.currentBar.bollingerBandLow)/self.currentBar.low
             return percentage < 0.01
+        return False
+
+    ### Criteria 3 ###
+    ### ** 2/3 should be comtempled ** ###
+    ## 6x18 EMA Cross
+    ## MACD cross Signal line
+    ## Price crossing 50EMA
+
+    def computeCriteria3(self, action: OrderAction, swingCandlePosition: int) -> Tuple[CriteriaResultType, StrategyImpulsePullbackResult]:
+        hasCrossEMA = self.hasEMACross(action,swingCandlePosition, self.previousBars)
+        hasCrossMACD = self.hasMACDCross(action,swingCandlePosition, self.previousBars)
+        hasPriceCross50EMA = self.hasPriceCrossed50EMA(action,swingCandlePosition)
+
+        if ((hasCrossEMA and hasCrossMACD) or
+            (hasCrossEMA and hasPriceCross50EMA) or
+            (hasCrossMACD and hasPriceCross50EMA)):
+            return (CriteriaResultType.success, None)
+        return (CriteriaResultType.failure, None)
+
+    def hasPriceCrossed50EMA(self, action: OrderAction, swingCandlePosition: int) -> bool:
+        eventA = self.previousBars[-(swingCandlePosition)]
+        eventB = self.previousBars[-(swingCandlePosition+1)]
+        eventAPrice = (eventA.open+eventA.close+eventA.high+eventA.low)/4
+        eventBPrice = (eventB.open+eventB.close+eventB.high+eventB.low)/4
+        if action == OrderAction.Buy:
+            return eventAPrice > eventA.ema50 and eventBPrice <= eventA.ema50
+        elif action == OrderAction.Sell:
+            return eventAPrice < eventA.ema50 and eventBPrice >= eventA.ema50
         return False
 
     # # Constructor
