@@ -12,7 +12,7 @@ from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConf
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from country_config.market_manager import MarketManager
 from strategy.configs.factory.strategy_config_factory import StrategyConfigFactory
-from strategy.impulse_pullback.models import StrategyImpulsePullbackData, StrategyImpulsePullbackResult
+from strategy.impulse_pullback.models import StrategyImpulsePullbackData, StrategyImpulsePullbackResult, StrategyImpulsePullbackResultResultType
 from models.impulse_pullback.models import EventImpulsePullback
 from typing import Any, List, Tuple, Union
 from backtest.backtest_module import BacktestModule
@@ -26,6 +26,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
         databaseModule: DatabaseModule
         positionIPDates: Union[str, date]
         positionIPHolds: Union[str, int]
+        positionIPCriteria: Union[str, StrategyImpulsePullbackResultResultType]
         eventsMapper: Union[str, EventImpulsePullback]
         currentDay: date
         tradesAvailable: int
