@@ -111,7 +111,7 @@ class ReportImpulsePullbackModule(ReportModule):
                                         size=mainOrder.size,
                                         totalInvested=round(mainOrder.size*mainOrder.price, 2),
                                         cash=round(cashAvailable, 2),
-                                        criteria= criteria)
+                                        criteria= criteria.emoji)
         self.results.append(result)
 
 

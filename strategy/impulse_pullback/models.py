@@ -23,6 +23,18 @@ class StrategyImpulsePullbackResultResultType(Enum):
     criteria2 = 2
     criteria3 = 3
 
+    @property
+    def emoji(self):
+        if self == StrategyImpulsePullbackResultResultType.criteria1:
+            return "⭐️"
+        elif self == StrategyImpulsePullbackResultResultType.criteria2:
+            return "⭐️⭐️"
+        elif self == StrategyImpulsePullbackResultResultType.criteria3:
+            return "⭐️⭐️⭐️"
+        else:
+            return "-"
+
+
 class StrategyImpulsePullbackResult(StrategyResult):
     ipType: StrategyImpulsePullbackResultResultType
 

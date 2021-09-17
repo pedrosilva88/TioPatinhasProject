@@ -44,6 +44,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
             self.eventsMapper = dict()
             self.nextDayTrades = dict()
             self.positionIPHolds = dict()
+            self.positionIPCriteria = dict()
 
     def __init__(self) -> None:
         super().__init__()
@@ -223,6 +224,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
                     print("%s Position for %s" % (event.datetime.date(), event.contract.symbol))
                     model.positionIPDates[identifier] = event.datetime.date()
                     model.positionIPHolds[identifier] = strategyConfig.maxPeriodsToHoldPosition
+                    model.positionIPCriteria[identifier] = result.ipType
                     model.tradesAvailable -= 1
                     newFill = FillDB(result.contract.symbol, result.event.datetime.date(
                     ), result.contract.country, strategyConfig.type)
@@ -251,13 +253,15 @@ class BacktestImpulsePullbackModule(BacktestModule):
                     loss = abs(stopOrder.price*stopOrder.size -
                                 mainOrder.price*mainOrder.size)
                     candlesHold = model.positionIPHolds[key]
+                    criteria = model.positionIPCriteria[key]
 
                     reportModule.createStopLossResult(
-                        event, bracketOrder, positionDate, loss, model.cashAvailable, candlesHold)
+                        event, bracketOrder, positionDate, loss, model.cashAvailable, criteria)
 
                     model.positions.pop(key)
                     model.positionIPDates.pop(key)
                     model.positionIPHolds.pop(key)
+                    model.positionIPCriteria.pop(key)
 
                     if model.isForStockPerformance == False:
                         model.cashAvailable -= loss
@@ -266,14 +270,15 @@ class BacktestImpulsePullbackModule(BacktestModule):
                     profitOrder: Order = bracketOrder.takeProfitOrder
                     profit = abs(profitOrder.price*profitOrder.size -
                                     mainOrder.price*mainOrder.size)
-                    candlesHold = model.positionIPHolds[key]
+                    criteria = model.positionIPCriteria[key]
 
                     reportModule.createTakeProfitResult(
-                        event, bracketOrder, positionDate, profit, model.cashAvailable, candlesHold)
+                        event, bracketOrder, positionDate, profit, model.cashAvailable, criteria)
 
                     model.positions.pop(key)
                     model.positionIPDates.pop(key)
                     model.positionIPHolds.pop(key)
+                    model.positionIPCriteria.pop(key)
 
                     if model.isForStockPerformance == False:
                         model.cashAvailable += profit
@@ -291,10 +296,10 @@ class BacktestImpulsePullbackModule(BacktestModule):
                         mainOrder: Order = bracketOrder.parentOrder
                         profit = abs(event.close*mainOrder.size -
                                         mainOrder.price*mainOrder.size)
-                        candlesHold = model.positionIPHolds[key]
+                        criteria = model.positionIPCriteria[key]
 
                         reportModule.createProfitResult(
-                            event, bracketOrder, positionDate, profit, model.cashAvailable, candlesHold)
+                            event, bracketOrder, positionDate, profit, model.cashAvailable, criteria)
 
                         if model.isForStockPerformance == False:
                             model.cashAvailable += profit
@@ -302,10 +307,10 @@ class BacktestImpulsePullbackModule(BacktestModule):
                         mainOrder: Order = bracketOrder.parentOrder
                         loss = abs(event.close*mainOrder.size -
                                     mainOrder.price*mainOrder.size)
-                        candlesHold = model.positionIPHolds[key]
+                        criteria = model.positionIPCriteria[key]
 
                         reportModule.createLossResult(
-                            event, bracketOrder, positionDate, loss, model.cashAvailable, candlesHold)
+                            event, bracketOrder, positionDate, loss, model.cashAvailable, criteria)
 
                         if model.isForStockPerformance == False:
                             model.cashAvailable -= loss
@@ -314,6 +319,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
                     model.positions.pop(identifier)
                     model.positionIPDates.pop(identifier)
                     model.positionIPHolds.pop(key)
+                    model.positionIPCriteria.pop(key)
 
     def isPositionExpired(self, event: EventImpulsePullback, positionDate: date, candlesToHold: int) -> bool:
         config: StrategyImpulsePullbackConfig = self.strategyModel.strategyConfig
