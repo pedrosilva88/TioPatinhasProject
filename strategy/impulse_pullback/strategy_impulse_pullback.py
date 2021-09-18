@@ -19,6 +19,7 @@ class StrategyImpulsePullback(Strategy):
     # Properties
     currentBar: EventImpulsePullback = None
     previousBars: List[EventImpulsePullback] = None
+    criteria: StrategyImpulsePullbackResultResultType = None
 
     # Strategy Parameters
     willingToLose: float = None
@@ -39,6 +40,7 @@ class StrategyImpulsePullback(Strategy):
         if criteriaResult == CriteriaResultType.failure and result:
             return result
 
+        self.criteria = StrategyImpulsePullbackResultResultType.criteria1
         strategyType = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
         order = self.createOrder(strategyType)
         criteriaResult, result = self.computeCriteria2(action)
@@ -46,13 +48,20 @@ class StrategyImpulsePullback(Strategy):
         if criteriaResult == CriteriaResultType.failure:
             print("(%s) \t⭐️ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
             return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria1, order)
+            #return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 
+        self.criteria = StrategyImpulsePullbackResultResultType.criteria3
+        order = self.createOrder(strategyType)
         criteriaResult, result = self.computeCriteria3(action, swingPosition)
 
         if criteriaResult == CriteriaResultType.failure:
             print("(%s) \t⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
             return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria2, order)
+            #return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
+
         else:
+            self.criteria = StrategyImpulsePullbackResultResultType.criteria3
+            order = self.createOrder(strategyType)
             print("(%s) \t⭐️⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
             return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria3, order)
 
@@ -343,8 +352,15 @@ class StrategyImpulsePullback(Strategy):
 
     ## Orders & Postion Sizing
 
-    def positonSizing(self, action:OrderAction, balance: float, r: float) -> int:
-        value = (balance*self.willingToLose)/(r)
+    def positonSizing(self, criteria: StrategyImpulsePullbackResultResultType, action:OrderAction, balance: float, r: float) -> int:
+        willingToLose = self.willingToLose
+        if criteria == StrategyImpulsePullbackResultResultType.criteria1:
+            willingToLose = 0.01
+        elif criteria == StrategyImpulsePullbackResultResultType.criteria2:
+            willingToLose = 0.02
+        elif criteria == StrategyImpulsePullbackResultResultType.criteria1:
+            willingToLose = 0.05
+        value = (balance*willingToLose)/(r)
         return int(round_down(value, 0))
 
     def getPriceTarget(self, action: OrderAction) -> float:
@@ -373,7 +389,7 @@ class StrategyImpulsePullback(Strategy):
         stopLossPrice = self.getStopLossPrice(action)
         balance = self.strategyData.totalCash
         r = targetPrice-stopLossPrice if action == OrderAction.Buy else stopLossPrice-targetPrice
-        return self.positonSizing(action, balance, r)
+        return self.positonSizing(self.criteria, action, balance, r)
 
     def getGap(self) -> float:
         if self.currentBar.close < 5 :
