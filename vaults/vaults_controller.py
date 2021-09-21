@@ -10,6 +10,7 @@ from pytz import timezone
 from island.island import IslandProtocol
 from vaults.zigzag.vault_zigzag import VaultZigZag
 from vaults.stoch_diverge.vault_stoch_diverge import VaultStochDiverge
+from vaults.impulse_pullback.vault_impulse_pullback import VaultImpulsePullback
 from strategy.configs.models import StrategyAction, StrategyType
 from typing import List
 from vaults.vault import Vault
@@ -45,7 +46,6 @@ class VaultsController(VaultsControllerProtocol):
             elif strategyConfig.type == StrategyType.stoch_diverge:
                 self.vaults.append(VaultStochDiverge(strategyConfig, self.portfolio, self))
             elif strategyConfig.type == StrategyType.impulse_pullback:
-                raise
                 self.vaults.append(VaultImpulsePullback(strategyConfig, self.portfolio, self))
 
     async def start(self):

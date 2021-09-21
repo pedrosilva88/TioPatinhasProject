@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, time
 from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
 from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
 from models.base_models import OrderType
@@ -92,7 +92,7 @@ class StrategyConfigFactory:
 
         openTime = (market.openTime.astimezone(
             tz)-timedelta(hours=constants.runStrategyBeforeHours)).time()
-
+        openTime = time(hour=15, minute=34)
         return StrategyImpulsePullbackConfig(market=market, runStrategyTime=openTime,
                                     willingToLose=constants.willingToLose,
                                     kPeriod=constants.kPeriod, dPeriod=constants.dPeriod,
@@ -172,7 +172,7 @@ class Constants:
     class ImpulsePullback:
         class Default:
             runStrategyBeforeHours = 4
-            daysBeforeToDownload = 1000
+            daysBeforeToDownload = 400
             willingToLose = 0.02
             kPeriod = 5
             dPeriod = 3
