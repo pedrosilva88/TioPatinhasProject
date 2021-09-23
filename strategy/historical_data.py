@@ -88,7 +88,9 @@ class HistoricalData:
         impulsePullbackEvents = []
         for j, event in enumerate(events):
             stochiValues = stochOscillatorsValues[event.datetime]
-
+            if ("%K" not in stochiValues.keys() or
+                "%D" not in stochiValues.keys()):
+                return []
 
             impulsePullbackEvent = EventImpulsePullback(contract=event.contract,
                                                         datetime=event.datetime,

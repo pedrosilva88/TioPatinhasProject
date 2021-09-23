@@ -140,7 +140,7 @@ class Constants:
 
     class StochasticDivergence:
         class Default:
-            runStrategyBeforeHours = 3
+            runStrategyBeforeHours = 4
             daysBeforeToDownload = 200
             willingToLose = 0.02
             daysBefore = 40
@@ -172,7 +172,7 @@ class Constants:
     class ImpulsePullback:
         class Default:
             runStrategyBeforeHours = 4
-            daysBeforeToDownload = 400
+            daysBeforeToDownload = 1000
             willingToLose = 0.02
             kPeriod = 5
             dPeriod = 3

@@ -46,7 +46,7 @@ class VaultImpulsePullback(Vault):
     # Strategy
 
     async def runMainStrategy(self):
-        log("🕐 Run Stochastic Divergence Strategy for %s market now 🕐" % self.strategyConfig.market.country.code)
+        log("🕐 Run Impulse pullback Strategy for %s market now 🕐" % self.strategyConfig.market.country.code)
         config: StrategyImpulsePullbackConfig = self.strategyConfig
         self.setupVault()
 
@@ -80,7 +80,7 @@ class VaultImpulsePullback(Vault):
     async def fetchHistoricalData(self):
         config: StrategyImpulsePullbackConfig = self.strategyConfig
         provider = self.delegate.controller.provider
-        chunks = Helpers.grouper(self.contracts, 50)
+        chunks = Helpers.grouper(self.contracts, 10)
         today = datetime.today()
         allEvents = []
         index = 1

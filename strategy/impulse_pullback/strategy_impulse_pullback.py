@@ -83,7 +83,7 @@ class StrategyImpulsePullback(Strategy):
                 isPullbackCandle, pullbackOrderAction = self.isPullbackCandle(bar, previousBar)
                 if pullbacksFound > 0:
                     if action == None:
-                        # print("❌ The action shouldn't be None at this point ❌")
+                        #print("❌ The action shouldn't be None at this point ❌")
                         return (CriteriaResultType.failure, None, None, StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent))
                     if action == OrderAction.Buy:
                         hasSwingHigh = self.isSwingHighCandle(bar, self.previousBars[-(i+7):-(i)])
@@ -106,8 +106,9 @@ class StrategyImpulsePullback(Strategy):
                         #print("❌ Invalid Candle. Ignore Event ❌")
                         return (CriteriaResultType.failure, None, None, StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent))
                 else:
-                    if isPullbackCandle and pullbackOrderAction == action:
+                    if isPullbackCandle and (pullbackOrderAction == action or action is None):
                         pullbacksFound += 1
+                        action = pullbackOrderAction
                     elif self.isInsideBarCandle(bar, previousBar):
                         continue
                     else:
@@ -207,7 +208,7 @@ class StrategyImpulsePullback(Strategy):
     def isInsideBarCandle(self, bar: EventImpulsePullback, previousBar: EventImpulsePullback) -> bool:
         return (bar.low > previousBar.low and bar.high < previousBar.high)
 
-    ### Criteria 2 ###
+    ### Criteria 2 ### (Current Candle)
     ## Long - EMA_18 > EMA_50 > EMA_100 > EMA_200 / Short - EMA_18 < EMA_50 < EMA_100 < EMA_200
     ## Stochastics not hitting highs (long) or lows (short)
     ## Bollinger bands not touching
@@ -258,15 +259,15 @@ class StrategyImpulsePullback(Strategy):
 
     def areBollingerBandsValid(self, action: OrderAction) -> bool:
         if action == OrderAction.Buy:
-            percentage = abs(self.currentBar.bollingerBandHigh-self.currentBar.high)/self.currentBar.high
+            percentage = (self.currentBar.bollingerBandHigh-self.currentBar.high)/self.currentBar.high
             return percentage > 0.01
 
         elif action == OrderAction.Sell:
-            percentage = abs(self.currentBar.low-self.currentBar.bollingerBandLow)/self.currentBar.low
-            return percentage < 0.01
+            percentage = (self.currentBar.low-self.currentBar.bollingerBandLow)/self.currentBar.low
+            return percentage > 0.01
         return False
 
-    ### Criteria 3 ###
+    ### Criteria 3 ### (Swing Camdle)
     ### ** 2/3 should be comtempled ** ###
     ## 6x18 EMA Cross
     ## MACD cross Signal line
