@@ -92,7 +92,7 @@ class StrategyConfigFactory:
 
         openTime = (market.openTime.astimezone(
             tz)-timedelta(hours=constants.runStrategyBeforeHours)).time()
-        openTime = time(hour=15, minute=34)
+        openTime = time(hour=20, minute=55)
         return StrategyImpulsePullbackConfig(market=market, runStrategyTime=openTime,
                                     willingToLose=constants.willingToLose,
                                     kPeriod=constants.kPeriod, dPeriod=constants.dPeriod,
