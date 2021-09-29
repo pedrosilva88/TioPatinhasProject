@@ -50,7 +50,7 @@ class StrategyImpulsePullback(Strategy):
             #return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria1, order)
             return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 
-        self.criteria = StrategyImpulsePullbackResultResultType.criteria3
+        self.criteria = StrategyImpulsePullbackResultResultType.criteria2
         order = self.createOrder(strategyType)
         criteriaResult, result = self.computeCriteria3(action, swingPosition)
 

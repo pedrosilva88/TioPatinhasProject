@@ -51,6 +51,7 @@ class VaultImpulsePullback(Vault):
         self.setupVault()
 
         await self.syncProviderData()
+        self.updatePortfolio()
         await self.fetchHistoricalData()
         
         for contract in self.contracts:
@@ -80,7 +81,7 @@ class VaultImpulsePullback(Vault):
     async def fetchHistoricalData(self):
         config: StrategyImpulsePullbackConfig = self.strategyConfig
         provider = self.delegate.controller.provider
-        chunks = Helpers.grouper(self.contracts, 10)
+        chunks = Helpers.grouper(self.contracts, 40)
         today = datetime.today()
         allEvents = []
         index = 1
@@ -101,3 +102,8 @@ class VaultImpulsePullback(Vault):
             else:
                 log("🧶 ❗️ Invalid Historical Data for %s ❗️ 🧶" % (contract.symbol))
             index += 1 
+
+    # Portfolio
+
+    def updatePortfolio(self):
+        return self.portfolio.updatePortfolio(self.delegate.controller.provider, self.strategyConfig.market)
