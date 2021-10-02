@@ -70,6 +70,7 @@ class OrderType(Enum):
     LimitOrder = "LMT"
     MarketOrder = "MKT"
     StopOrder = "STP"
+    StopLimitOrder = "STP LMT"
 
 class Order:
     action: OrderAction

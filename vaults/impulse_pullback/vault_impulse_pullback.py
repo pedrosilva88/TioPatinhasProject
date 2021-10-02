@@ -81,7 +81,7 @@ class VaultImpulsePullback(Vault):
     async def fetchHistoricalData(self):
         config: StrategyImpulsePullbackConfig = self.strategyConfig
         provider = self.delegate.controller.provider
-        chunks = Helpers.grouper(self.contracts, 40)
+        chunks = Helpers.grouper(self.contracts, 15)
         today = datetime.today()
         allEvents = []
         index = 1

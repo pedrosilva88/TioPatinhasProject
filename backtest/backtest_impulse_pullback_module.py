@@ -159,9 +159,10 @@ class BacktestImpulsePullbackModule(BacktestModule):
         if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
             return None
         previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
-        balance = min(30000, self.getBalance())
+        balance = self.getBalance()
+        cashToInvest = balance/2 if balance > 6000 else balance
         return StrategyImpulsePullbackData(contract=event.contract,
-                                            totalCash=balance,
+                                            totalCash=cashToInvest,
                                             event=event,
                                             previousEvents=previousEventsFiltered,
                                             today=event.datetime.date(),
@@ -202,11 +203,12 @@ class BacktestImpulsePullbackModule(BacktestModule):
             if model.isForStockPerformance:
                 model.tradesAvailable = 9999
             else:
-                total = math.floor(balance/30000)
-                if balance - (30000*total) >= 2000:
-                    model.tradesAvailable = total+1
+                if balance > 6000:
+                    model.tradesAvailable = 2
+                elif balance > 3000:
+                    model.tradesAvailable = 1
                 else:
-                    model.tradesAvailable = total
+                    model.tradesAvailable = 0
 
             model.currentDay = None
         
@@ -214,7 +216,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
             result: StrategyImpulsePullbackResult = model.nextDayTrades[event.contract.symbol]
             order: BracketOrder = result.bracketOrder
             if order.parentOrder.size > 0:
-                if order.parentOrder.price < event.high and order.parentOrder.price > event.low:
+                if order.parentOrder.price < event.high and order.parentOrder.price > event.low and model.tradesAvailable > 0:
                     identifier = self.uniqueIdentifier(result.contract.symbol, event.datetime.date())
                     model.positions[identifier] = (order,
                                                     Position(contract=result.contract, size=order.parentOrder.size),
