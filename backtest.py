@@ -26,27 +26,30 @@ if __name__ == '__main__':
 
 # from backtest.scanner.scanner_manager import BacktestScannerManager
 # from scanner import Scanner
-        # pathDownload = "backtest/scanner/Data/CSV/TWS/ZigZag/US/scan_to_download.csv"
-        # pathStrategy = "backtest/scanner/Data/CSV/TWS/ZigZag/US/scan_to_run_strategy.csv"
-        # stocksDownload = Scanner.contratcsFrom(pathDownload)
-        # stocksStrategy = Scanner.contratcsFrom(pathStrategy)
-        #
-        # inDownloadArray = []
-        # outDownloadArray = []
-        # for item in stocksStrategy:
-        #     exist = False
-        #     for copy in stocksDownload:
-        #         if copy.symbol == item.symbol:
-        #             exist = True
-        #             break
-        #     if exist:
-        #         inDownloadArray.append(item)
-        #     else:
-        #         outDownloadArray.append(item)
-        # print(len(inDownloadArray))
-        # print(len(outDownloadArray))
-        # for i in outDownloadArray:
-        #     print("%s,%s,%s" % (i.symbol, i.exchange, i.currency))
+# pathDownload = "backtest/scanner/Data/CSV/TWS/impulse_pullback/US/scan_to_download.csv"
+# pathDownloadPremium = "backtest/scanner/Data/CSV/TWS/impulse_pullback/US/scan_to_download_premium.csv"
+# stocksDownload = Scanner.contratcsFrom(pathDownload)
+# stocksDownloadPremium = Scanner.contratcsFrom(pathDownloadPremium)
+
+# inDownloadArray = []
+# outDownloadArray = []
+# for item in stocksDownload:
+#     exist = False
+#     for index, copy in enumerate(stocksDownloadPremium):
+#         # if index > 780 and index < 790:
+#         #     print(copy.symbol, len(copy.symbol))
+#         if copy.symbol == item.symbol:
+#             exist = True
+#             break
+#     # print("")
+#     if exist:
+#         inDownloadArray.append(item)
+#     else:
+#         outDownloadArray.append(item)
+# print(len(inDownloadArray))
+# print(len(outDownloadArray))
+# for i in outDownloadArray:
+#     print("%s,%s,%s" % (i.symbol, i.exchange, i.currency))
 
 
 # import pandas as pd

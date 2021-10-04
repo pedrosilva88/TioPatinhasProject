@@ -82,7 +82,7 @@ class TWSClient(ProviderClient):
         parentOrder = bracketOrder.parentOrder
         profitOrder = bracketOrder.takeProfitOrder
         stopLossOrder = bracketOrder.stopLossOrder
-        newContract: Stock = Stock(symbol=contract.symbol, exchange=contract.exchange, currency=contract.currency)
+        newContract: Stock = Stock(symbol=contract.symbol, exchange=contract.exchange, currency=contract.currency, primaryExchange=contract.primary)
 
         if parentOrder.type == OrderType.MarketOrder:
             assert parentOrder.action in (OrderAction.Buy, OrderAction.Sell)
@@ -126,7 +126,8 @@ class TWSClient(ProviderClient):
         order = MarketOrder(action.value, abs(position.size))
         contract: Stock = Stock(symbol=position.contract.symbol, 
                                 currency=position.contract.currency,
-                                exchange=position.contract.exchange)
+                                exchange=position.contract.exchange,
+                                primaryExchange=position.contract.primary)
         log("⛑ MKT Order: Action(%s) Type(%s) Size(%f) OrderId(%d) PermId(%d)⛑ " % (order.action, order.orderType, order.totalQuantity, order.orderId, order.permId))
         self.client.placeOrder(contract, order)
 
@@ -151,7 +152,8 @@ class TWSClient(ProviderClient):
                                                 barSizeSetting=barSize, 
                                                 whatToShow='TRADES',
                                                 useRTH=True,
-                                                formatDate=1)
+                                                formatDate=1,
+                                                timeout=1200)
             startDate = startDate+timedelta(days=6)
             allBars += bars
 
@@ -179,7 +181,8 @@ class TWSClient(ProviderClient):
                                                     barSizeSetting=barSize, 
                                                     whatToShow='TRADES',
                                                     useRTH=True,
-                                                    formatDate=1)
+                                                    formatDate=1,
+                                                    timeout=1200)
             startDate = startDate+timedelta(days=6)
             allBars += bars
 
@@ -204,7 +207,7 @@ class TWSClient(ProviderClient):
             self.durationDays = ("%d D" % (self.nDays+10)) if self.nDays < 365 else ("%d Y" % self.nYears)
             self.endDate = endDate
             self.startDate = self.endDate-timedelta(days=self.nDays+1) if barSize.endswith('min') else self.endDate
-            self.stock = Stock(contract.symbol, contract.exchange, contract.currency)
+            self.stock = Stock(contract.symbol, contract.exchange, contract.currency, primaryExchange=contract.primary)
             self.durationStr = '5 D' if barSize.endswith('min') else self.durationDays
 
     # Events

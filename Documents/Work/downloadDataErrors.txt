@@ -1,0 +1,117 @@
+Error 162, reqId 54: Historical Market Data Service error message:No historical market data for 1514/STK@NYSENBBO Last 1d, contract: Stock(symbol='LIN', exchange='SMART', currency='USD')
+Error 162, reqId 179: Historical Market Data Service error message:No historical market data for PLTR/STK@VALUE Last 1d, contract: Stock(symbol='PLTR', exchange='SMART', currency='USD')
+Error 162, reqId 667: Historical Market Data Service error message:No historical market data for MCFE/STK@VALUE Last 1d, contract: Stock(symbol='MCFE', exchange='SMART', currency='USD')
+Error 162, reqId 704: Historical Market Data Service error message:No historical market data for 1568/STK@NYSENBBO Last 1d, contract: Stock(symbol='ST', exchange='SMART', currency='USD')
+Error 162, reqId 729: Historical Market Data Service error message:No historical market data for SGMS/STK@VALUE Last 1d, contract: Stock(symbol='SGMS', exchange='SMART', currency='USD')
+Error 162, reqId 752: Historical Market Data Service error message:No historical market data for 1769/STK@NYSENBBO Last 1d, contract: Stock(symbol='HESM', exchange='SMART', currency='USD')
+Error 162, reqId 1172: Historical Market Data Service error message:No historical market data for PSTH/STK@VALUE Last 1d, contract: Stock(symbol='PSTH', exchange='SMART', currency='USD')
+Error 162, reqId 1203: Historical Market Data Service error message:No historical market data for 1644/STK@NYSENBBO Last 1d, contract: Stock(symbol='PFSI', exchange='SMART', currency='USD')
+Error 162, reqId 1485: Historical Market Data Service error message:No historical market data for AGTI/STK@VALUE Last 1d, contract: Stock(symbol='AGTI', exchange='SMART', currency='USD')
+Error 162, reqId 1531: Historical Market Data Service error message:No historical market data for RPAY/STK@VALUE Last 1d, contract: Stock(symbol='RPAY', exchange='SMART', currency='USD')
+Error 162, reqId 1846: Historical Market Data Service error message:No historical market data for WFRD/STK@CORPACT Last 1d, contract: Stock(symbol='WFRD', exchange='SMART', currency='USD')
+Error 162, reqId 1896: Historical Market Data Service error message:No historical market data for 1490/STK@NYSENBBO Last 1d, contract: Stock(symbol='DK', exchange='SMART', currency='USD')
+Error 162, reqId 1898: Historical Market Data Service error message:No historical market data for KLTR/STK@VALUE Last 1d, contract: Stock(symbol='KLTR', exchange='SMART', currency='USD')
+Error 162, reqId 1905: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='NLST', exchange='SMART', currency='USD')
+Error 162, reqId 1954: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='CYDY', exchange='SMART', currency='USD')
+Error 162, reqId 2016: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='NWBO', exchange='SMART', currency='USD')
+Error 162, reqId 2039: Historical Market Data Service error message:No historical market data for CPUH/STK@VALUE Last 1d, contract: Stock(symbol='CPUH', exchange='SMART', currency='USD')
+Error 162, reqId 2076: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='FNMA', exchange='SMART', currency='USD')
+Error 162, reqId 2085: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='ABML', exchange='SMART', currency='USD')
+Error 200, reqId 2238: No security definition has been found for the request, contract: Stock(symbol='FI', exchange='SMART', currency='USD')
+Error 162, reqId 2323: Historical Market Data Service error message:No historical market data for BRY/STK@VALUE Last 1d, contract: Stock(symbol='BRY', exchange='SMART', currency='USD')
+Error 162, reqId 2359: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='FMCC', exchange='SMART', currency='USD')
+Error 162, reqId 2380: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='ALPP', exchange='SMART', currency='USD')
+Error 162, reqId 2385: Historical Market Data Service error message:No historical market data for BYRN/STK@VALUE Last 1d, contract: Stock(symbol='BYRN', exchange='SMART', currency='USD')
+Error 162, reqId 2442: Historical Market Data Service error message:No historical market data for PVAC/STK@VALUE Last 1d, contract: Stock(symbol='PVAC', exchange='SMART', currency='USD')
+Error 162, reqId 2546: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='INVU', exchange='SMART', currency='USD')
+Error 162, reqId 2573: Historical Market Data Service error message:No historical market data for SBOW/STK@VALUE Last 1d, contract: Stock(symbol='SBOW', exchange='SMART', currency='USD')
+Error 162, reqId 2610: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='GTII', exchange='SMART', currency='USD')
+Error 162, reqId 2629: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='MRMD', exchange='SMART', currency='USD')
+Error 200, reqId 2701: No security definition has been found for the request, contract: Stock(symbol='KCAC', exchange='SMART', currency='USD')
+Error 162, reqId 2716: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='SHMP', exchange='SMART', currency='USD')
+Error 162, reqId 2731: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='VKIN', exchange='SMART', currency='USD')
+Error 162, reqId 2858: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='UNRV', exchange='SMART', currency='USD')
+Error 162, reqId 2889: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='HLYK', exchange='SMART', currency='USD')
+Error 162, reqId 2905: Historical Market Data Service error message:No historical market data for AEI/STK@VALUE Last 1d, contract: Stock(symbol='AEI', exchange='SMART', currency='USD')
+Error 162, reqId 2913: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='IPIX', exchange='SMART', currency='USD')
+Error 162, reqId 2924: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='LQMT', exchange='SMART', currency='USD')
+Error 162, reqId 2949: Historical Market Data Service error message:No historical market data for INUV/STK@VALUE Last 1d, contract: Stock(symbol='INUV', exchange='SMART', currency='USD')
+Error 162, reqId 2952: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='ADOM', exchange='SMART', currency='USD')
+Error 162, reqId 2959: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='INTV', exchange='SMART', currency='USD')
+Error 162, reqId 2960: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='BASA', exchange='SMART', currency='USD')
+Error 162, reqId 2977: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='KBLB', exchange='SMART', currency='USD')
+Error 162, reqId 3015: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='IQST', exchange='SMART', currency='USD')
+Error 162, reqId 3021: Historical Market Data Service error message:No historical market data for TRKA/STK@VALUE Last 1d, contract: Stock(symbol='TRKA', exchange='SMART', currency='USD')
+Error 162, reqId 3040: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='STMH', exchange='SMART', currency='USD')
+Error 162, reqId 3043: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='MITI', exchange='SMART', currency='USD')
+Error 162, reqId 3061: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='OTLC', exchange='SMART', currency='USD')
+Error 162, reqId 3064: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='ZNOG', exchange='SMART', currency='USD')
+Error 162, reqId 3066: Historical Market Data Service error message:No historical market data for IKT/STK@VALUE Last 1d, contract: Stock(symbol='IKT', exchange='SMART', currency='USD')
+Error 162, reqId 3072: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='XERI', exchange='SMART', currency='USD')
+Error 162, reqId 3073: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='SKYE', exchange='SMART', currency='USD')
+Error 162, reqId 3082: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='BLGO', exchange='SMART', currency='USD')
+Error 162, reqId 3104: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='RDGL', exchange='SMART', currency='USD')
+Error 162, reqId 3128: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='ATAO', exchange='SMART', currency='USD')
+Error 162, reqId 3138: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='LTUM', exchange='SMART', currency='USD')
+Error 162, reqId 3145: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='DSGT', exchange='SMART', currency='USD')
+Error 162, reqId 3150: Historical Market Data Service error message:No historical market data for JUPW/STK@VALUE Last 1d, contract: Stock(symbol='JUPW', exchange='SMART', currency='USD')
+Error 162, reqId 3169: Historical Market Data Service error message:No historical market data for AUUD/STK@VALUE Last 1d, contract: Stock(symbol='AUUD', exchange='SMART', currency='USD')
+Error 162, reqId 3173: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='ARTH', exchange='SMART', currency='USD')
+Error 162, reqId 3194: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='CVSI', exchange='SMART', currency='USD')
+Error 162, reqId 3195: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='PVCT', exchange='SMART', currency='USD')
+Error 162, reqId 3203: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='CRTG', exchange='SMART', currency='USD')
+Error 162, reqId 3206: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='SSFT', exchange='SMART', currency='USD')
+Error 162, reqId 3213: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='GNBT', exchange='SMART', currency='USD')
+Error 162, reqId 3232: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='SURG', exchange='SMART', currency='USD')
+Error 162, reqId 3234: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='NGTF', exchange='SMART', currency='USD')
+Error 162, reqId 3236: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='SHRG', exchange='SMART', currency='USD')
+Error 162, reqId 3237: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='IINX', exchange='SMART', currency='USD')
+Error 162, reqId 3245: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='SGSI', exchange='SMART', currency='USD')
+Error 162, reqId 3254: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='SRNA', exchange='SMART', currency='USD')
+Error 162, reqId 3265: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='DTGI', exchange='SMART', currency='USD')
+Error 162, reqId 3268: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='ADMQ', exchange='SMART', currency='USD')
+Error 162, reqId 3272: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='AMMJ', exchange='SMART', currency='USD')
+Error 162, reqId 3275: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='SING', exchange='SMART', currency='USD')
+Error 162, reqId 3282: Historical Market Data Service error message:No market data permissions for ARCAEDGE STK, contract: Stock(symbol='AMIH', exchange='SMART', currency='USD')
+Error 200, reqId 3318: No security definition has been found for the request, contract: Stock(symbol='XEC', exchange='SMART', currency='USD')
+Error 200, reqId 3357: No security definition has been found for the request, contract: Stock(symbol='GRA', exchange='SMART', currency='USD')
+Error 200, reqId 3405: No security definition has been found for the request, contract: Stock(symbol='LDL', exchange='SMART', currency='USD')
+Error 200, reqId 12: No security definition has been found for the request, contract: Stock(symbol='CREE', exchange='SMART', primaryExchange='NASDAQ', currency='USD')
+Error 200, reqId 21: No security definition has been found for the request, contract: Stock(symbol='WRHLF', exchange='SMART', primaryExchange='NASDAQ', currency='USD')
+
+'FIVE','SMART','USD'
+'TREX','SMART','USD'
+'OPEN','SMART','USD'
+'LPLA','SMART','USD'
+'FANG','SMART','USD'
+'KEYS','SMART','USD'
+'CAT','SMART','USD'
+'ABNB','SMART','USD'
+'CSCO','SMART','USD'
+'PLAN','SMART','USD'
+'CYBR','SMART','USD'
+'ROLL','SMART','USD'
+'SPCE','SMART','USD'
+'SMTC','SMART','USD'
+'WING','SMART','USD'
+'APLS','SMART','USD'
+'CLEU','SMART','USD'
+'GBS','SMART','USD'
+'ALF','SMART','USD'
+'FTEK','SMART','USD'
+'AVGR','SMART','USD'
+'ISUN','SMART','USD'
+'VOLT','SMART','USD'
+'AGRO','SMART','USD'
+'GLDD','SMART','USD'
+'LQDA','SMART','USD'
+'LIFE','SMART','USD'
+'GPRO','SMART','USD'
+'RBOT','SMART','USD'
+'CRBU','SMART','USD'
+'LBRT','SMART','USD'
+'CASH','SMART','USD'
+'SHIP','SMART','USD'
+'ECOM','SMART','USD'
+'TCS','SMART','USD'
+

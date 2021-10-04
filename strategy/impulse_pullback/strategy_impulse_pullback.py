@@ -46,7 +46,7 @@ class StrategyImpulsePullback(Strategy):
         criteriaResult, result = self.computeCriteria2(action)
 
         if criteriaResult == CriteriaResultType.failure:
-            log("(%s) \t⭐️ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
+            #log("(%s) \t⭐️ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
             #return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria1, order)
             return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 

@@ -8,11 +8,13 @@ class Contract:
     symbol: str
     country: Country
     exchange: str
+    primary: str
 
-    def __init__(self, symbol: str, country: Country, exchange: str = "SMART") -> None:
+    def __init__(self, symbol: str, country: Country, exchange: str = "SMART", primary: str = "NASDAQ") -> None:
         self.symbol = symbol
         self.country = country
         self.exchange = exchange
+        self.primary = primary
 
     @property
     def currency(self):
