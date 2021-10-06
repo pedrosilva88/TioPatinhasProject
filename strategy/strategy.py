@@ -34,12 +34,9 @@ class Strategy:
     def createOrder(self, type: StrategyResultType):
         action = OrderAction.Buy if type == StrategyResultType.Buy else OrderAction.Sell
         price = self.getOrderPrice(action)
-        log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.contract.symbol, price))
         profitTarget = self.calculatePnl(action)
         stopLossPrice = self.getStopLossPrice(action)
         size = self.getSize(action)
-
-        log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, size, price, profitTarget, stopLossPrice))
 
         mainOrderType = self.strategyConfig.orderType
         profitOrder = Order(action.reverse, mainOrderType, size, round(profitTarget, 2))

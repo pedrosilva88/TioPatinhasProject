@@ -53,6 +53,8 @@ class StrategyImpulsePullback(Strategy):
         self.criteria = StrategyImpulsePullbackResultResultType.criteria2
         order = self.createOrder(strategyType)
         criteriaResult, result = self.computeCriteria3(action, swingPosition)
+        log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.contract.symbol, order.parentOrder.price))
+        log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, order.parentOrder.size, order.parentOrder.price, order.takeProfitOrder.price, order.stopLossOrder.price))
 
         if criteriaResult == CriteriaResultType.failure:
             log("(%s) \t⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))

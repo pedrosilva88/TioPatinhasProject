@@ -81,12 +81,13 @@ class VaultImpulsePullback(Vault):
     async def fetchHistoricalData(self):
         config: StrategyImpulsePullbackConfig = self.strategyConfig
         provider = self.delegate.controller.provider
+        chunks = Helpers.grouper(self.contracts, 50)
         today = datetime.today()
         allEvents = []
         index = 1
-        for contract in self.contracts:
-            allEvents += await provider.downloadHistoricalDataAsync(contract, config.daysBeforeToDownload, config.barSize, today)
-            logCounter("Download Contracts in Chunks", len(self.contracts), index)
+        for contracts in chunks:
+            allEvents += await asyncio.gather(*[provider.downloadHistoricalDataAsync(contract, config.daysBeforeToDownload, config.barSize, today) for contract in contracts ])
+            logCounter("Download Contracts in Chunks", len(chunks), index)
             index += 1
 
         index = 1
