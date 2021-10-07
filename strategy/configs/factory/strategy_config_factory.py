@@ -90,9 +90,7 @@ class StrategyConfigFactory:
             print("🚨 Cant Create Impulse Pullback Strategy for this country - %s 🚨" %
                   market.country)
 
-        openTime = (market.openTime.astimezone(
-            tz)-timedelta(hours=constants.runStrategyBeforeHours)).time()
-        openTime = time(hour=9, minute=6)
+        openTime = constants.runStrategyTime
         return StrategyImpulsePullbackConfig(market=market, runStrategyTime=openTime,
                                     willingToLose=constants.willingToLose,
                                     kPeriod=constants.kPeriod, dPeriod=constants.dPeriod,
@@ -171,7 +169,7 @@ class Constants:
 
     class ImpulsePullback:
         class Default:
-            runStrategyBeforeHours = 4
+            runStrategyTime = time(hour=21, minute=15)
             daysBeforeToDownload = 600
             willingToLose = 0.02
             kPeriod = 5
