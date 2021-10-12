@@ -1,45 +1,43 @@
-from models.impulse_pullback.models import EventImpulsePullback
+from models.bounce.models import EventBounce
 from typing import List
 from enum import Enum
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from models.base_models import BracketOrder, Contract, Position
 from datetime import date, datetime
 
-class StrategyImpulsePullbackData(StrategyData):
-    previousEvents: List[EventImpulsePullback]
+class StrategyBounceData(StrategyData):
+    previousEvents: List[EventBounce]
 
     def __init__(self, contract: Contract, 
                         totalCash: float, 
-                        event: EventImpulsePullback, 
-                        previousEvents: List[EventImpulsePullback],  
+                        event: EventBounce, 
+                        previousEvents: List[EventBounce],  
                         today: date = None,
                         now: datetime = None):
         super().__init__(contract, totalCash, event, position=None, today=today, now=now)
         self.previousEvents = previousEvents
 
-class StrategyImpulsePullbackResultType(Enum):
+class StrategyBounceResultType(Enum):
     none = 0
     criteria1 = 1
-    criteria2 = 2
-    criteria3 = 3
 
     @property
     def emoji(self):
-        if self == StrategyImpulsePullbackResultType.criteria1:
+        if self == StrategyBounceResultType.criteria1:
             return "⭐️"
-        elif self == StrategyImpulsePullbackResultType.criteria2:
+        elif self == StrategyBounceResultType.criteria2:
             return "⭐️⭐️"
-        elif self == StrategyImpulsePullbackResultType.criteria3:
+        elif self == StrategyBounceResultType.criteria3:
             return "⭐️⭐️⭐️"
         else:
             return "-"
 
 
 class StrategyImpulsePullbackResult(StrategyResult):
-    ipType: StrategyImpulsePullbackResultType
+    resultType: StrategyBounceResultType
 
-    def __init__(self, contract: Contract, event: EventImpulsePullback, type: StrategyResultType,
-                ipType: StrategyImpulsePullbackResultType = StrategyImpulsePullbackResultType.none,
+    def __init__(self, contract: Contract, event: EventBounce, type: StrategyResultType,
+                resultType: StrategyBounceResultType = StrategyBounceResultType.none,
                 order: BracketOrder = None, position: Position = None):
         super().__init__(contract, event, type, order, position)
-        self.ipType = ipType
+        self.resultType = resultType
