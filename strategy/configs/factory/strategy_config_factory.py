@@ -169,7 +169,7 @@ class Constants:
 
     class ImpulsePullback:
         class Default:
-            runStrategyTime = time(hour=21, minute=15)
+            runStrategyTime = time(hour=20, minute=15)
             daysBeforeToDownload = 600
             willingToLose = 0.02
             kPeriod = 5

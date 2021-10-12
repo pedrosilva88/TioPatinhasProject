@@ -249,6 +249,9 @@ class BacktestImpulsePullbackModule(BacktestModule):
         if (len(positions.values()) > 0):
             for key, (bracketOrder, position, positionDate, event) in positions.items():
                 bracketOrder: BracketOrder = bracketOrder
+                if positionDate == model.currentDay:
+                    continue
+                
                 if self.isStopLoss(event, bracketOrder):
                     mainOrder: Order = bracketOrder.parentOrder
                     stopOrder: Order = bracketOrder.stopLossOrder
