@@ -9,6 +9,7 @@ class StrategyType(Enum):
     stoch_diverge = 'stoch_diverge'
     stoch_sma = 'stoch_sma'
     impulse_pullback = 'impulse_pullback'
+    bounce = 'bounce'
 
     def strategyFromCode(code: str):
         if code == 'zigzag':
@@ -21,6 +22,8 @@ class StrategyType(Enum):
             return StrategyType.stoch_sma
         elif code == 'impulse_pullback':
             return StrategyType.impulse_pullback
+        elif code == 'bounce':
+            return StrategyType.bounce
 
 class StrategyAction(Enum):
     runStrategy = 0

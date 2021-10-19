@@ -4,16 +4,16 @@ from backtest.reports.impulse_pullback.report_impulse_pullback_module import Rep
 from datetime import date, timedelta
 import csv
 import math
-from strategy.impulse_pullback.strategy_impulse_pullback import StrategyImpulsePullback
+from strategy.bounce.strategy_bounce import StrategyBounce
 from models.base_models import BracketOrder, Contract, Event, Order, OrderAction, Position
 from strategy.strategy import Strategy
 from strategy.configs.models import StrategyConfig, StrategyType
-from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
+from strategy.configs.bounce.models import StrategyBounceConfig
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from country_config.market_manager import MarketManager
 from strategy.configs.factory.strategy_config_factory import StrategyConfigFactory
-from strategy.impulse_pullback.models import StrategyImpulsePullbackData, StrategyImpulsePullbackResult, StrategyImpulsePullbackResultType
-from models.impulse_pullback.models import EventImpulsePullback
+from strategy.bounce.models import StrategyBounceData, StrategyBounceResult, StrategyBounceResultType
+from models.bounce.models import EventBounce
 from typing import Any, List, Tuple, Union
 from backtest.backtest_module import BacktestModule
 from backtest.models.base_models import BacktestAction, ContractSymbol
@@ -21,16 +21,16 @@ from backtest.configs.models import BacktestConfigs
 from helpers.date_timezone import DateSystemFormat, Helpers
 from strategy.historical_data import HistoricalData
 
-class BacktestImpulsePullbackModule(BacktestModule):
-    class RunStrategyImpulsePullbackModel(BacktestModule.RunStrategyModel):
+class BacktestBounceModule(BacktestModule):
+    class RunStrategyBounceModel(BacktestModule.RunStrategyModel):
         databaseModule: DatabaseModule
         positionIPDates: Union[str, date]
         positionIPHolds: Union[str, int]
-        positionIPCriteria: Union[str, StrategyImpulsePullbackResultType]
-        eventsMapper: Union[str, EventImpulsePullback]
+        positionIPCriteria: Union[str, StrategyBounceResultType]
+        eventsMapper: Union[str, EventBounce]
         currentDay: date
         tradesAvailable: int
-        nextDayTrades: Union[str, StrategyImpulsePullbackResult]
+        nextDayTrades: Union[str, StrategyBounceResult]
 
         def __init__(self, strategy: Strategy, strategyConfig: StrategyConfig, isForStockPerformance: bool) -> None:
             super().__init__(strategy, strategyConfig, isForStockPerformance)
@@ -55,7 +55,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
     def addIndicatorsToStocksData(self, stocksData: Union[ContractSymbol, Tuple[Contract, List[Event]]], config: BacktestConfigs) -> Union[ContractSymbol, Tuple[Contract, List[Event]]]:
         newData: Union[str, Tuple[Contract, List[Event]]] = dict()
         for stockSymbol, (stock, bars) in stocksData.items():
-            events = HistoricalData.computeEventsForImpulsePullbackStrategy(bars, config.strategy)
+            events = HistoricalData.computeEventsForBounceStrategy(bars, config.strategy)
             if events is not None:
                 newData[stockSymbol] = (stock, events)
         return newData
@@ -66,7 +66,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
                 "BB_High", "BB_Low"
                 "MACD", "MACD_Signal"]
 
-    def getStockFileDataRow(self, contract: Contract, data: EventImpulsePullback) -> List[Any]:
+    def getStockFileDataRow(self, contract: Contract, data: EventBounce) -> List[Any]:
         symbol = contract.symbol
         date = Helpers.dateToString(data.datetime, format=DateSystemFormat)
 
@@ -127,7 +127,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
                 macd = None if not row[15] else float(row[15])
                 macd_signal = None if not row[16] else float(row[16])
                 
-                event = EventImpulsePullback(contract, datetime, open, close, high, low, k, d, 
+                event = EventBounce(contract, datetime, open, close, high, low, k, d, 
                                             ema50, ema100, ema200, ema6, ema18,
                                             bb_high, bb_low,
                                             macd, macd_signal)
@@ -138,22 +138,22 @@ class BacktestImpulsePullbackModule(BacktestModule):
     def setupRunStrategy(self, events: List[Event], dynamicParameters: List[List[float]]):
         config = BacktestConfigs()
         isForStockPerformance = True if config.action == BacktestAction.runStrategyPerformance or config.action == BacktestAction.runStrategyPerformanceWithDynamicParameters else False
-        strategyConfig: StrategyImpulsePullbackConfig = StrategyConfigFactory.createImpulsePullbackStrategyFor(
+        strategyConfig: StrategyBounceConfig = StrategyConfigFactory.createBounceStrategyFor(
             MarketManager.getMarketFor(config.country), config.timezone)
         if dynamicParameters is not None:
             strategyConfig.willingToLose = float(dynamicParameters[0])
             strategyConfig.winLossRatio = float(dynamicParameters[1])
-        self.strategyModel = self.RunStrategyImpulsePullbackModel(
-            StrategyImpulsePullback(), strategyConfig, isForStockPerformance)
+        self.strategyModel = self.RunStrategyBounceModel(
+            StrategyBounce(), strategyConfig, isForStockPerformance)
         for event in events:
             identifier = self.uniqueIdentifier(
                 event.contract.symbol, event.datetime.date())
             self.strategyModel.eventsMapper[identifier] = event
 
     def getStrategyData(self, event: Event, events: List[Event], index: int) -> StrategyData:
-        strategyConfig: StrategyImpulsePullbackConfig = self.strategyModel.strategyConfig
-        event: EventImpulsePullback = event
-        events: List[EventImpulsePullback] = events
+        strategyConfig: StrategyBounceConfig = self.strategyModel.strategyConfig
+        event: EventBounce = event
+        events: List[EventBounce] = events
         previousEvents = self.getPreviousEvents(
             event, strategyConfig.daysBeforeToDownload)
         if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
@@ -161,16 +161,16 @@ class BacktestImpulsePullbackModule(BacktestModule):
         previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
         balance = self.getBalance()
         cashToInvest = balance/2 if balance > 6000 else balance
-        return StrategyImpulsePullbackData(contract=event.contract,
+        return StrategyBounceData(contract=event.contract,
                                             totalCash=cashToInvest,
                                             event=event,
                                             previousEvents=previousEventsFiltered,
                                             today=event.datetime.date(),
                                             now=event.datetime)
 
-    def getPreviousEvents(self, event: EventImpulsePullback, daysBefore: int = 5):
-        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
-        previousDays: List[EventImpulsePullback] = []
+    def getPreviousEvents(self, event: EventBounce, daysBefore: int = 5):
+        model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
+        previousDays: List[EventBounce] = []
         for x in range(1, daysBefore):
             previousDate = event.datetime.date()+timedelta(days=-x)
             identifier = self.uniqueIdentifier(
@@ -182,9 +182,9 @@ class BacktestImpulsePullbackModule(BacktestModule):
         return previousDays
 
     def handleStrategyResult(self, event: Event, events: List[Event], result: StrategyResult, currentPosition: int):
-        result: StrategyImpulsePullbackResult = result
-        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
-        strategyConfig: StrategyImpulsePullbackConfig = model.strategyConfig
+        result: StrategyBounceResult = result
+        model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
+        strategyConfig: StrategyBounceConfig = model.strategyConfig
         if ((result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell) and model.tradesAvailable > 0):
             model.nextDayTrades[result.event.contract.symbol] = result
         else:
@@ -195,8 +195,8 @@ class BacktestImpulsePullbackModule(BacktestModule):
                     model.positions[key] = tuple(lista)
     
     def validateCurrentDay(self, event: Event):
-        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
-        strategyConfig: StrategyImpulsePullbackConfig = model.strategyConfig
+        model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
+        strategyConfig: StrategyBounceConfig = model.strategyConfig
         if model.currentDay != event.datetime.date():
             balance = self.getBalance()
             model.tradesAvailable = 0
@@ -214,7 +214,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
             model.currentDay = None
         
         if event.contract.symbol in model.nextDayTrades:
-            result: StrategyImpulsePullbackResult = model.nextDayTrades[event.contract.symbol]
+            result: StrategyBounceResult = model.nextDayTrades[event.contract.symbol]
             order: BracketOrder = result.bracketOrder
             if order.parentOrder.size > 0:
                 if order.parentOrder.price < event.high and order.parentOrder.price > event.low and model.tradesAvailable > 0:
@@ -235,7 +235,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
             model.nextDayTrades.pop(event.contract.symbol)
 
     def handleEndOfDayIfNecessary(self, event: Event, events: List[Event], currentPosition: int):
-        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
         model.currentDay = event.datetime.date()
 
         if ((len(events) > currentPosition+1 and events[currentPosition+1].datetime.date() != model.currentDay) or
@@ -244,7 +244,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
             self.handleExpiredFills()
 
     def handleProfitAndStop(self):
-        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
         reportModule: ReportImpulsePullbackModule = self.reportModule
         positions = model.positions.copy()
         if (len(positions.values()) > 0):
@@ -290,7 +290,7 @@ class BacktestImpulsePullbackModule(BacktestModule):
                         model.cashAvailable += profit
 
     def handleExpiredFills(self):
-        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
         reportModule: ReportImpulsePullbackModule = self.reportModule
         positions = model.positions.copy()
         if (len(positions.values()) > 0):
@@ -327,36 +327,36 @@ class BacktestImpulsePullbackModule(BacktestModule):
                     model.positionIPHolds.pop(key)
                     model.positionIPCriteria.pop(key)
 
-    def isPositionExpired(self, event: EventImpulsePullback, positionDate: date, candlesToHold: int) -> bool:
-        config: StrategyImpulsePullbackConfig = self.strategyModel.strategyConfig
+    def isPositionExpired(self, event: EventBounce, positionDate: date, candlesToHold: int) -> bool:
+        config: StrategyBounceConfig = self.strategyModel.strategyConfig
         return event.datetime.date() >= (positionDate+timedelta(days=candlesToHold))
 
-    def isStopLoss(self, event: EventImpulsePullback, bracketOrder: BracketOrder) -> bool:
+    def isStopLoss(self, event: EventBounce, bracketOrder: BracketOrder) -> bool:
         mainOrder = bracketOrder.parentOrder
         stopOrder = bracketOrder.stopLossOrder
         return ((mainOrder.action == OrderAction.Buy and event.low <= stopOrder.price) or
                 (mainOrder.action == OrderAction.Sell and event.high >= stopOrder.price))
 
-    def isTakeProfit(self, event: EventImpulsePullback, bracketOrder: BracketOrder) -> bool:
+    def isTakeProfit(self, event: EventBounce, bracketOrder: BracketOrder) -> bool:
         mainOrder = bracketOrder.parentOrder
         takeProfitOrder = bracketOrder.takeProfitOrder
         return ((mainOrder.action == OrderAction.Buy and event.high >= takeProfitOrder.price) or
                 (mainOrder.action == OrderAction.Sell and event.low <= takeProfitOrder.price))
 
-    def isProfit(self, event: EventImpulsePullback, bracketOrder: BracketOrder) -> bool:
+    def isProfit(self, event: EventBounce, bracketOrder: BracketOrder) -> bool:
         mainOrder = bracketOrder.parentOrder
         return ((mainOrder.action == OrderAction.Buy and mainOrder.price < event.close) or
                 (mainOrder.action == OrderAction.Sell and mainOrder.price > event.close))
 
     def clearOldFills(self, event: Event):
-        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
         fills = model.databaseModule.getFills()
         limitDate = event.datetime.date()-timedelta(days=40)
         filteredFills = list(filter(lambda x: (x.date < limitDate and x.strategy == StrategyType.impulse_pullback), fills))
         model.databaseModule.deleteFills(filteredFills)
 
     def getFill(self, contract: Contract):
-        model: BacktestImpulsePullbackModule.RunStrategyImpulsePullbackModel = self.strategyModel
+        model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
         fills = model.databaseModule.getFills()
         filteredFills = list(
             filter(lambda x: (contract.symbol == x.symbol and x.strategy == StrategyType.impulse_pullback), fills))

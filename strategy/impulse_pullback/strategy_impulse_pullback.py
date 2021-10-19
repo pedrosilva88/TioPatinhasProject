@@ -1,6 +1,5 @@
 from enum import Enum
 from helpers.math import round_down
-from logging import critical
 from models.base_models import OrderAction
 from typing import List, Tuple
 from strategy.strategy import Strategy
@@ -8,7 +7,7 @@ from models.impulse_pullback.models import EventImpulsePullback
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from strategy.configs.models import StrategyConfig
 from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
-from strategy.impulse_pullback.models import StrategyImpulsePullbackData, StrategyImpulsePullbackResult, StrategyImpulsePullbackResultResultType
+from strategy.impulse_pullback.models import StrategyImpulsePullbackData, StrategyImpulsePullbackResult, StrategyImpulsePullbackResultType
 from helpers import log
 
 class CriteriaResultType(Enum):
@@ -19,7 +18,7 @@ class StrategyImpulsePullback(Strategy):
     # Properties
     currentBar: EventImpulsePullback = None
     previousBars: List[EventImpulsePullback] = None
-    criteria: StrategyImpulsePullbackResultResultType = None
+    criteria: StrategyImpulsePullbackResultType = None
 
     # Strategy Parameters
     willingToLose: float = None
@@ -40,7 +39,7 @@ class StrategyImpulsePullback(Strategy):
         if criteriaResult == CriteriaResultType.failure and result:
             return result
 
-        self.criteria = StrategyImpulsePullbackResultResultType.criteria1
+        self.criteria = StrategyImpulsePullbackResultType.criteria1
         strategyType = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
         order = self.createOrder(strategyType)
         criteriaResult, result = self.computeCriteria2(action)
@@ -50,22 +49,22 @@ class StrategyImpulsePullback(Strategy):
             #return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria1, order)
             return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 
-        self.criteria = StrategyImpulsePullbackResultResultType.criteria2
+        self.criteria = StrategyImpulsePullbackResultType.criteria2
         order = self.createOrder(strategyType)
         criteriaResult, result = self.computeCriteria3(action, swingPosition)
-        log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.contract.symbol, order.parentOrder.price))
-        log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, order.parentOrder.size, order.parentOrder.price, order.takeProfitOrder.price, order.stopLossOrder.price))
 
         if criteriaResult == CriteriaResultType.failure:
-            log("(%s) \t⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
+            #log("(%s) \t⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
             #return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria2, order)
             return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 
         else:
-            self.criteria = StrategyImpulsePullbackResultResultType.criteria3
+            self.criteria = StrategyImpulsePullbackResultType.criteria3
             order = self.createOrder(strategyType)
+            log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.contract.symbol, order.parentOrder.price))
+            log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, order.parentOrder.size, order.parentOrder.price, order.takeProfitOrder.price, order.stopLossOrder.price))
             log("(%s) \t⭐️⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
-            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria3, order)
+            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultType.criteria3, order)
 
     ### Criteria 1 ###
     ## 6x18 or MACD cross
@@ -355,13 +354,13 @@ class StrategyImpulsePullback(Strategy):
 
     ## Orders & Postion Sizing
 
-    def positonSizing(self, criteria: StrategyImpulsePullbackResultResultType, action:OrderAction, balance: float, r: float) -> int:
+    def positonSizing(self, criteria: StrategyImpulsePullbackResultType, action:OrderAction, balance: float, r: float) -> int:
         willingToLose = self.willingToLose
-        if criteria == StrategyImpulsePullbackResultResultType.criteria1:
+        if criteria == StrategyImpulsePullbackResultType.criteria1:
             willingToLose = 0.01
-        elif criteria == StrategyImpulsePullbackResultResultType.criteria2:
+        elif criteria == StrategyImpulsePullbackResultType.criteria2:
             willingToLose = 0.02
-        elif criteria == StrategyImpulsePullbackResultResultType.criteria3:
+        elif criteria == StrategyImpulsePullbackResultType.criteria3:
             willingToLose = 0.05
         value = (balance*willingToLose)/(r)
         return int(round_down(value, 0))
@@ -396,15 +395,15 @@ class StrategyImpulsePullback(Strategy):
 
     def getGap(self) -> float:
         if self.currentBar.close < 5 :
-            return 0.01
+            return 0.03
         elif self.currentBar.close >= 5 and self.currentBar.close < 10:
-            return 0.02
+            return 0.04
         elif self.currentBar.close >= 10 and self.currentBar.close < 50:
-            return 0.05
+            return 0.06
         elif self.currentBar.close >= 50 and self.currentBar.close < 100:
-            return 0.05
+            return 0.08
         elif self.currentBar.close >= 100 and self.currentBar.close < 200:
-            return 0.1
+            return 0.12
         elif self.currentBar.close >= 200:
-            return 0.15
+            return 0.18
         return 0.0

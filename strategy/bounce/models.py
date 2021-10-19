@@ -20,20 +20,19 @@ class StrategyBounceData(StrategyData):
 class StrategyBounceResultType(Enum):
     none = 0
     criteria1 = 1
+    criteria2 = 2
 
     @property
     def emoji(self):
         if self == StrategyBounceResultType.criteria1:
-            return "⭐️"
-        elif self == StrategyBounceResultType.criteria2:
             return "⭐️⭐️"
-        elif self == StrategyBounceResultType.criteria3:
+        elif self == StrategyBounceResultType.criteria2:
             return "⭐️⭐️⭐️"
         else:
             return "-"
 
 
-class StrategyImpulsePullbackResult(StrategyResult):
+class StrategyBounceResult(StrategyResult):
     resultType: StrategyBounceResultType
 
     def __init__(self, contract: Contract, event: EventBounce, type: StrategyResultType,

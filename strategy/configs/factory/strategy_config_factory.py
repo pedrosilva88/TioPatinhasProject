@@ -1,4 +1,5 @@
 from datetime import timedelta, time
+from strategy.configs.bounce.models import StrategyBounceConfig
 from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
 from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
 from models.base_models import OrderType
@@ -18,6 +19,8 @@ class StrategyConfigFactory:
         elif strategyType == StrategyType.stoch_sma:
             return StrategyConfigFactory.createStochasticDivergeStrategyFor(market, tz)
         elif strategyType == StrategyType.impulse_pullback:
+            return StrategyConfigFactory.createImpulsePullbackStrategyFor(market, tz)   
+        elif strategyType == StrategyType.bounce:
             return StrategyConfigFactory.createImpulsePullbackStrategyFor(market, tz)    
         else:
             return None
@@ -99,6 +102,27 @@ class StrategyConfigFactory:
                                     barSize=constants.barSize,
                                     maxPeriodsToHoldPosition=constants.maxPeriodsToHoldPosition,
                                     winLossRatio=constants.winLossRatio)
+
+    def createBounceStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
+        constants = Constants.Bounce.Default()
+
+        if market.country == market.country.USA:
+            constants = Constants.Bounce.US()
+        elif market.country == market.country.UK:
+            constants = Constants.Bounce.UK()
+        else:
+            print("🚨 Cant Create Bounce for this country - %s 🚨" %
+                  market.country)
+
+        openTime = constants.runStrategyTime
+        return StrategyBounceConfig(market=market, runStrategyTime=openTime,
+                                    willingToLose=constants.willingToLose,
+                                    kPeriod=constants.kPeriod, dPeriod=constants.dPeriod,
+                                    smooth=constants.smooth,
+                                    daysBeforeToDownload=constants.daysBeforeToDownload, daysBefore=constants.daysBefore,
+                                    barSize=constants.barSize,
+                                    maxPeriodsToHoldPosition=constants.maxPeriodsToHoldPosition,
+                                    winLossRatio=constants.winLossRatio)
  
 class Constants:
     class ZigZag:
@@ -111,8 +135,8 @@ class Constants:
             maxToInvestPerStockPercentage = 1
             maxToInvestPerStrategy = -1
             orderType = OrderType.LimitOrder
-            minRSI = 30
-            maxRSI = 70
+            minRSI = 20
+            maxRSI = 80
             rsiOffsetDays = 14
             zigzagSpread = 0.05
             daysBeforeToDownload = 90
@@ -168,6 +192,31 @@ class Constants:
                 Constants.StochasticDivergence.Default.__init__(self)
 
     class ImpulsePullback:
+        class Default:
+            runStrategyTime = time(hour=20, minute=15)
+            daysBeforeToDownload = 600
+            willingToLose = 0.02
+            kPeriod = 5
+            dPeriod = 3
+            smooth = 3
+            daysBefore = 50
+            barSize = "1 day"
+
+            maxPeriodsToHoldPosition = 6
+            winLossRatio = 2.5
+
+            def __init__(self):
+                None
+
+        class US(Default):
+            def __init__(self):
+                Constants.StochasticDivergence.Default.__init__(self)
+
+        class UK(Default):
+            def __init__(self):
+                Constants.StochasticDivergence.Default.__init__(self)
+
+    class Bounce:
         class Default:
             runStrategyTime = time(hour=20, minute=15)
             daysBeforeToDownload = 600

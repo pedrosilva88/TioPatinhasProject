@@ -1,4 +1,6 @@
 from datetime import datetime
+from strategy.configs.bounce.models import StrategyBounceConfig
+from models.bounce.models import EventBounce
 from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
 import numpy as np
 from numpy.lib import npyio
@@ -93,6 +95,59 @@ class HistoricalData:
                 return []
 
             impulsePullbackEvent = EventImpulsePullback(contract=event.contract,
+                                                        datetime=event.datetime,
+                                                        open=event.open,
+                                                        high=event.high,
+                                                        low=event.low,
+                                                        close=event.close,
+                                                        stochK=None if np.isnan(stochiValues['%K']) else stochiValues['%K'],
+                                                        stochD=None if np.isnan(stochiValues['%D']) else stochiValues['%D'],
+                                                        ema50=ema50[j], ema100=ema100[j], ema200=ema200[j], ema6=ema6[j], ema18=ema18[j],
+                                                        bollingerBandHigh=bollingerBands[j][0], bollingerBandLow=bollingerBands[j][1],
+                                                        macd=macd[j][0], macdEMA=macd[j][1])
+            
+            impulsePullbackEvents.append(impulsePullbackEvent)
+
+        return impulsePullbackEvents
+
+  
+    def computeEventsForBounceStrategy(events: List[Event], strategyConfigs: StrategyBounceConfig) -> List[EventBounce]:
+        if len(events) <= 0:
+            return []
+        
+        stochDF: DataFrame = HistoricalData.calculateStochasticOscillators(events, strategyConfigs.kPeriod, strategyConfigs.dPeriod, strategyConfigs.smooth)
+        stochOscillatorsValues: Union[datetime, Union[str, float]] = HistoricalData.getStochasticOscillatorsValues(stochDF)
+
+        if stochOscillatorsValues is None:
+            return []
+
+        ema6 = HistoricalData.calculateEMA(events, 6)
+        ema18 = HistoricalData.calculateEMA(events, 18)
+        ema50 = HistoricalData.calculateEMA(events, 50)
+        ema100 = HistoricalData.calculateEMA(events, 100)
+        ema200 = HistoricalData.calculateEMA(events, 200)
+
+        if ema6 is None or ema18 is None or ema50 is None or ema100 is None or ema200 is None:
+            return []
+
+        bollingerBands = HistoricalData.calculateBollingerBands(events)
+
+        if bollingerBands is None:
+            return []
+
+        macd = HistoricalData.calculateMACD(events, 50, 100, 9)
+
+        if macd is None:
+            return []
+
+        impulsePullbackEvents = []
+        for j, event in enumerate(events):
+            stochiValues = stochOscillatorsValues[event.datetime]
+            if ("%K" not in stochiValues.keys() or
+                "%D" not in stochiValues.keys()):
+                return []
+
+            impulsePullbackEvent = EventBounce(contract=event.contract,
                                                         datetime=event.datetime,
                                                         open=event.open,
                                                         high=event.high,

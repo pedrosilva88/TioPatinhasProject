@@ -37,6 +37,7 @@ class StrategyImpulsePullbackResultType(Enum):
 
 class StrategyImpulsePullbackResult(StrategyResult):
     ipType: StrategyImpulsePullbackResultType
+    swingCandleDate: datetime
 
     def __init__(self, contract: Contract, event: EventImpulsePullback, type: StrategyResultType,
                 ipType: StrategyImpulsePullbackResultType = StrategyImpulsePullbackResultType.none,

@@ -1,5 +1,5 @@
 from datetime import date
-from strategy.impulse_pullback.models import StrategyImpulsePullbackResultResultType
+from strategy.impulse_pullback.models import StrategyImpulsePullbackResultType
 from models.impulse_pullback.models import EventImpulsePullback
 from models.base_models import BracketOrder, Event, Order, OrderAction
 from typing import Any, List
@@ -35,7 +35,7 @@ class ReportImpulsePullbackModule(ReportModule):
                 item.averageReturnPerTrade, item.standardDeviation, item.sharpRatio, item.numberOfTrades]
     
     def createStopLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float,
-                            criteria: StrategyImpulsePullbackResultResultType):
+                            criteria: StrategyImpulsePullbackResultType):
         super().createStopLossResult(event, bracketOrder, positionDate, -loss, cashAvailable)
 
         event: EventImpulsePullback = event
@@ -52,7 +52,7 @@ class ReportImpulsePullbackModule(ReportModule):
                             criteria= criteria)
 
     def createTakeProfitResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, profit: float, cashAvailable: float,
-                                criteria: StrategyImpulsePullbackResultResultType):
+                                criteria: StrategyImpulsePullbackResultType):
         super().createTakeProfitResult(event, bracketOrder, positionDate, profit, cashAvailable)
 
         event: EventImpulsePullback = event
@@ -69,7 +69,7 @@ class ReportImpulsePullbackModule(ReportModule):
                             criteria= criteria)
 
     def createLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float,
-                                criteria: StrategyImpulsePullbackResultResultType):
+                                criteria: StrategyImpulsePullbackResultType):
         super().createLossResult(event, bracketOrder, positionDate, -loss, cashAvailable)
 
         event: EventImpulsePullback = event
@@ -84,7 +84,7 @@ class ReportImpulsePullbackModule(ReportModule):
                             criteria= criteria)
 
     def createProfitResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, profit: float, cashAvailable: float,
-                                criteria: StrategyImpulsePullbackResultResultType):
+                                criteria: StrategyImpulsePullbackResultType):
         super().createProfitResult(event, bracketOrder, positionDate, profit, cashAvailable)
 
         event: EventImpulsePullback = event
@@ -99,7 +99,7 @@ class ReportImpulsePullbackModule(ReportModule):
                             criteria=criteria)
 
     def createResult(self, type: BacktestResultType, pnl: float, closePrice: float, event: EventImpulsePullback, mainOrder: Order, positionDate: date, cashAvailable: float,
-                    criteria: StrategyImpulsePullbackResultResultType):
+                    criteria: StrategyImpulsePullbackResultType):
         result = BacktestImpulsePullbackResult(contract=event.contract, 
                                         action=mainOrder.action,
                                         type= type,
