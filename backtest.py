@@ -1,4 +1,5 @@
 from backtest.backtest_impulse_pullback_module import BacktestImpulsePullbackModule
+from backtest.backtest_bounce_module import BacktestBounceModule
 from backtest.backtest_stoch_diverge_module import BacktestStochDivergeModule
 from strategy.configs.models import StrategyType
 from backtest.configs.models import BacktestConfigs
@@ -13,6 +14,8 @@ def createBacktestModule() -> BacktestModule:
         return BacktestStochDivergeModule()
     elif config.strategyType == StrategyType.impulse_pullback:
         return BacktestImpulsePullbackModule()
+    elif config.strategyType == StrategyType.bounce:
+        return BacktestBounceModule()
     return None
 
 
