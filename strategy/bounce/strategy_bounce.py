@@ -20,6 +20,18 @@ class ReversalCandletType(Enum):
     InsideBar2CandleReversal = 2
     TradeThroughCandleReversal = 3
 
+    @property
+    def code(self) -> str:
+        if self == ReversalCandletType.SingleCandleReversal:
+            return "Single_CR"
+        elif self == ReversalCandletType.Original2CandleReversal:
+            return "Original_2CR"
+        elif self == ReversalCandletType.InsideBar2CandleReversal:
+            return "InsideBar_2CR"
+        elif self == ReversalCandletType.TradeThroughCandleReversal:
+            return "TradeThrough_2CR"
+
+
 class StrategyBounce(Strategy):
     # Properties
     currentBar: EventBounce = None
@@ -35,7 +47,7 @@ class StrategyBounce(Strategy):
         if result:
             return result
 
-        criteriaResult, action, reversalCandlePosition, reversalType, result = self.computeCriteria1()
+        criteriaResult, action, reversalCandlePosition, reversalType, emaCross, result = self.computeCriteria1()
 
         if criteriaResult == CriteriaResultType.failure and result:
             return result
@@ -43,31 +55,16 @@ class StrategyBounce(Strategy):
         self.criteria = StrategyBounceResultType.criteria1
         strategyType = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
         order = self.createOrder(strategyType)
-        #criteriaResult, result = self.computeCriteria2(action)
-
-        print("(%s) \t⭐️⭐️ \t ReversalCandle(%s) ReversalType(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[reversalCandlePosition].datetime.date(),reversalType, action.code))
+        criteriaResult, result = self.computeCriteria2(action, reversalCandlePosition)
 
         if criteriaResult == CriteriaResultType.failure:
-            #log("(%s) \t⭐️ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
-            #return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria1, order)
             return StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
-        return StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
-        # self.criteria = StrategyBounceResultType.criteria2
+        self.criteria = StrategyBounceResultType.criteria2
+        
         # order = self.createOrder(strategyType)
         # criteriaResult, result = self.computeCriteria3(action, swingPosition)
-        
-        # if criteriaResult == CriteriaResultType.failure:
-        #     #log("(%s) \t⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
-        #     #return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultResultType.criteria2, order)
-        #     return StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
-
-        # else:
-        #     self.criteria = StrategyBounceResultType.criteria3
-        #     order = self.createOrder(strategyType)
-        #     log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.contract.symbol, order.parentOrder.price))
-        #     log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, order.parentOrder.size, order.parentOrder.price, order.takeProfitOrder.price, order.stopLossOrder.price))
-        #     log("(%s) \t⭐️⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
-        #     return StrategyBounceResult(self.strategyData.contract, self.currentBar, strategyType, StrategyBounceResultType.criteria2, order)
+        print("(%s)\t CC(%s) RC(%s)\t EMA(%d)\tAction(%s) ReversalType(%s)" % (self.currentBar.contract.symbol, self.currentBar.datetime.date(), self.previousBars[reversalCandlePosition].datetime.date(), emaCross, action.code, reversalType.code))        
+        return StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 
     ### Criteria 1 ###
         ## Look For:
@@ -77,104 +74,163 @@ class StrategyBounce(Strategy):
             ## Single candle reversal
         ## Confirmation Candle
 
-    def computeCriteria1(self) -> Tuple[CriteriaResultType, OrderAction, int, ReversalCandletType, StrategyBounceResult]:
+    def computeCriteria1(self) -> Tuple[CriteriaResultType, OrderAction, int, ReversalCandletType, int, StrategyBounceResult]:
         hasConfirmationCandle, action, confirmationCandle = self.isConfirmationCandle(self.currentBar, self.previousBars[-1])
         if hasConfirmationCandle:
             reversalCandles = [(self.previousBars[-1], self.previousBars[-2], -1), (self.previousBars[-2], self.previousBars[-3], -2)]
             for item in reversalCandles:
-                hasReversalCandle, reversalType, reversalCandle = self.isReversalCandle(item[0], item[1], action)
+                hasReversalCandle, reversalType, reversalCandle, emaCross = self.isReversalCandle(item[0], item[1], action)
                 if hasReversalCandle:
-                    print("ConfirmationCandle(%s)" % (confirmationCandle.datetime.date()))
-                    return (CriteriaResultType.success, action, item[2], reversalType, StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent))
+                    return (CriteriaResultType.success, action, item[2], reversalType, emaCross, StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent))
             
-        return (CriteriaResultType.failure, None, None, None, StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent))
+        return (CriteriaResultType.failure, None, None, None, None, StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent))
 
-    def isReversalCandle(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> Tuple[bool, ReversalCandletType, EventBounce]:
-        has2CandleReversal, candleReversalType = self.is2CandleReversal(reversalCandle, previousReversalCandle, action)
+    ### Criteria 2 ###
+        ## Long - EMA_18 > EMA_50 > EMA_100 > EMA_200 / Short - EMA_18 < EMA_50 < EMA_100 < EMA_200 (Check last 20 bars)
+        ## Stochastics(5,3,3)
+            ## Long
+                # Reversal Candle below 30
+                # Stoch_K cross above Stoch_D between ConfirmationCandle and ReversalCandle
+            ## Short
+                # Reversal Candle above 70
+                # Stoch_K cross below Stoch_D between ConfirmationCandle and ReversalCandle
+        ## MACD(50,100,9)
+            ## Long
+                # 
+                # 
+            ## Short
+                # 
+                # 
+            
+    def computeCriteria2(self, action: OrderAction, reversalCandlePosition: int) -> Tuple[CriteriaResultType, StrategyBounceResult]:
+        emasValid = self.areEMAsValid(action, reversalCandlePosition)
+        stochasticValid = self.isStochasticValid(action, reversalCandlePosition)
+        # macdValid = self.isMACDValid(action)
+        # bbValid = self.areBollingerBandsValid(action)
+
+        if emasValid and stochasticValid:
+            return(CriteriaResultType.success, None)
+
+        return (CriteriaResultType.failure, None)
+
+    def areEMAsValid(self, action: OrderAction, reversalCandlePosition: int) -> bool:
+        for i in range(reversalCandlePosition-20, reversalCandlePosition):
+            if action == OrderAction.Buy:
+                return (self.previousBars[i].ema18 >= self.previousBars[i].ema50 and
+                        self.previousBars[i].ema50 >= self.previousBars[i].ema100 and
+                        self.previousBars[i].ema100 >= self.previousBars[i].ema200 and
+                        self.previousBars[i].ema50 >= self.previousBars[i-1].ema50 and
+                        self.previousBars[i].ema100 >= self.previousBars[i-1].ema100 and
+                        self.previousBars[i].ema200 >= self.previousBars[i-1].ema200)
+            elif action == OrderAction.Sell:
+                return (self.previousBars[i].ema18 <= self.previousBars[i].ema50 and
+                        self.previousBars[i].ema50 <= self.previousBars[i].ema100 and
+                        self.previousBars[i].ema100 <= self.previousBars[i].ema200 and
+                        self.previousBars[i].ema50 <= self.previousBars[i-1].ema50 and
+                        self.previousBars[i].ema100 <= self.previousBars[i-1].ema100 and
+                        self.previousBars[i].ema200 <= self.previousBars[i-1].ema200)
+            return False
+
+    def isStochasticValid(self, action: OrderAction, reversalCandlePosition: int) -> bool:
+        reversalCandle = self.previousBars[reversalCandlePosition]
+        confirmationCandle = self.currentBar
+        if action == OrderAction.Buy:
+            validStochCondition = (reversalCandle.stochK < reversalCandle.stochD and confirmationCandle.stochK > confirmationCandle.stochD)
+            return (reversalCandle.stochK < 30 and
+                    reversalCandle.stochD < 30 and
+                    validStochCondition)
+
+        elif action == OrderAction.Sell:
+            validStochCondition = (reversalCandle.stochK > reversalCandle.stochD and confirmationCandle.stochK < confirmationCandle.stochD)
+            return (reversalCandle.stochK > 70 and
+                    reversalCandle.stochD > 70)
+        return False
+
+    def isReversalCandle(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> Tuple[bool, ReversalCandletType, EventBounce, int]:
+        has2CandleReversal, candleReversalType, ema2Candle = self.is2CandleReversal(reversalCandle, previousReversalCandle, action)
+        hasSingleCandleReversal, emaSingleCandle = self.isSingleCandleReversal(reversalCandle, previousReversalCandle, action)
         if has2CandleReversal:
-            return (True, candleReversalType, reversalCandle)
-        else:
-            hasSingleCandleReversal = self.isSingleCandleReversal(reversalCandle, previousReversalCandle, action)
-            if hasSingleCandleReversal:
-                return (True, ReversalCandletType.SingleCandleReversal, reversalCandle)
-        return (False, None, None)
+            return (True, candleReversalType, reversalCandle, ema2Candle)
+        elif hasSingleCandleReversal:
+            return (True, ReversalCandletType.SingleCandleReversal, reversalCandle, emaSingleCandle)
+        return (False, None, None, None)
 
-    def is2CandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> Tuple[bool, ReversalCandletType]:
-        hasOriginal2CandleReversal = self.isOriginal2CandleReversal(reversalCandle, previousReversalCandle, action)
-        hasInsideBar2CandleReversal = self.isInsideBar2CandleReversal(reversalCandle, previousReversalCandle, action)
-        hasTradeThrough2CandleReversal = self.isTradeThrough2CandleReversal(reversalCandle, previousReversalCandle, action)
+    def is2CandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> Tuple[bool, ReversalCandletType, int]:
+        hasOriginal2CandleReversal, emaOriginal = self.isOriginal2CandleReversal(reversalCandle, previousReversalCandle, action)
+        hasInsideBar2CandleReversal, emaInsideBar = self.isInsideBar2CandleReversal(reversalCandle, previousReversalCandle, action)
+        hasTradeThrough2CandleReversal, emaTradeThrough = self.isTradeThrough2CandleReversal(reversalCandle, previousReversalCandle, action)
 
         if hasOriginal2CandleReversal:
-            return (True, ReversalCandletType.Original2CandleReversal)
+            return (True, ReversalCandletType.Original2CandleReversal, emaOriginal)
         elif hasInsideBar2CandleReversal:
-            return (True, ReversalCandletType.InsideBar2CandleReversal)
+            return (True, ReversalCandletType.InsideBar2CandleReversal, emaInsideBar)
         elif hasTradeThrough2CandleReversal:
-            return (True, ReversalCandletType.TradeThroughCandleReversal)
+            return (True, ReversalCandletType.TradeThroughCandleReversal, emaTradeThrough)
 
-        return (False, None)
+        return (False, None, None)
 
-    def isOriginal2CandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> bool:
+    def isOriginal2CandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> Tuple[bool, int]:
         if action == OrderAction.Buy: 
             emas = [50, 100, 200]
             for ema in emas:
                 if (self.isBarBodyAboveEMA(reversalCandle, ema) and self.isBarDownShadowExtendingEMA(reversalCandle, ema) and
                     reversalCandle.low < previousReversalCandle.low and self.bottomValueOfBody(reversalCandle) > previousReversalCandle.low):
-                    return previousReversalCandle.low > self.getEMAValue(previousReversalCandle, ema) # last confirmation (Previous candle of reversal)
+                    return ((previousReversalCandle.low > self.getEMAValue(previousReversalCandle, ema)), ema) # last confirmation (Previous candle of reversal)
         elif action == OrderAction.Sell:
             emas = [50, 100, 200]
             for ema in emas:
                 if (self.isBarBodyBelowEMA(reversalCandle, ema) and self.isBarUpShadowExtendingEMA(reversalCandle, ema) and
                     reversalCandle.high > previousReversalCandle.high and self.topValueOfBody(reversalCandle) < previousReversalCandle.high):
-                    return previousReversalCandle.high < self.getEMAValue(previousReversalCandle, ema) # last confirmation (Previous candle of reversal)
-        return False
+                    return ((previousReversalCandle.high < self.getEMAValue(previousReversalCandle, ema)), ema) # last confirmation (Previous candle of reversal)
+        return (False, None)
 
-    def isInsideBar2CandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> bool:
+    def isInsideBar2CandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> Tuple[bool,int]:
         if action == OrderAction.Buy: 
             emas = [50, 100, 200]
             for ema in emas:
                 if (self.isBarBodyAboveEMA(reversalCandle, ema) and self.isBarDownShadowExtendingEMA(reversalCandle, ema) and self.isInsideBar(reversalCandle, previousReversalCandle)):
-                    return self.isBarBodyAboveEMA(previousReversalCandle, ema) and self.isBarDownShadowExtendingEMA(previousReversalCandle, ema) # last confirmation (Previous candle of reversal)
+                    return ((self.isBarBodyAboveEMA(previousReversalCandle, ema) and self.isBarDownShadowExtendingEMA(previousReversalCandle, ema)), ema) # last confirmation (Previous candle of reversal)
         elif action == OrderAction.Sell:
             emas = [50, 100, 200]
             for ema in emas:
                 if (self.isBarBodyBelowEMA(reversalCandle, ema) and self.isBarUpShadowExtendingEMA(reversalCandle, ema) and self.isInsideBar(reversalCandle, previousReversalCandle)):
-                    return self.isBarBodyBelowEMA(previousReversalCandle, ema) and self.isBarUpShadowExtendingEMA(previousReversalCandle, ema) # last confirmation (Previous candle of reversal)
-        return False
+                    return ((self.isBarBodyBelowEMA(previousReversalCandle, ema) and self.isBarUpShadowExtendingEMA(previousReversalCandle, ema)), ema) # last confirmation (Previous candle of reversal)
+        return (False, None)
 
-    def isTradeThrough2CandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> bool:
+    def isTradeThrough2CandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> Tuple[bool, int]:
         if action == OrderAction.Buy: 
             emas = [50, 100, 200]
             for ema in emas:
                 if (self.isBullishCandle(reversalCandle) and 
                     reversalCandle.open < self.getEMAValue(reversalCandle, ema) and reversalCandle.close > self.getEMAValue(reversalCandle, ema) and
                     reversalCandle.low < previousReversalCandle.low):
-                    return self.isBearishCandle(previousReversalCandle) and reversalCandle.open > self.getEMAValue(reversalCandle, ema) and reversalCandle.close < self.getEMAValue(reversalCandle, ema) # last confirmation (Previous candle of reversal)
+                    return ((self.isBearishCandle(previousReversalCandle) and previousReversalCandle.open > self.getEMAValue(previousReversalCandle, ema) and previousReversalCandle.close < self.getEMAValue(previousReversalCandle, ema)), ema) # last confirmation (Previous candle of reversal)
         elif action == OrderAction.Sell:
             emas = [50, 100, 200]
             for ema in emas:
                 if (self.isBearishCandle(reversalCandle) and 
                     reversalCandle.open > self.getEMAValue(reversalCandle, ema) and reversalCandle.close < self.getEMAValue(reversalCandle, ema) and
                     reversalCandle.high > previousReversalCandle.high):
-                    return self.isBullishCandle(previousReversalCandle) and reversalCandle.open < self.getEMAValue(reversalCandle, ema) and reversalCandle.close > self.getEMAValue(reversalCandle, ema) # last confirmation (Previous candle of reversal)
-        return False
+                    return ((self.isBullishCandle(previousReversalCandle) and previousReversalCandle.open < self.getEMAValue(previousReversalCandle, ema) and previousReversalCandle.close > self.getEMAValue(previousReversalCandle, ema)), ema) # last confirmation (Previous candle of reversal)
+        return (False, None)
 
-    def isSingleCandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> bool:
+    def isSingleCandleReversal(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce, action: OrderAction) -> Tuple[bool, int]:
         if action == OrderAction.Buy:
             if self.isBullishPinBar(reversalCandle):
                 emas = [50, 100, 200]
                 for ema in emas:
                     if self.isBarBodyAboveEMA(reversalCandle, ema) and self.isBarDownShadowExtendingEMA(reversalCandle, ema):
-                        return True
-                return False
+                        return (True, ema)
+                return (False, None)
 
         elif action == OrderAction.Sell:
             if self.isBearishPinBar(reversalCandle):
                 emas = [50, 100, 200]
                 for ema in emas:
-                    if self.isBarBodyBelowEMA(reversalCandle, ema) and self.isBarDownShadowExtendingEMA(reversalCandle, ema):
-                        return True
-                return False
-        return False
+                    if self.isBarBodyBelowEMA(reversalCandle, ema) and self.isBarUpShadowExtendingEMA(reversalCandle, ema):
+                        return (True, ema)
+                return (False, None)
+        return (False, None)
     
     def isInsideBar(self, reversalCandle: EventBounce, previousReversalCandle: EventBounce) -> bool:
         return reversalCandle.high < previousReversalCandle.high and reversalCandle.low > previousReversalCandle.low
@@ -223,16 +279,17 @@ class StrategyBounce(Strategy):
         return None
 
     def isBullishPinBar(self, bar: EventBounce) -> bool:
+        print(bar.contract.symbol)
         barSize = bar.high - bar.low
         barTopBodySize = bar.high - (bar.close if bar.close < bar.open else bar.open)
-
-        return (1-(barSize/barTopBodySize)) >= 0.8
+        return (1-(barTopBodySize/barSize)) >= 0.8
 
     def isBearishPinBar(self, bar: EventBounce) -> bool:
+        print(bar.contract.symbol)
         barSize = bar.high - bar.low
         barBottomBodySize = (bar.close if bar.close > bar.open else bar.open) - bar.low 
 
-        return (1-(barSize/barBottomBodySize)) >= 0.8
+        return (1-(barBottomBodySize/barSize)) >= 0.8
         
     def getPreviousCandleOf(self, candle: EventBounce) -> Tuple[EventBounce, int]:
         if candle == self.currentBar:
@@ -318,7 +375,6 @@ class StrategyBounce(Strategy):
                 self.winLossRatio > 0 and
                 self.willingToLose > 0)
     
-
         ## Orders & Postion Sizing
 
     def positonSizing(self, criteria: StrategyBounceResultType, action:OrderAction, balance: float, r: float) -> int:
