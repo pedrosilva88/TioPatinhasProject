@@ -242,12 +242,13 @@ class StrategyImpulsePullback(Strategy):
 
     def isStochasticValid(self, action: OrderAction) -> bool:
         if action == OrderAction.Buy:
-            return (self.currentBar.stochK < 80 and
-                    self.currentBar.stochD < 80)
+            print(self.currentBar.contract.symbol, self.currentBar.stochD, self.currentBar.stochK)
+            return (self.currentBar.stochK < 75 and
+                    self.currentBar.stochD < 75)
 
         elif action == OrderAction.Sell:
-            return (self.currentBar.stochK > 20 and
-                    self.currentBar.stochD > 20)
+            return (self.currentBar.stochK > 25 and
+                    self.currentBar.stochD > 25)
         return False
 
     def isMACDValid(self, action: OrderAction) -> bool:
@@ -259,13 +260,13 @@ class StrategyImpulsePullback(Strategy):
         return False
 
     def areBollingerBandsValid(self, action: OrderAction) -> bool:
-        if action == OrderAction.Buy:
+        if action == OrderAction.Buy:            
             percentage = (self.currentBar.bollingerBandHigh-self.currentBar.high)/self.currentBar.high
-            return percentage > 0.01
+            return percentage > 0.015
 
         elif action == OrderAction.Sell:
             percentage = (self.currentBar.low-self.currentBar.bollingerBandLow)/self.currentBar.low
-            return percentage > 0.01
+            return percentage > 0.015
         return False
 
     ### Criteria 3 ### (Swing Camdle)
