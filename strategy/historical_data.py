@@ -130,11 +130,6 @@ class HistoricalData:
         if ema6 is None or ema18 is None or ema50 is None or ema100 is None or ema200 is None:
             return []
 
-        bollingerBands = HistoricalData.calculateBollingerBands(events)
-
-        if bollingerBands is None:
-            return []
-
         macd = HistoricalData.calculateMACD(events, 50, 100, 9)
 
         if macd is None:
@@ -156,7 +151,6 @@ class HistoricalData:
                                                         stochK=None if np.isnan(stochiValues['%K']) else stochiValues['%K'],
                                                         stochD=None if np.isnan(stochiValues['%D']) else stochiValues['%D'],
                                                         ema50=ema50[j], ema100=ema100[j], ema200=ema200[j], ema6=ema6[j], ema18=ema18[j],
-                                                        bollingerBandHigh=bollingerBands[j][0], bollingerBandLow=bollingerBands[j][1],
                                                         macd=macd[j][0], macdEMA=macd[j][1])
             
             impulsePullbackEvents.append(impulsePullbackEvent)

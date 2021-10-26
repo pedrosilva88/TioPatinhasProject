@@ -37,10 +37,14 @@ class StrategyImpulsePullbackResultType(Enum):
 
 class StrategyImpulsePullbackResult(StrategyResult):
     ipType: StrategyImpulsePullbackResultType
-    swingCandleDate: datetime
+    swingCandle: EventImpulsePullback
+    pullbackCandle: EventImpulsePullback
 
     def __init__(self, contract: Contract, event: EventImpulsePullback, type: StrategyResultType,
                 ipType: StrategyImpulsePullbackResultType = StrategyImpulsePullbackResultType.none,
+                swingCandle: EventImpulsePullback = None, pullbackCandle: EventImpulsePullback = None,
                 order: BracketOrder = None, position: Position = None):
         super().__init__(contract, event, type, order, position)
         self.ipType = ipType
+        self.swingCandle = swingCandle
+        self.pullbackCandle = pullbackCandle

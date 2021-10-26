@@ -16,6 +16,8 @@ def createBacktestModule() -> BacktestModule:
         return BacktestImpulsePullbackModule()
     elif config.strategyType == StrategyType.bounce:
         return BacktestBounceModule()
+    elif config.strategyType == StrategyType.none:
+        return BacktestModule()
     return None
 
 

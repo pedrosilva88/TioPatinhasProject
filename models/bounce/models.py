@@ -10,8 +10,6 @@ class EventBounce(Event):
     ema200: float
     ema6: float
     ema18: float
-    bollingerBandHigh: float
-    bollingerBandLow: float
     macd: float
     macdEMA: float 
 
@@ -21,7 +19,6 @@ class EventBounce(Event):
                         high: float, low: float,
                         stochK: float, stochD: float,
                         ema50: float, ema100: float, ema200: float, ema6: float, ema18: float,
-                        bollingerBandHigh: float, bollingerBandLow: float,
                         macd: float, macdEMA: float):
         Event.__init__(self, contract= contract, datetime= datetime,
                         open= open, close= close, high= high, low= low)
@@ -32,8 +29,6 @@ class EventBounce(Event):
         self.ema200 = ema200
         self.ema6 = ema6
         self.ema18 = ema18
-        self.bollingerBandHigh = bollingerBandHigh
-        self.bollingerBandLow = bollingerBandLow
         self.macd = macd
         self.macdEMA = macdEMA
 
@@ -46,8 +41,6 @@ class EventBounce(Event):
         dict['ema200'] = self.ema200
         dict['ema6'] = self.ema6
         dict['ema18'] = self.ema18
-        dict['bollingerBandHigh'] = self.bollingerBandHigh
-        dict['bollingerBandLow'] = self.bollingerBandLow
         dict['macd'] = self.macd
         dict['macdEMA'] = self.macdEMA
 

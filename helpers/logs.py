@@ -38,6 +38,35 @@ def createLog():
     logger.addHandler(f_handler)
     return logger
 
+def createLogReports(report: str):
+    logging.basicConfig(level=logging.info)
+    logger = getLogger(("Tio Patinhas - Report - %s" % (report)))
+    logger.setLevel(DEBUG)
+
+    today = datetime.today()
+    dirPathMonth = ("logs/%s" % (today.strftime("%B")))
+    dirPathDay = ("logs/%s/%d" % (today.strftime("%B"), today.day))
+    dirPathReport = ("logs/%s/%d/%s" % (today.strftime("%B"), today.day, "Reports"))
+    mkdir(dirPathMonth)
+    mkdir(dirPathDay)
+    mkdir(dirPathReport)
+    logPath = ("logs/%s/%d/Reports/%s_(%d:%d).log" % (today.strftime("%B"), today.day, report, today.hour, today.minute))
+    file = open(logPath, 'w')
+    file.truncate(0)
+    
+
+    # Create handlers
+    f_handler = FileHandler(logPath)
+    f_handler.setLevel(DEBUG)
+
+    # Create formatters and add it to handlers
+    f_format = Formatter('[%(asctime)s] -> %(message)s', "%H:%M:%S")
+    f_handler.setFormatter(f_format)
+
+    # Add handlers to the logger
+    logger.addHandler(f_handler)
+    return logger
+
 def getLog() -> Logger:
     return getLogger("Tio Patinhas")
 
@@ -62,7 +91,6 @@ def logExecutionZigZag(data, result):
         logger.info("⭐️ ZigZag %s: %s ⭐️" % (data.contract.symbol,
                                             result.type))
 
-
 def logInitTioPatinhas():
     log("\t🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆 🦆\n")
     log("\t🦆\t\t\t   🦆\n")
@@ -84,3 +112,11 @@ def logCounter(prefix: str, total: int, current: int):
         sys.stdout.flush()
     else:
         print("")
+
+def logImpulsePullbackReport(key: str, line: str):
+    logger = getLogger(("Tio Patinhas - Report - %s" % (key)))
+    logger.info(line)
+
+def logBounceReport(key: str, line: str):
+    logger = getLogger(("Tio Patinhas - Report - %s" % (key)))
+    logger.info(line)

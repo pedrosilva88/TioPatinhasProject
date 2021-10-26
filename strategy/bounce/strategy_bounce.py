@@ -1,7 +1,7 @@
 from enum import Enum
 from strategy.strategy import Strategy
 from models.bounce.models import EventBounce
-from strategy.bounce.models import StrategyBounceData, StrategyBounceResultType, StrategyBounceResult
+from strategy.bounce.models import StrategyBounceData, StrategyBounceResultType, StrategyBounceResult, ReversalCandletType
 from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from strategy.configs.models import StrategyConfig
 from strategy.configs.bounce.models import StrategyBounceConfig
@@ -13,24 +13,6 @@ from helpers import log
 class CriteriaResultType(Enum):
     success = 0
     failure = 1
-
-class ReversalCandletType(Enum):
-    SingleCandleReversal = 0
-    Original2CandleReversal = 1
-    InsideBar2CandleReversal = 2
-    TradeThroughCandleReversal = 3
-
-    @property
-    def code(self) -> str:
-        if self == ReversalCandletType.SingleCandleReversal:
-            return "Single_CR"
-        elif self == ReversalCandletType.Original2CandleReversal:
-            return "Original_2CR"
-        elif self == ReversalCandletType.InsideBar2CandleReversal:
-            return "InsideBar_2CR"
-        elif self == ReversalCandletType.TradeThroughCandleReversal:
-            return "TradeThrough_2CR"
-
 
 class StrategyBounce(Strategy):
     # Properties
@@ -55,16 +37,15 @@ class StrategyBounce(Strategy):
         self.criteria = StrategyBounceResultType.criteria1
         strategyType = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
         order = self.createOrder(strategyType)
-        criteriaResult, result = self.computeCriteria2(action, reversalCandlePosition)
+        criteriaResult = self.computeCriteria2(action, reversalCandlePosition)
 
         if criteriaResult == CriteriaResultType.failure:
             return StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
         self.criteria = StrategyBounceResultType.criteria2
-        
-        # order = self.createOrder(strategyType)
-        # criteriaResult, result = self.computeCriteria3(action, swingPosition)
+        result.bracketOrder = order
+        result.resultType = self.criteria
         print("(%s)\t CC(%s) RC(%s)\t EMA(%d)\tAction(%s) ReversalType(%s)" % (self.currentBar.contract.symbol, self.currentBar.datetime.date(), self.previousBars[reversalCandlePosition].datetime.date(), emaCross, action.code, reversalType.code))        
-        return StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
+        return result
 
     ### Criteria 1 ###
         ## Look For:
@@ -81,7 +62,8 @@ class StrategyBounce(Strategy):
             for item in reversalCandles:
                 hasReversalCandle, reversalType, reversalCandle, emaCross = self.isReversalCandle(item[0], item[1], action)
                 if hasReversalCandle:
-                    return (CriteriaResultType.success, action, item[2], reversalType, emaCross, StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent))
+                    strategyResult = StrategyResultType.Buy if action == OrderAction.Buy else StrategyResultType.Sell
+                    return (CriteriaResultType.success, action, item[2], reversalType, emaCross, StrategyBounceResult(self.strategyData.contract, self.currentBar, strategyResult, self.criteria, reversalCandle, confirmationCandle, reversalType))
             
         return (CriteriaResultType.failure, None, None, None, None, StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent))
 
@@ -96,22 +78,39 @@ class StrategyBounce(Strategy):
                 # Stoch_K cross below Stoch_D between ConfirmationCandle and ReversalCandle
         ## MACD(50,100,9)
             ## Long
-                # 
-                # 
+                # bullish - main line above signal line
+                # bearish - if the cross bearish was more than 5 candles ago (Starting from the reversal candle)
             ## Short
-                # 
-                # 
+                # bearish - main line below signal line
+                # bullish - if the cross bullish was more than 5 candles ago (Starting from the reversal candle)
             
-    def computeCriteria2(self, action: OrderAction, reversalCandlePosition: int) -> Tuple[CriteriaResultType, StrategyBounceResult]:
+    def computeCriteria2(self, action: OrderAction, reversalCandlePosition: int) -> CriteriaResultType:
         emasValid = self.areEMAsValid(action, reversalCandlePosition)
         stochasticValid = self.isStochasticValid(action, reversalCandlePosition)
-        # macdValid = self.isMACDValid(action)
-        # bbValid = self.areBollingerBandsValid(action)
+        macdValid = self.isMACDValid(action, reversalCandlePosition)
 
-        if emasValid and stochasticValid:
-            return(CriteriaResultType.success, None)
+        if emasValid and stochasticValid: # and macdValid:
+            return CriteriaResultType.success
 
-        return (CriteriaResultType.failure, None)
+        return CriteriaResultType.failure
+
+    def isMACDValid(self, action: OrderAction, reversalCandlePosition: int) -> bool:
+        reversalCandle = self.previousBars[reversalCandlePosition]
+        if action == OrderAction.Buy:
+            if reversalCandle.macd > reversalCandle.macdEMA:
+             return True
+            for i in range(reversalCandlePosition-5, reversalCandlePosition):
+                if self.previousBars[i].macd > self.previousBars[i].macdEMA:
+                    return False
+
+        elif action == OrderAction.Sell:
+            if reversalCandle.macd < reversalCandle.macdEMA:
+                return True
+            for i in range(reversalCandlePosition-5, reversalCandlePosition):
+                if self.previousBars[i].macd < self.previousBars[i].macdEMA:
+                    return False
+
+        return False
 
     def areEMAsValid(self, action: OrderAction, reversalCandlePosition: int) -> bool:
         for i in range(reversalCandlePosition-20, reversalCandlePosition):
@@ -279,16 +278,17 @@ class StrategyBounce(Strategy):
         return None
 
     def isBullishPinBar(self, bar: EventBounce) -> bool:
-        print(bar.contract.symbol)
         barSize = bar.high - bar.low
         barTopBodySize = bar.high - (bar.close if bar.close < bar.open else bar.open)
+    
+        if barSize <= 0: return False
         return (1-(barTopBodySize/barSize)) >= 0.8
 
     def isBearishPinBar(self, bar: EventBounce) -> bool:
-        print(bar.contract.symbol)
         barSize = bar.high - bar.low
         barBottomBodySize = (bar.close if bar.close > bar.open else bar.open) - bar.low 
 
+        if barSize <= 0: return False 
         return (1-(barBottomBodySize/barSize)) >= 0.8
         
     def getPreviousCandleOf(self, candle: EventBounce) -> Tuple[EventBounce, int]:
@@ -354,8 +354,6 @@ class StrategyBounce(Strategy):
             (self.currentBar.ema100 is not None) and
             (self.currentBar.ema200 is not None) and 
 
-            (self.currentBar.bollingerBandHigh is not None) and
-            (self.currentBar.bollingerBandLow is not None) and 
             (self.currentBar.macd is not None) and 
             (self.currentBar.macdEMA is not None) and
 

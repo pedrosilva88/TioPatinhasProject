@@ -29,7 +29,7 @@ class Vault:
         log("🏃‍ Setup Vault for %s Market 🏃‍" % self.strategyConfig.market.country.code)
         self.configs = TioPatinhasConfigs()
         path = Scanner.getPathFor(self.configs.provider.value, 
-                                            self.strategyConfig.type.value,
+                                            self.strategyConfig.type.folderName,
                                             self.strategyConfig.market.country.code)
         self.contracts = Scanner.contratcsFrom(path)
 

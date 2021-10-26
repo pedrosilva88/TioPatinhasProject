@@ -64,7 +64,7 @@ class StrategyImpulsePullback(Strategy):
             log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.contract.symbol, order.parentOrder.price))
             log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, order.parentOrder.size, order.parentOrder.price, order.takeProfitOrder.price, order.stopLossOrder.price))
             log("(%s) \t⭐️⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
-            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultType.criteria3, order)
+            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultType.criteria3, swingCandle=self.previousBars[-swingPosition], pullbackCandle=self.currentBar.datetime.date(), order= order)
 
     ### Criteria 1 ###
     ## 6x18 or MACD cross
@@ -242,7 +242,6 @@ class StrategyImpulsePullback(Strategy):
 
     def isStochasticValid(self, action: OrderAction) -> bool:
         if action == OrderAction.Buy:
-            print(self.currentBar.contract.symbol, self.currentBar.stochD, self.currentBar.stochK)
             return (self.currentBar.stochK < 75 and
                     self.currentBar.stochD < 75)
 

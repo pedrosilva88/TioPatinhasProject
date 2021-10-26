@@ -1,4 +1,5 @@
 from datetime import timedelta, time
+from strategy.configs.combined.models import StrategyCombinedConfig
 from strategy.configs.bounce.models import StrategyBounceConfig
 from strategy.configs.impulse_pullback.models import StrategyImpulsePullbackConfig
 from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
@@ -21,7 +22,9 @@ class StrategyConfigFactory:
         elif strategyType == StrategyType.impulse_pullback:
             return StrategyConfigFactory.createImpulsePullbackStrategyFor(market, tz)   
         elif strategyType == StrategyType.bounce:
-            return StrategyConfigFactory.createImpulsePullbackStrategyFor(market, tz)    
+            return StrategyConfigFactory.createImpulsePullbackStrategyFor(market, tz) 
+        elif strategyType == StrategyType.combined:
+            return StrategyConfigFactory.createCombinedStrategyFor(market, tz)    
         else:
             return None
 
@@ -123,6 +126,26 @@ class StrategyConfigFactory:
                                     barSize=constants.barSize,
                                     maxPeriodsToHoldPosition=constants.maxPeriodsToHoldPosition,
                                     winLossRatio=constants.winLossRatio)
+
+    def createCombinedStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
+        impulsePullbackConfig = StrategyConfigFactory.createImpulsePullbackStrategyFor(market, tz)
+        bounceConfig = StrategyConfigFactory.createBounceStrategyFor(market, tz)
+        constants = Constants.Combined.Default()
+
+        if market.country == market.country.USA:
+            constants = Constants.Combined.US()
+        elif market.country == market.country.UK:
+            constants = Constants.Combined.UK()
+        else:
+            print("🚨 Cant Create Combined for this country - %s 🚨" %
+                  market.country)
+
+        openTime = constants.runStrategyTime
+        return StrategyCombinedConfig(market=market, runStrategyTime=openTime,
+                                    daysBeforeToDownload=constants.daysBeforeToDownload,
+                                    barSize=constants.barSize,
+                                        impulsePullbackConfig= impulsePullbackConfig,
+                                        bounceConfig= bounceConfig)
  
 class Constants:
     class ZigZag:
@@ -230,6 +253,22 @@ class Constants:
             maxPeriodsToHoldPosition = 6
             winLossRatio = 2.5
 
+            def __init__(self):
+                None
+
+        class US(Default):
+            def __init__(self):
+                Constants.StochasticDivergence.Default.__init__(self)
+
+        class UK(Default):
+            def __init__(self):
+                Constants.StochasticDivergence.Default.__init__(self)
+
+    class Combined:
+        class Default:
+            runStrategyTime = time(hour=17, minute=10)
+            daysBeforeToDownload = 600
+            barSize = "1 day"
             def __init__(self):
                 None
 

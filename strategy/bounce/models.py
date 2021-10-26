@@ -31,12 +31,37 @@ class StrategyBounceResultType(Enum):
         else:
             return "-"
 
+class ReversalCandletType(Enum):
+    SingleCandleReversal = 0
+    Original2CandleReversal = 1
+    InsideBar2CandleReversal = 2
+    TradeThroughCandleReversal = 3
+
+    @property
+    def code(self) -> str:
+        if self == ReversalCandletType.SingleCandleReversal:
+            return "Single_CR"
+        elif self == ReversalCandletType.Original2CandleReversal:
+            return "Original_2CR"
+        elif self == ReversalCandletType.InsideBar2CandleReversal:
+            return "InsideBar_2CR"
+        elif self == ReversalCandletType.TradeThroughCandleReversal:
+            return "TradeThrough_2CR"
 
 class StrategyBounceResult(StrategyResult):
     resultType: StrategyBounceResultType
+    reversalCandle: EventBounce
+    confirmationCandle: EventBounce
+    reversalCandleType: ReversalCandletType
 
     def __init__(self, contract: Contract, event: EventBounce, type: StrategyResultType,
                 resultType: StrategyBounceResultType = StrategyBounceResultType.none,
+                reversalCandle: EventBounce = None,
+                confirmationCandle: EventBounce = None,
+                reversalCandleType: ReversalCandletType = None,
                 order: BracketOrder = None, position: Position = None):
         super().__init__(contract, event, type, order, position)
         self.resultType = resultType
+        self.reversalCandle = reversalCandle
+        self.confirmationCandle = confirmationCandle
+        self.reversalCandleType = reversalCandleType

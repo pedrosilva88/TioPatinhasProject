@@ -9,7 +9,7 @@ from backtest.reports.report_module import ReportModule
 import csv
 from datetime import date, datetime
 from strategy.models import StrategyData, StrategyResult
-
+from helpers.date_timezone import DateSystemFormat, Helpers
 from strategy.configs.models import StrategyConfig
 from strategy.strategy import Strategy
 from typing import Any, List, Tuple, Union
@@ -62,13 +62,39 @@ class BacktestModule:
         pass
     
     def getStockFileHeaderRow(self) -> List[str]:
-        pass
+        return ["Symbol", "Date", "Open", "Close", "High", "Low"]
 
-    def getStockFileDataRow(self) -> List[Any]:
-        pass
+    def getStockFileDataRow(self, contract: Contract, data: Event) -> List[Any]:
+        symbol = contract.symbol
+        date = Helpers.dateToString(data.datetime, format=DateSystemFormat)
 
-    def parseCSVFile(self, reader: csv.reader) -> List[Event]:
-        pass
+        open = 0 if not data.open else round(data.open, 2)
+        close = 0 if not data.close else round(data.close, 2)
+        high = 0 if not data.high else round(data.high, 2)
+        low = 0 if not data.low else round(data.low, 2)
+
+        return [symbol, date, open, close, high, low]
+
+    def parseRawCSVFile(self, reader: csv.reader) -> List[Event]:
+        configs = BacktestConfigs()
+        line_count = 0
+        contractEvents = []
+        for row in reader:
+            if line_count > 0:
+                symbol = None if not row[0] else row[0]
+                contract = Contract(symbol, configs.country)
+
+                datetimeStr = None if not row[1] else row[1]
+                datetime = Helpers.stringToDate(datetimeStr, DateSystemFormat)
+
+                open = 0 if not row[2] else float(row[2])
+                close = 0 if not row[3] else float(row[3])
+                high = 0 if not row[4] else float(row[4])
+                low = 0 if not row[5] else float(row[5])
+                event = Event(contract, datetime, open, close, high, low)
+                contractEvents.append(event)
+            line_count += 1
+        return contractEvents
 
     def setupRunStrategy(self, events: List[Event], dynamicParameters: List[List[float]]):
         pass
@@ -90,8 +116,7 @@ class BacktestModule:
     def runDownloadStocksAction(self):
         config = BacktestConfigs()
         stocksData = self.downloadStocksData(config)
-        strategyStocksData = self.addIndicatorsToStocksData(stocksData, config)
-        self.saveDataInCSVFiles(config, strategyStocksData)
+        self.saveDataInCSVFiles(config, stocksData)
 
     def runStrategyAction(self):
         print("🧙‍♀️ Lets Start running Strategy 🧙‍♀️")
@@ -123,7 +148,12 @@ class BacktestModule:
     def contractsToRunStrategy(self) -> List[Event]:
         print("🧙‍♀️ Lets Start 🧙‍♀️")
         config = BacktestConfigs()
-        allContractsEvents = BacktestScannerManager.loadStockFiles(config.provider, config.country, config.strategyType, config.action, self.parseCSVFile)
+        stocksData = BacktestScannerManager.loadStockFiles(config.provider, config.country, config.strategyType, config.action, self.parseRawCSVFile)
+        print("🧙‍♀️ Compute Strategy Indicators 🧙‍♀️")
+        strategyStocksData = self.addIndicatorsToStocksData(stocksData, config)
+        allContractsEvents = []
+        for stockSymbol, (stock, bars) in strategyStocksData.items():
+            allContractsEvents += bars
         print("🧙‍♀️ Sort all Events by date 🧙‍♀️")
         allContractsEvents.sort(key=lambda x: x.datetime, reverse=False)
         return allContractsEvents

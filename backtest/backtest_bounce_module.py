@@ -1,6 +1,6 @@
 from database.model import FillDB
 from database.database_module import DatabaseModule
-from backtest.reports.impulse_pullback.report_impulse_pullback_module import ReportImpulsePullbackModule
+from backtest.reports.bounce.report_bounce_module import ReportBounceModule
 from datetime import date, timedelta
 import csv
 import math
@@ -48,7 +48,7 @@ class BacktestBounceModule(BacktestModule):
 
     def __init__(self) -> None:
         super().__init__()
-        self.reportModule = ReportImpulsePullbackModule()
+        self.reportModule = ReportBounceModule()
 
     #### READ/WRITE IN CSV FILES ####
 
@@ -63,7 +63,6 @@ class BacktestBounceModule(BacktestModule):
     def getStockFileHeaderRow(self) -> List[str]:
         return ["Symbol", "Date", "Open", "Close", "High", "Low", "Stoch_K", "Stoch_D", 
                 "EMA6", "EMA18", "EMA50", "EMA100", "EMA200",
-                "BB_High", "BB_Low"
                 "MACD", "MACD_Signal"]
 
     def getStockFileDataRow(self, contract: Contract, data: EventBounce) -> List[Any]:
@@ -84,15 +83,11 @@ class BacktestBounceModule(BacktestModule):
         ema100 = None if data.ema100 is None else round(data.ema100, 2)
         ema200 = None if data.ema200 is None else round(data.ema200, 2)
 
-        bb_high = None if data.bollingerBandHigh is None else round(data.bollingerBandHigh, 2)
-        bb_low = None if data.bollingerBandLow is None else round(data.bollingerBandLow, 2)
-
         macd = None if data.macd is None else round(data.macd, 2)
         macd_signal = None if data.macdEMA is None else round(data.macdEMA, 2)
 
         return [symbol, date, open, close, high, low, k, d, 
                 ema6, ema18, ema50, ema100, ema200,
-                bb_high, bb_low,
                 macd, macd_signal]
 
     def parseCSVFile(self, reader: csv.reader) -> List[Event]:
@@ -121,15 +116,11 @@ class BacktestBounceModule(BacktestModule):
                 ema100 = None if not row[11] else float(row[11])
                 ema200 = None if not row[12] else float(row[12])
 
-                bb_high = None if not row[13] else float(row[13])
-                bb_low = None if not row[14] else float(row[14])
-
                 macd = None if not row[15] else float(row[15])
                 macd_signal = None if not row[16] else float(row[16])
                 
                 event = EventBounce(contract, datetime, open, close, high, low, k, d, 
                                             ema50, ema100, ema200, ema6, ema18,
-                                            bb_high, bb_low,
                                             macd, macd_signal)
                 contractEvents.append(event)
             line_count += 1
@@ -227,7 +218,7 @@ class BacktestBounceModule(BacktestModule):
                     print("%s Position for %s" % (event.datetime.date(), event.contract.symbol))
                     model.positionIPDates[identifier] = event.datetime.date()
                     model.positionIPHolds[identifier] = strategyConfig.maxPeriodsToHoldPosition
-                    model.positionIPCriteria[identifier] = result.ipType
+                    model.positionIPCriteria[identifier] = result.resultType
                     model.tradesAvailable -= 1
                     newFill = FillDB(result.contract.symbol, result.event.datetime.date(
                     ), result.contract.country, strategyConfig.type)
@@ -245,7 +236,7 @@ class BacktestBounceModule(BacktestModule):
 
     def handleProfitAndStop(self):
         model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
-        reportModule: ReportImpulsePullbackModule = self.reportModule
+        reportModule: ReportBounceModule = self.reportModule
         positions = model.positions.copy()
         if (len(positions.values()) > 0):
             for key, (bracketOrder, position, positionDate, event) in positions.items():
@@ -291,7 +282,7 @@ class BacktestBounceModule(BacktestModule):
 
     def handleExpiredFills(self):
         model: BacktestBounceModule.RunStrategyBounceModel = self.strategyModel
-        reportModule: ReportImpulsePullbackModule = self.reportModule
+        reportModule: ReportBounceModule = self.reportModule
         positions = model.positions.copy()
         if (len(positions.values()) > 0):
             for key, (bracketOrder, position, positionDate, event) in positions.items():
