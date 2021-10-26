@@ -102,6 +102,7 @@ class VaultCombined(Vault):
                                             previousEvents=previousEvents)
         result: StrategyImpulsePullbackResult = self.strategyImpulsePullback.run(data, config.impulsePullbackConfig)
         if result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell:
+            print(result.swingCandle, result.pullbackCandle)
             logResult = ("\t\t 🤴   %s   🤴\nSwing(%s)\t Pullback(%s)\n 📣Action(%s)\n💰 Price(%.2f) \t\tSize(%d)\n\t\tTP(%.2f)\n\t\tSL(%.2f)\n\n \t\t\t🥽🥽🥽🥽🥽🥽🥽 \n\n" % 
                         (result.contract.symbol, result.swingCandle.datetime.date(), 
                         result.pullbackCandle.datetime.date(), result.bracketOrder.parentOrder.action.code, 
@@ -124,7 +125,7 @@ class VaultCombined(Vault):
                         result.bracketOrder.parentOrder.action.code, 
                         result.bracketOrder.parentOrder.price, result.bracketOrder.parentOrder.size, 
                         result.bracketOrder.takeProfitOrder.price, result.bracketOrder.stopLossOrder.price))
-            logBounceReport(config.bounceConfig.type.value, result.contract.symbol)
+            logBounceReport(config.bounceConfig.type.value, logResult)
 
     # Historical Data
 

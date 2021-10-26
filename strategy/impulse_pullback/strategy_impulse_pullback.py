@@ -64,7 +64,7 @@ class StrategyImpulsePullback(Strategy):
             log("🎃 OrderPrice used for %s: %.2f 🎃" % (self.strategyData.contract.symbol, order.parentOrder.price))
             log("\t⭐️ [Create] Type(%s) Size(%i) Price(%.2f) ProfitPrice(%.2f) StopLoss(%.2f) ⭐️" % (action, order.parentOrder.size, order.parentOrder.price, order.takeProfitOrder.price, order.stopLossOrder.price))
             log("(%s) \t⭐️⭐️⭐️‍ \t Swing(%s) PB(%s) Action(%s)" % (self.currentBar.contract.symbol, self.previousBars[-swingPosition].datetime.date(),self.currentBar.datetime.date(), action.code))
-            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultType.criteria3, swingCandle=self.previousBars[-swingPosition], pullbackCandle=self.currentBar.datetime.date(), order= order)
+            return StrategyImpulsePullbackResult(self.strategyData.contract, self.currentBar, strategyType, StrategyImpulsePullbackResultType.criteria3, swingCandle=self.previousBars[-swingPosition], pullbackCandle=self.currentBar, order= order)
 
     ### Criteria 1 ###
     ## 6x18 or MACD cross
