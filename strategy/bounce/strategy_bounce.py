@@ -63,7 +63,7 @@ class StrategyBounce(Strategy):
                 hasReversalCandle, reversalType, reversalCandle, emaCross = self.isReversalCandle(item[0], item[1], action)
                 if hasReversalCandle:
                     strategyResult = StrategyResultType.Buy if action == OrderAction.Buy else StrategyResultType.Sell
-                    return (CriteriaResultType.success, action, item[2], reversalType, emaCross, StrategyBounceResult(self.strategyData.contract, self.currentBar, strategyResult, self.criteria, reversalCandle, confirmationCandle, reversalType))
+                    return (CriteriaResultType.success, action, item[2], reversalType, emaCross, StrategyBounceResult(self.strategyData.contract, self.currentBar, strategyResult, self.criteria, reversalCandle, confirmationCandle, reversalType, emaCross))
             
         return (CriteriaResultType.failure, None, None, None, None, StrategyBounceResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent))
 

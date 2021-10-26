@@ -46,7 +46,7 @@ class Portfolio:
             self.exchangeUKRate = client.currencyRateFor(market.country.currency)
 
         self.calcOpenTradesValue()
-        log("💵 \nCash Balance: %s€ (%2f$) \nAvailable Cash: %s€ (%2f$)\n💵\n" % (self.cashBalance, (self.cashBalance/self.exchangeUSDRate), self.cashAvailable, (self.cashAvailable/self.exchangeUSDRate)))
+        log("💵 \nCash Balance: %s€ (%.2f$) \nAvailable Cash: %s€ (%.2f$)\n💵\n" % (self.cashBalance, (self.cashBalance/self.exchangeUSDRate), self.cashAvailable, (self.cashAvailable/self.exchangeUSDRate)))
         
 
     def calcOpenTradesValue(self):

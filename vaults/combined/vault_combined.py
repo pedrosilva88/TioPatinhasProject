@@ -13,9 +13,9 @@ from strategy.configs.models import StrategyAction, StrategyConfig
 from typing import List, Union
 from strategy.historical_data import HistoricalData
 from strategy.impulse_pullback.strategy_impulse_pullback import StrategyImpulsePullback
-from strategy.impulse_pullback.models import EventImpulsePullback, StrategyImpulsePullbackData
+from strategy.impulse_pullback.models import EventImpulsePullback, StrategyImpulsePullbackData, StrategyImpulsePullbackResult
 from strategy.bounce.strategy_bounce import StrategyBounce
-from strategy.bounce.models import EventBounce, StrategyBounceData
+from strategy.bounce.models import EventBounce, StrategyBounceData, StrategyBounceResult
 from helpers.logs import log, logCounter, logImpulsePullbackReport, logBounceReport, createLogReports
 
 class VaultCombined(Vault):
@@ -100,9 +100,14 @@ class VaultCombined(Vault):
                                             totalCash= self.portfolio.getCashBalanceFor(self.strategyConfig.market),
                                             event=currentEvent,
                                             previousEvents=previousEvents)
-        result = self.strategyImpulsePullback.run(data, config.impulsePullbackConfig)
+        result: StrategyImpulsePullbackResult = self.strategyImpulsePullback.run(data, config.impulsePullbackConfig)
         if result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell:
-            logImpulsePullbackReport(config.impulsePullbackConfig.type.value, result.contract.symbol)
+            logResult = ("\t\t 🤴   %s   🤴\nSwing(%s)\t Pullback(%s)\n 📣Action(%s)\n💰 Price(%.2f) \t\tSize(%d)\n\t\tTP(%.2f)\n\t\tSL(%.2f)\n\n \t\t\t🥽🥽🥽🥽🥽🥽🥽 \n\n" % 
+                        (result.contract.symbol, result.swingCandle.datetime.date(), 
+                        result.pullbackCandle.datetime.date(), result.bracketOrder.parentOrder.action.code, 
+                        result.bracketOrder.parentOrder.price, result.bracketOrder.parentOrder.size, 
+                        result.bracketOrder.takeProfitOrder.price, result.bracketOrder.stopLossOrder.price))
+            logImpulsePullbackReport(config.impulsePullbackConfig.type.value, logResult)
 
     def runStrategyForBounce(self, contract: Contract,
                                     previousEvents: List[EventBounce], currentEvent: EventBounce):
@@ -111,8 +116,14 @@ class VaultCombined(Vault):
                                             totalCash= self.portfolio.getCashBalanceFor(self.strategyConfig.market),
                                             event=currentEvent,
                                             previousEvents=previousEvents)
-        result = self.strategyBounce.run(data, config.bounceConfig)
+        result: StrategyBounceResult = self.strategyBounce.run(data, config.bounceConfig)
         if result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell:
+            logResult = ("\t\t 🤴   %s   🤴\nConfirmationBar(%s)\t ReversalBar(%s)\t EMA(%s) \t Type(%s)\n 📣Action(%s)\n💰 Price(%.2f) \t\tSize(%d)\n\t\tTP(%.2f)\n\t\tSL(%.2f)\n\n \t\t\t🥽🥽🥽🥽🥽🥽🥽 \n\n" % 
+                        (result.contract.symbol, result.confirmationCandle.datetime.date(), 
+                        result.reversalCandle.datetime.date(), result.ema, result.reversalCandleType.code, 
+                        result.bracketOrder.parentOrder.action.code, 
+                        result.bracketOrder.parentOrder.price, result.bracketOrder.parentOrder.size, 
+                        result.bracketOrder.takeProfitOrder.price, result.bracketOrder.stopLossOrder.price))
             logBounceReport(config.bounceConfig.type.value, result.contract.symbol)
 
     # Historical Data

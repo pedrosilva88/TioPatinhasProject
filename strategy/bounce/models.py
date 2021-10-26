@@ -52,6 +52,7 @@ class StrategyBounceResult(StrategyResult):
     resultType: StrategyBounceResultType
     reversalCandle: EventBounce
     confirmationCandle: EventBounce
+    ema: int
     reversalCandleType: ReversalCandletType
 
     def __init__(self, contract: Contract, event: EventBounce, type: StrategyResultType,
@@ -59,9 +60,11 @@ class StrategyBounceResult(StrategyResult):
                 reversalCandle: EventBounce = None,
                 confirmationCandle: EventBounce = None,
                 reversalCandleType: ReversalCandletType = None,
+                ema: int = None,
                 order: BracketOrder = None, position: Position = None):
         super().__init__(contract, event, type, order, position)
         self.resultType = resultType
         self.reversalCandle = reversalCandle
         self.confirmationCandle = confirmationCandle
         self.reversalCandleType = reversalCandleType
+        self.ema = ema

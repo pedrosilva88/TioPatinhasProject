@@ -266,7 +266,7 @@ class Constants:
 
     class Combined:
         class Default:
-            runStrategyTime = time(hour=17, minute=10)
+            runStrategyTime = time(hour=18, minute=59)
             daysBeforeToDownload = 600
             barSize = "1 day"
             def __init__(self):
