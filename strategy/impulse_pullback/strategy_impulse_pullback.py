@@ -356,12 +356,6 @@ class StrategyImpulsePullback(Strategy):
 
     def positonSizing(self, criteria: StrategyImpulsePullbackResultType, action:OrderAction, balance: float, r: float) -> int:
         willingToLose = self.willingToLose
-        if criteria == StrategyImpulsePullbackResultType.criteria1:
-            willingToLose = 0.01
-        elif criteria == StrategyImpulsePullbackResultType.criteria2:
-            willingToLose = 0.02
-        elif criteria == StrategyImpulsePullbackResultType.criteria3:
-            willingToLose = 0.05
         value = (balance*willingToLose)/(r)
         return int(round_down(value, 0))
 

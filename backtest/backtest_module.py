@@ -10,7 +10,7 @@ import csv
 from datetime import date, datetime
 from strategy.models import StrategyData, StrategyResult
 from helpers.date_timezone import DateSystemFormat, Helpers
-from strategy.configs.models import StrategyConfig
+from strategy.configs.models import StrategyConfig, StrategyType
 from strategy.strategy import Strategy
 from typing import Any, List, Tuple, Union
 from backtest.scanner.scanner_manager import BacktestScannerManager
@@ -116,7 +116,10 @@ class BacktestModule:
     def runDownloadStocksAction(self):
         config = BacktestConfigs()
         stocksData = self.downloadStocksData(config)
-        self.saveDataInCSVFiles(config, stocksData)
+        events = stocksData
+        if config.strategyType is not StrategyType.none and config.strategyType is not StrategyType.combined:
+            events = self.addIndicatorsToStocksData(stocksData, config)
+        self.saveDataInCSVFiles(config, events)
 
     def runStrategyAction(self):
         print("🧙‍♀️ Lets Start running Strategy 🧙‍♀️")

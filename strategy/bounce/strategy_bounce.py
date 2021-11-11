@@ -6,7 +6,7 @@ from strategy.models import StrategyData, StrategyResult, StrategyResultType
 from strategy.configs.models import StrategyConfig
 from strategy.configs.bounce.models import StrategyBounceConfig
 from helpers.math import round_down
-from models.base_models import OrderAction
+from models.base_models import Order, OrderAction
 from typing import List, Tuple
 from helpers import log
 
@@ -17,6 +17,7 @@ class CriteriaResultType(Enum):
 class StrategyBounce(Strategy):
     # Properties
     currentBar: EventBounce = None
+    reversalCandle: EventBounce = None
     previousBars: List[EventBounce] = None
     criteria: StrategyBounceResultType = None
 
@@ -34,6 +35,7 @@ class StrategyBounce(Strategy):
         if criteriaResult == CriteriaResultType.failure and result:
             return result
 
+        self.reversalCandle = self.previousBars[reversalCandlePosition]
         self.criteria = StrategyBounceResultType.criteria1
         strategyType = StrategyResultType.Sell if action == OrderAction.Sell else StrategyResultType.Buy
         order = self.createOrder(strategyType)
@@ -44,6 +46,7 @@ class StrategyBounce(Strategy):
         self.criteria = StrategyBounceResultType.criteria2
         result.bracketOrder = order
         result.resultType = self.criteria
+
         print("(%s)\t CC(%s) RC(%s)\t EMA(%d)\tAction(%s) ReversalType(%s)" % (self.currentBar.contract.symbol, self.currentBar.datetime.date(), self.previousBars[reversalCandlePosition].datetime.date(), emaCross, action.code, reversalType.code))        
         return result
 
@@ -89,19 +92,21 @@ class StrategyBounce(Strategy):
         stochasticValid = self.isStochasticValid(action, reversalCandlePosition)
         macdValid = self.isMACDValid(action, reversalCandlePosition)
 
-        if emasValid and stochasticValid: # and macdValid:
+        if emasValid and stochasticValid and macdValid:
             return CriteriaResultType.success
 
         return CriteriaResultType.failure
 
     def isMACDValid(self, action: OrderAction, reversalCandlePosition: int) -> bool:
         reversalCandle = self.previousBars[reversalCandlePosition]
+
         if action == OrderAction.Buy:
             if reversalCandle.macd > reversalCandle.macdEMA:
              return True
             for i in range(reversalCandlePosition-5, reversalCandlePosition):
                 if self.previousBars[i].macd > self.previousBars[i].macdEMA:
                     return False
+            return True
 
         elif action == OrderAction.Sell:
             if reversalCandle.macd < reversalCandle.macdEMA:
@@ -109,6 +114,7 @@ class StrategyBounce(Strategy):
             for i in range(reversalCandlePosition-5, reversalCandlePosition):
                 if self.previousBars[i].macd < self.previousBars[i].macdEMA:
                     return False
+            return True
 
         return False
 
@@ -134,13 +140,13 @@ class StrategyBounce(Strategy):
         reversalCandle = self.previousBars[reversalCandlePosition]
         confirmationCandle = self.currentBar
         if action == OrderAction.Buy:
-            validStochCondition = (reversalCandle.stochK < reversalCandle.stochD and confirmationCandle.stochK > confirmationCandle.stochD)
+            validStochCondition = (reversalCandle.stochK < reversalCandle.stochD or confirmationCandle.stochK > confirmationCandle.stochD)
             return (reversalCandle.stochK < 30 and
                     reversalCandle.stochD < 30 and
                     validStochCondition)
 
         elif action == OrderAction.Sell:
-            validStochCondition = (reversalCandle.stochK > reversalCandle.stochD and confirmationCandle.stochK < confirmationCandle.stochD)
+            validStochCondition = (reversalCandle.stochK > reversalCandle.stochD or confirmationCandle.stochK < confirmationCandle.stochD)
             return (reversalCandle.stochK > 70 and
                     reversalCandle.stochD > 70)
         return False
@@ -316,7 +322,22 @@ class StrategyBounce(Strategy):
     def isBearishCandle(self, bar: EventBounce) -> bool:
         return bar.close <= bar.open
 
- ## Constructor
+    ## Concepts
+
+    def isTouchingEMA(self, bar: EventBounce, action: OrderAction) -> Tuple[bool, int]:
+        if action == OrderAction.Buy: 
+            emas = [50, 100, 200]
+            for ema in emas:
+                if self.isBarDownShadowExtendingEMA(bar, ema) and self.isBarBodyAboveEMA(bar, ema):
+                    return (True, ema)
+        elif action == OrderAction.Sell:
+            emas = [50, 100, 200]
+            for ema in emas:
+                if self.isBarUpShadowExtendingEMA(bar, ema) and self.isBarBodyBelowEMA(bar, ema):
+                    return (True, ema)
+        return (False, None)
+
+    ## Constructor
 
     def fetchInformation(self):
         strategyData: StrategyBounceData = self.strategyData
@@ -388,7 +409,7 @@ class StrategyBounce(Strategy):
 
     def getStopLossPrice(self, action: OrderAction) -> float:
         gap = self.getGap()
-        target = self.currentBar.low if action == OrderAction.Buy else self.currentBar.high
+        target = self.reversalCandle.low if action == OrderAction.Buy else self.reversalCandle.high
 
         return target-gap if action == OrderAction.Buy else target+gap
     
@@ -398,7 +419,7 @@ class StrategyBounce(Strategy):
     def calculatePnl(self, action: OrderAction):
         targetPrice = self.getPriceTarget(action)
         stopLossPrice = self.getStopLossPrice(action)
-        r = (targetPrice-stopLossPrice)*2.5 if action == OrderAction.Buy else (stopLossPrice-targetPrice)*2.5
+        r = (targetPrice-stopLossPrice)*2 if action == OrderAction.Buy else (stopLossPrice-targetPrice)*2
         return targetPrice+r if action == OrderAction.Buy else targetPrice-r
 
     def getSize(self, action: OrderAction):

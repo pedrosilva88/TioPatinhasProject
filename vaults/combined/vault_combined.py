@@ -91,7 +91,7 @@ class VaultCombined(Vault):
                     previousEvents.insert(0, event)
                     index -= 1
                 self.runStrategyForBounce(contract, previousEvents, currentEvent)
-        log("🏁 Finished to run Impulse Pullback Divergence Strategy 🏁")
+        log("🏁 Finished to run Combined Strategy 🏁")
 
     def runStrategyForImpulsePullback(self, contract: Contract,
                                         previousEvents: List[EventImpulsePullback], currentEvent: EventImpulsePullback):

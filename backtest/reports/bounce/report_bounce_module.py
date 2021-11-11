@@ -15,14 +15,17 @@ class StrategyBounceResultModel(StrategyResultModel):
 
 class ReportBounceModule(ReportModule):
     def getHeaderRowForTradesReport(self) -> List[str]:
-        return["Date", "Order Date", "Symbol", "Result", "Criteria", "PnL", 
+        return["Date", "Order Date", "Symbol", "Result", "PnL", 
                 "Price CreateTrade", "Price CloseTrade", "Size", 
-                "Total Invested", "Action", "Cash"]
+                "Total Invested", "Action", "Cash",
+                "ConfirmationCandle", "ReversalCandle", "ReversalType", "EMA"]
                 
     def getRowForTradesReport(self, item: BacktestResult) -> List[Any]:
         item: BacktestBounceResult = item 
-        return[item.closeTradeDate, item.createTradeDate, item.contract.symbol, item.type.emoji, item.criteria, 
-                item.pnl, item.priceCreateTrade, item.priceCloseTrade, item.size, item.totalInvested, item.action.code, item.cash]
+        return[item.closeTradeDate, item.createTradeDate, item.contract.symbol, item.type.emoji, item.pnl, 
+                item.priceCreateTrade, item.priceCloseTrade, item.size, 
+                item.totalInvested, item.action.code, item.cash,
+                item.confirmationCandle.datetime.date(), item.reversalCandle.datetime.date(), item.reversalType, item.ema]
 
     def getHeaderRowForStrategyReport(self) -> List[str]:
         return["PnL", "Total Return", "Batting Average", "Win/Loss Ratio", 
@@ -34,7 +37,7 @@ class ReportBounceModule(ReportModule):
                 item.averageReturnPerTrade, item.standardDeviation, item.sharpRatio, item.numberOfTrades]
     
     def createStopLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float,
-                            criteria: StrategyBounceResultType):
+                            confirmationCandle: EventBounce, reversalCandle: EventBounce, reversalType: str, ema: int):
         super().createStopLossResult(event, bracketOrder, positionDate, -loss, cashAvailable)
 
         event: EventBounce = event
@@ -48,10 +51,13 @@ class ReportBounceModule(ReportModule):
                             mainOrder=mainOrder,
                             positionDate= positionDate,
                             cashAvailable= cashAvailable,
-                            criteria= criteria)
+                            confirmationCandle= confirmationCandle,
+                            reversalCandle= reversalCandle,
+                            reversalType= reversalType,
+                            ema= ema)
 
     def createTakeProfitResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, profit: float, cashAvailable: float,
-                                criteria: StrategyBounceResultType):
+                                confirmationCandle: EventBounce, reversalCandle: EventBounce, reversalType: str, ema: int):
         super().createTakeProfitResult(event, bracketOrder, positionDate, profit, cashAvailable)
 
         event: EventBounce = event
@@ -65,10 +71,13 @@ class ReportBounceModule(ReportModule):
                             mainOrder=mainOrder,
                             positionDate= positionDate,
                             cashAvailable= cashAvailable,
-                            criteria= criteria)
+                            confirmationCandle= confirmationCandle,
+                            reversalCandle= reversalCandle,
+                            reversalType= reversalType,
+                            ema= ema)
 
     def createLossResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, loss: float, cashAvailable: float,
-                                criteria: StrategyBounceResultType):
+                                confirmationCandle: EventBounce, reversalCandle: EventBounce, reversalType: str, ema: int):
         super().createLossResult(event, bracketOrder, positionDate, -loss, cashAvailable)
 
         event: EventBounce = event
@@ -80,10 +89,13 @@ class ReportBounceModule(ReportModule):
                             mainOrder=mainOrder,
                             positionDate= positionDate,
                             cashAvailable= cashAvailable,
-                            criteria= criteria)
+                            confirmationCandle= confirmationCandle,
+                            reversalCandle= reversalCandle,
+                            reversalType= reversalType,
+                            ema= ema)
 
     def createProfitResult(self, event: Event, bracketOrder: BracketOrder, positionDate: date, profit: float, cashAvailable: float,
-                                criteria: StrategyBounceResultType):
+                                confirmationCandle: EventBounce, reversalCandle: EventBounce, reversalType: str, ema: int):
         super().createProfitResult(event, bracketOrder, positionDate, profit, cashAvailable)
 
         event: EventBounce = event
@@ -95,10 +107,13 @@ class ReportBounceModule(ReportModule):
                             mainOrder=mainOrder,
                             positionDate= positionDate,
                             cashAvailable= cashAvailable,
-                            criteria=criteria)
+                            confirmationCandle= confirmationCandle,
+                            reversalCandle= reversalCandle,
+                            reversalType= reversalType,
+                            ema= ema)
 
     def createResult(self, type: BacktestResultType, pnl: float, closePrice: float, event: EventBounce, mainOrder: Order, positionDate: date, cashAvailable: float,
-                    criteria: StrategyBounceResultType):
+                    confirmationCandle: EventBounce, reversalCandle: EventBounce, reversalType: str, ema: int):
         result = BacktestBounceResult(contract=event.contract, 
                                         action=mainOrder.action,
                                         type= type,
@@ -110,7 +125,10 @@ class ReportBounceModule(ReportModule):
                                         size=mainOrder.size,
                                         totalInvested=round(mainOrder.size*mainOrder.price, 2),
                                         cash=round(cashAvailable, 2),
-                                        criteria= criteria.emoji)
+                                        confirmationCandle= confirmationCandle,
+                                        reversalCandle= reversalCandle,
+                                        reversalType= reversalType,
+                                        ema= ema)
         self.results.append(result)
 
 

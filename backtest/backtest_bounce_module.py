@@ -24,9 +24,9 @@ from strategy.historical_data import HistoricalData
 class BacktestBounceModule(BacktestModule):
     class RunStrategyBounceModel(BacktestModule.RunStrategyModel):
         databaseModule: DatabaseModule
-        positionIPDates: Union[str, date]
-        positionIPHolds: Union[str, int]
-        positionIPCriteria: Union[str, StrategyBounceResultType]
+        positionBounceDates: Union[str, date]
+        positionBounceHolds: Union[str, int]
+        positionResults: Union[str, StrategyBounceResult]
         eventsMapper: Union[str, EventBounce]
         currentDay: date
         tradesAvailable: int
@@ -40,11 +40,11 @@ class BacktestBounceModule(BacktestModule):
 
             self.currentDay = None
             self.tradesAvailable = 0
-            self.positionIPDates = dict()
+            self.positionBounceDates = dict()
             self.eventsMapper = dict()
             self.nextDayTrades = dict()
-            self.positionIPHolds = dict()
-            self.positionIPCriteria = dict()
+            self.positionBounceHolds = dict()
+            self.positionResults = dict()
 
     def __init__(self) -> None:
         super().__init__()
@@ -139,6 +139,8 @@ class BacktestBounceModule(BacktestModule):
         for event in events:
             identifier = self.uniqueIdentifier(
                 event.contract.symbol, event.datetime.date())
+            event: EventBounce = event
+            print(event.datetime.date(),event.ema200)
             self.strategyModel.eventsMapper[identifier] = event
 
     def getStrategyData(self, event: Event, events: List[Event], index: int) -> StrategyData:
@@ -150,10 +152,9 @@ class BacktestBounceModule(BacktestModule):
         if previousEvents is None or len(previousEvents) < strategyConfig.daysBefore:
             return None
         previousEventsFiltered = previousEvents[-strategyConfig.daysBefore:]
-        balance = self.getBalance()
-        cashToInvest = balance/2 if balance > 6000 else balance
+        balance = self.strategyModel.cashAvailable
         return StrategyBounceData(contract=event.contract,
-                                            totalCash=cashToInvest,
+                                            totalCash=balance,
                                             event=event,
                                             previousEvents=previousEventsFiltered,
                                             today=event.datetime.date(),
@@ -194,13 +195,7 @@ class BacktestBounceModule(BacktestModule):
             if model.isForStockPerformance:
                 model.tradesAvailable = 9999
             else:
-                if balance > 6000:
-                    model.tradesAvailable = 2
-                elif balance > 3000:
-                    model.tradesAvailable = 1
-                else:
-                    model.tradesAvailable = 0
-            model.tradesAvailable = 10 - len(model.positions)
+                model.tradesAvailable = 10 - len(model.positions)
 
             model.currentDay = None
         
@@ -216,9 +211,9 @@ class BacktestBounceModule(BacktestModule):
                                                     event)
                     print(result)
                     print("%s Position for %s" % (event.datetime.date(), event.contract.symbol))
-                    model.positionIPDates[identifier] = event.datetime.date()
-                    model.positionIPHolds[identifier] = strategyConfig.maxPeriodsToHoldPosition
-                    model.positionIPCriteria[identifier] = result.resultType
+                    model.positionBounceDates[identifier] = event.datetime.date()
+                    model.positionBounceHolds[identifier] = strategyConfig.maxPeriodsToHoldPosition
+                    model.positionResults[identifier] = result
                     model.tradesAvailable -= 1
                     newFill = FillDB(result.contract.symbol, result.event.datetime.date(
                     ), result.contract.country, strategyConfig.type)
@@ -249,16 +244,17 @@ class BacktestBounceModule(BacktestModule):
                     stopOrder: Order = bracketOrder.stopLossOrder
                     loss = abs(stopOrder.price*stopOrder.size -
                                 mainOrder.price*mainOrder.size)
-                    candlesHold = model.positionIPHolds[key]
-                    criteria = model.positionIPCriteria[key]
+                    candlesHold = model.positionBounceHolds[key]
+                    result = model.positionResults[key]
 
                     reportModule.createStopLossResult(
-                        event, bracketOrder, positionDate, loss, model.cashAvailable, criteria)
+                        event, bracketOrder, positionDate, loss, model.cashAvailable, 
+                        result.confirmationCandle, result.reversalCandle, result.reversalCandleType.code, result.ema)
 
                     model.positions.pop(key)
-                    model.positionIPDates.pop(key)
-                    model.positionIPHolds.pop(key)
-                    model.positionIPCriteria.pop(key)
+                    model.positionBounceDates.pop(key)
+                    model.positionBounceHolds.pop(key)
+                    model.positionResults.pop(key)
 
                     if model.isForStockPerformance == False:
                         model.cashAvailable -= loss
@@ -267,15 +263,16 @@ class BacktestBounceModule(BacktestModule):
                     profitOrder: Order = bracketOrder.takeProfitOrder
                     profit = abs(profitOrder.price*profitOrder.size -
                                     mainOrder.price*mainOrder.size)
-                    criteria = model.positionIPCriteria[key]
+                    result = model.positionResults[key]
 
                     reportModule.createTakeProfitResult(
-                        event, bracketOrder, positionDate, profit, model.cashAvailable, criteria)
+                        event, bracketOrder, positionDate, profit, model.cashAvailable, 
+                            result.confirmationCandle, result.reversalCandle, result.reversalCandleType.code, result.ema)
 
                     model.positions.pop(key)
-                    model.positionIPDates.pop(key)
-                    model.positionIPHolds.pop(key)
-                    model.positionIPCriteria.pop(key)
+                    model.positionBounceDates.pop(key)
+                    model.positionBounceHolds.pop(key)
+                    model.positionResults.pop(key)
 
                     if model.isForStockPerformance == False:
                         model.cashAvailable += profit
@@ -287,16 +284,17 @@ class BacktestBounceModule(BacktestModule):
         if (len(positions.values()) > 0):
             for key, (bracketOrder, position, positionDate, event) in positions.items():
                 bracketOrder: BracketOrder = bracketOrder
-                ipPostionHold = model.positionIPHolds[key]
+                ipPostionHold = model.positionBounceHolds[key]
                 if self.isPositionExpired(event, positionDate, ipPostionHold):
                     if self.isProfit(event, bracketOrder):
                         mainOrder: Order = bracketOrder.parentOrder
                         profit = abs(event.close*mainOrder.size -
                                         mainOrder.price*mainOrder.size)
-                        criteria = model.positionIPCriteria[key]
+                        result = model.positionResults[key]
 
                         reportModule.createProfitResult(
-                            event, bracketOrder, positionDate, profit, model.cashAvailable, criteria)
+                            event, bracketOrder, positionDate, profit, model.cashAvailable, 
+                            result.confirmationCandle, result.reversalCandle, result.reversalCandleType.code, result.ema)
 
                         if model.isForStockPerformance == False:
                             model.cashAvailable += profit
@@ -304,19 +302,20 @@ class BacktestBounceModule(BacktestModule):
                         mainOrder: Order = bracketOrder.parentOrder
                         loss = abs(event.close*mainOrder.size -
                                     mainOrder.price*mainOrder.size)
-                        criteria = model.positionIPCriteria[key]
+                        result = model.positionResults[key]
 
                         reportModule.createLossResult(
-                            event, bracketOrder, positionDate, loss, model.cashAvailable, criteria)
+                            event, bracketOrder, positionDate, loss, model.cashAvailable, 
+                            result.confirmationCandle, result.reversalCandle, result.reversalCandleType.code, result.ema)
 
                         if model.isForStockPerformance == False:
                             model.cashAvailable -= loss
 
                     identifier = self.uniqueIdentifier(event.contract.symbol, positionDate)
                     model.positions.pop(identifier)
-                    model.positionIPDates.pop(identifier)
-                    model.positionIPHolds.pop(key)
-                    model.positionIPCriteria.pop(key)
+                    model.positionBounceDates.pop(identifier)
+                    model.positionBounceHolds.pop(key)
+                    model.positionResults.pop(key)
 
     def isPositionExpired(self, event: EventBounce, positionDate: date, candlesToHold: int) -> bool:
         config: StrategyBounceConfig = self.strategyModel.strategyConfig

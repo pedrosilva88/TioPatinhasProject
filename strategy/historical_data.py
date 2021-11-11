@@ -109,8 +109,7 @@ class HistoricalData:
             impulsePullbackEvents.append(impulsePullbackEvent)
 
         return impulsePullbackEvents
-
-  
+ 
     def computeEventsForBounceStrategy(events: List[Event], strategyConfigs: StrategyBounceConfig) -> List[EventBounce]:
         if len(events) <= 0:
             return []

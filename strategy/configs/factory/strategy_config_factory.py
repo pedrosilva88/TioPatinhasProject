@@ -218,15 +218,15 @@ class Constants:
         class Default:
             runStrategyTime = time(hour=20, minute=15)
             daysBeforeToDownload = 600
-            willingToLose = 0.02
+            willingToLose = 0.01
             kPeriod = 5
             dPeriod = 3
             smooth = 3
             daysBefore = 50
             barSize = "1 day"
 
-            maxPeriodsToHoldPosition = 6
-            winLossRatio = 2.5
+            maxPeriodsToHoldPosition = 20
+            winLossRatio = 2
 
             def __init__(self):
                 None
@@ -243,15 +243,15 @@ class Constants:
         class Default:
             runStrategyTime = time(hour=20, minute=15)
             daysBeforeToDownload = 600
-            willingToLose = 0.02
+            willingToLose = 0.01
             kPeriod = 5
             dPeriod = 3
             smooth = 3
             daysBefore = 50
             barSize = "1 day"
 
-            maxPeriodsToHoldPosition = 6
-            winLossRatio = 2.5
+            maxPeriodsToHoldPosition = 20
+            winLossRatio = 2
 
             def __init__(self):
                 None
@@ -266,8 +266,8 @@ class Constants:
 
     class Combined:
         class Default:
-            runStrategyTime = time(hour=18, minute=59)
-            daysBeforeToDownload = 600
+            runStrategyTime = time(hour=21, minute=15)
+            daysBeforeToDownload = 1000
             barSize = "1 day"
             def __init__(self):
                 None
