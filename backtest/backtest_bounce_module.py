@@ -139,8 +139,6 @@ class BacktestBounceModule(BacktestModule):
         for event in events:
             identifier = self.uniqueIdentifier(
                 event.contract.symbol, event.datetime.date())
-            event: EventBounce = event
-            print(event.datetime.date(),event.ema200)
             self.strategyModel.eventsMapper[identifier] = event
 
     def getStrategyData(self, event: Event, events: List[Event], index: int) -> StrategyData:

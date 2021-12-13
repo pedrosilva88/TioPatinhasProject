@@ -130,6 +130,8 @@ class StrategyConfigFactory:
     def createCombinedStrategyFor(market: Market, tz: timezone) -> StrategyConfig:
         impulsePullbackConfig = StrategyConfigFactory.createImpulsePullbackStrategyFor(market, tz)
         bounceConfig = StrategyConfigFactory.createBounceStrategyFor(market, tz)
+        zigzagConfig = StrategyConfigFactory.createZigZagStrategyFor(market, tz)
+        stochDivergeConfig = StrategyConfigFactory.createStochasticDivergeStrategyFor(market, tz)
         constants = Constants.Combined.Default()
 
         if market.country == market.country.USA:
@@ -142,10 +144,12 @@ class StrategyConfigFactory:
 
         openTime = constants.runStrategyTime
         return StrategyCombinedConfig(market=market, runStrategyTime=openTime,
-                                    daysBeforeToDownload=constants.daysBeforeToDownload,
-                                    barSize=constants.barSize,
+                                        daysBeforeToDownload=constants.daysBeforeToDownload,
+                                        barSize=constants.barSize,
                                         impulsePullbackConfig= impulsePullbackConfig,
-                                        bounceConfig= bounceConfig)
+                                        bounceConfig= bounceConfig,
+                                        zigzagConfig=zigzagConfig,
+                                        stochDivergeConfig=stochDivergeConfig)
  
 class Constants:
     class ZigZag:

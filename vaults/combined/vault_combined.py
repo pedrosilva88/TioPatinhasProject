@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+from strategy.configs.stoch_diverge.models import StrategyStochDivergeConfig
 from vaults.vault import Vault
 from helpers.array_helper import Helpers
 from models.base_models import Contract, Event
@@ -16,16 +17,24 @@ from strategy.impulse_pullback.strategy_impulse_pullback import StrategyImpulseP
 from strategy.impulse_pullback.models import EventImpulsePullback, StrategyImpulsePullbackData, StrategyImpulsePullbackResult
 from strategy.bounce.strategy_bounce import StrategyBounce
 from strategy.bounce.models import EventBounce, StrategyBounceData, StrategyBounceResult
-from helpers.logs import log, logCounter, logImpulsePullbackReport, logBounceReport, createLogReports
+from strategy.zigzag.strategy_zigzag import StrategyZigZag
+from strategy.zigzag.models import EventZigZag, StrategyZigZagData, StrategyZigZagResult
+from strategy.stoch_diverge.strategy_stoch_diverge import StrategyStochDiverge
+from strategy.stoch_diverge.models import EventStochDiverge, StrategyStochDivergeData, StrategyResult, StrategyStochDivergeResult
+from helpers.logs import log, logCounter, logImpulsePullbackReport, logBounceReport, createLogReports, logStochDivergeReport, logZigZagReport
 
 class VaultCombined(Vault):
     historicalData: HistoricalData
 
     allContractsEventsImpulsePullback: Union[str, List[EventImpulsePullback]]
     allContractsEventsBounce: Union[str, List[EventBounce]]
+    allContractsEventsZigZag: Union[str, List[EventZigZag]]
+    allContractsEventsStochDiverge: Union[str, List[EventStochDiverge]]
 
     strategyImpulsePullback: StrategyImpulsePullback = StrategyImpulsePullback()
     strategyBounce: StrategyBounce = StrategyBounce()
+    strategyZigZag: StrategyZigZag = StrategyZigZag()
+    strategyStochDiverge: StrategyStochDiverge = StrategyStochDiverge()
 
     def __init__(self, strategyConfig: StrategyConfig, portfolio: Portfolio, delegate: VaultsControllerProtocol) -> None:
         super().__init__(strategyConfig, portfolio, delegate)
@@ -36,6 +45,8 @@ class VaultCombined(Vault):
         config: StrategyCombinedConfig = strategyConfig
         createLogReports(config.impulsePullbackConfig.type.value)
         createLogReports(config.bounceConfig.type.value)
+        createLogReports(config.zigzagConfig.type.value)
+        createLogReports(config.stochDivergeConfig.type.value)
         
     # Setup
 
@@ -44,6 +55,8 @@ class VaultCombined(Vault):
         log("🏃‍ Setup Combined Vault 🏃‍")
         self.allContractsEventsImpulsePullback = dict()
         self.allContractsEventsBounce = dict()
+        self.allContractsEventsZigZag = dict()
+        self.allContractsEventsStochDiverge = dict()
 
     # Reset
 
@@ -51,6 +64,8 @@ class VaultCombined(Vault):
         log("🤖 Reset Combined Vault 🤖")
         self.allContractsEventsImpulsePullback = dict()
         self.allContractsEventsBounce = dict()
+        self.allContractsEventsZigZag = dict()
+        self.allContractsEventsStochDiverge = dict()
 
     async def runNextOperationBlock(self, action: StrategyAction):
         if action == StrategyAction.runStrategy:
@@ -69,6 +84,8 @@ class VaultCombined(Vault):
         
         self.computeForImpulsePullback(allEvents)
         self.computeForBounce(allEvents)
+        self.computeForZigZag(allEvents)
+        self.computeForStochDiverge(allEvents)
         for contract in self.contracts:
             events = self.allContractsEventsImpulsePullback[contract.symbol]
             if len(events) >= config.impulsePullbackConfig.daysBefore:
@@ -91,6 +108,28 @@ class VaultCombined(Vault):
                     previousEvents.insert(0, event)
                     index -= 1
                 self.runStrategyForBounce(contract, previousEvents, currentEvent)
+
+            events = self.allContractsEventsZigZag[contract.symbol]
+            if len(events) >= config.zigzagConfig.daysBefore:
+                currentEvent = events[-1]
+                previousEvents = [] 
+                index = -2
+                while index >= -config.zigzagConfig.daysBefore:
+                    event = events[index]
+                    previousEvents.insert(0, event)
+                    index -= 1
+                self.runStrategyForZigzag(contract, previousEvents, currentEvent)
+
+            events = self.allContractsEventsStochDiverge[contract.symbol]
+            if len(events) >= config.stochDivergeConfig.daysBefore:
+                currentEvent = events[-1]
+                previousEvents = [] 
+                index = -2
+                while index >= -config.stochDivergeConfig.daysBefore:
+                    event = events[index]
+                    previousEvents.insert(0, event)
+                    index -= 1
+                self.runStrategyForStochDiverge(contract, previousEvents, currentEvent)
         log("🏁 Finished to run Combined Strategy 🏁")
 
     def runStrategyForImpulsePullback(self, contract: Contract,
@@ -102,7 +141,6 @@ class VaultCombined(Vault):
                                             previousEvents=previousEvents)
         result: StrategyImpulsePullbackResult = self.strategyImpulsePullback.run(data, config.impulsePullbackConfig)
         if result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell:
-            print(result.swingCandle, result.pullbackCandle)
             logResult = ("\t\t 🤴   %s   🤴\nSwing(%s)\t Pullback(%s)\n 📣Action(%s)\n💰 Price(%.2f) \t\tSize(%d)\n\t\tTP(%.2f)\n\t\tSL(%.2f)\n\n \t\t\t🥽🥽🥽🥽🥽🥽🥽 \n\n" % 
                         (result.contract.symbol, result.swingCandle.datetime.date(), 
                         result.pullbackCandle.datetime.date(), result.bracketOrder.parentOrder.action.code, 
@@ -126,6 +164,39 @@ class VaultCombined(Vault):
                         result.bracketOrder.parentOrder.price, result.bracketOrder.parentOrder.size, 
                         result.bracketOrder.takeProfitOrder.price, result.bracketOrder.stopLossOrder.price))
             logBounceReport(config.bounceConfig.type.value, logResult)
+
+    def runStrategyForZigzag(self, contract: Contract,
+                                    previousEvents: List[EventBounce], currentEvent: EventBounce):
+        config: StrategyCombinedConfig = self.strategyConfig
+        data = StrategyZigZagData(contract=contract,
+                                            totalCash= self.portfolio.getCashBalanceFor(self.strategyConfig.market),
+                                            event=currentEvent,
+                                            previousEvents=previousEvents)
+        result: StrategyZigZagResult = self.strategyZigZag.run(data, config.zigzagConfig)
+        if result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell:
+            logResult = ("\t\t 🤴   %s   🤴\n 📣Action(%s)\n💰 Price(%.2f) \t\tSize(%d)\n\t\tTP(%.2f)\n\t\tSL(%.2f)\n\n \t\t\t🥽🥽🥽🥽🥽🥽🥽 \n\n" % 
+                        (result.contract.symbol, 
+                        result.bracketOrder.parentOrder.action.code, 
+                        result.bracketOrder.parentOrder.price, result.bracketOrder.parentOrder.size, 
+                        result.bracketOrder.takeProfitOrder.price, result.bracketOrder.stopLossOrder.price))
+            logZigZagReport(config.zigzagConfig.type.value, logResult)
+
+    
+    def runStrategyForStochDiverge(self, contract: Contract,
+                                    previousEvents: List[EventBounce], currentEvent: EventBounce):
+        config: StrategyCombinedConfig = self.strategyConfig
+        data = StrategyStochDivergeData(contract=contract,
+                                            totalCash= self.portfolio.getCashBalanceFor(self.strategyConfig.market),
+                                            event=currentEvent,
+                                            previousEvents=previousEvents)
+        result: StrategyStochDivergeResult = self.strategyStochDiverge.run(data, config.stochDivergeConfig)
+        if result.type == StrategyResultType.Buy or result.type == StrategyResultType.Sell:
+            logResult = ("\t\t 🤴   %s   🤴\n\n \t\t\t🥽🥽🥽🥽🥽🥽🥽 \n\n" % 
+                        (result.contract.symbol, 
+                        result.bracketOrder.parentOrder.action.code, 
+                        result.bracketOrder.parentOrder.price, result.bracketOrder.parentOrder.size, 
+                        result.bracketOrder.takeProfitOrder.price, result.bracketOrder.stopLossOrder.price))
+            logStochDivergeReport(config.zigzagConfig.type.value, logResult)
 
     # Historical Data
 
@@ -175,6 +246,36 @@ class VaultCombined(Vault):
             if len(histData) > 0:
                 self.allContractsEventsBounce[contract.symbol] = histData
                 logCounter("🧶 Compute Historical Data For Bounce 🧶", len(allEvents), index)
+            else:
+                log("🧶 ❗️ Invalid Historical Data for %s ❗️ 🧶" % (contract.symbol))
+            index += 1
+
+    def computeForZigZag(self, allEvents: List[Event]):
+        index = 1
+        config: StrategyCombinedConfig = self.strategyConfig
+        for contract, events in zip(self.contracts, allEvents):
+            if contract.symbol not in self.allContractsEventsZigZag:
+                self.allContractsEventsZigZag[contract.symbol] = []
+                
+            histData = HistoricalData.computeEventsForZigZagStrategy(events, config.zigzagConfig)
+            if len(histData) > 0:
+                self.allContractsEventsZigZag[contract.symbol] = histData
+                logCounter("🧶 Compute Historical Data For Zigzag 🧶", len(allEvents), index)
+            else:
+                log("🧶 ❗️ Invalid Historical Data for %s ❗️ 🧶" % (contract.symbol))
+            index += 1
+
+    def computeForStochDiverge(self, allEvents: List[Event]):
+        index = 1
+        config: StrategyCombinedConfig = self.strategyConfig
+        for contract, events in zip(self.contracts, allEvents):
+            if contract.symbol not in self.allContractsEventsStochDiverge:
+                self.allContractsEventsStochDiverge[contract.symbol] = []
+                
+            histData = HistoricalData.computeEventsForStochDivergeStrategy(events, config.stochDivergeConfig)
+            if len(histData) > 0:
+                self.allContractsEventsStochDiverge[contract.symbol] = histData
+                logCounter("🧶 Compute Historical Data For Stoch Diverge 🧶", len(allEvents), index)
             else:
                 log("🧶 ❗️ Invalid Historical Data for %s ❗️ 🧶" % (contract.symbol))
             index += 1

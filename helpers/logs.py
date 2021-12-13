@@ -120,3 +120,11 @@ def logImpulsePullbackReport(key: str, line: str):
 def logBounceReport(key: str, line: str):
     logger = getLogger(("Tio Patinhas - Report - %s" % (key)))
     logger.info(line)
+
+def logZigZagReport(key: str, line: str):
+    logger = getLogger(("Tio Patinhas - Report - %s" % (key)))
+    logger.info(line)
+
+def logStochDivergeReport(key: str, line: str):
+    logger = getLogger(("Tio Patinhas - Report - %s" % (key)))
+    logger.info(line)

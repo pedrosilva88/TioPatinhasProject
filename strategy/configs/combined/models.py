@@ -9,13 +9,17 @@ class StrategyCombinedConfig(StrategyConfig):
 
     impulsePullbackConfig: StrategyConfig
     bounceConfig: StrategyConfig
+    zigzagConfig: StrategyConfig
+    stochDivergeConfig: StrategyConfig
 
     def __init__(self, market: Market,
                     runStrategyTime: time,
                     daysBeforeToDownload: int,
                     barSize: str,
                     impulsePullbackConfig: StrategyConfig,
-                    bounceConfig: StrategyConfig):
+                    bounceConfig: StrategyConfig,
+                    zigzagConfig: StrategyConfig,
+                    stochDivergeConfig: StrategyConfig):
 
         StrategyConfig.__init__(self, market= market, runStrategyTime=runStrategyTime, 
                                 willingToLose= None, stopToLosePercentage= None, profitPercentage= None,
@@ -28,6 +32,8 @@ class StrategyCombinedConfig(StrategyConfig):
         self.barSize = barSize
         self.impulsePullbackConfig = impulsePullbackConfig
         self.bounceConfig = bounceConfig
+        self.zigzagConfig = zigzagConfig
+        self.stochDivergeConfig = stochDivergeConfig
 
     def nextProcessDatetime(self, now: datetime) -> datetime:
         currentTime = now.time()
