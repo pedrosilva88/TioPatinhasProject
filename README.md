@@ -49,7 +49,7 @@ $ sudo chmod o+x *.sh */*.sh
 ```
 
 >You should also have a `config.ini` with your personal configs. You can check a template inside that Zip.
-If you have any daughts of where to put this, please consult this [User Guide](https://github.com/IbcAlpha/IBC/blob/master/userguide.md#getting-started). 
+If you have any doubts of where to put this, please consult this [User Guide](https://github.com/IbcAlpha/IBC/blob/master/userguide.md#getting-started). 
 I have also added a document with that User guide [here](https://github.com/pedrosilva88/TioPatinhasProject/blob/master/Documents/IBCUserGuide.pdf)
 
 In this `config.ini` you should provide your username, password, the version of TWS that you installed and the trading mode that you want to use.
