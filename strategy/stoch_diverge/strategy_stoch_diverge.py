@@ -1,3 +1,4 @@
+from helpers.math import round_down
 from strategy.stoch_diverge.models import StrategyStochDivergeData, StrategyStochDivergeResult
 from models.stoch_diverge.models import EventStochDiverge
 from database.model import FillDB
@@ -70,7 +71,8 @@ class StrategyStochDiverge(Strategy):
                         log("💎 💎 💎 💎 💎 💎 💎 💎 💎 \n\n\n\n")
                         resultType = StrategyResultType.Buy if orderAction == OrderAction.Buy else StrategyResultType.Sell
                         candlesToHold = max(barKDivergence_Position_Start-barKDivergence_Position_Finish, barPriceDivergence_Position_Start-barPriceDivergence_Position_Finish)
-                        return StrategyStochDivergeResult(self.currentBar.contract, self.currentBar, resultType, targetPrice, percentage, min(candlesToHold, self.maxPeriodsToHoldPosition))
+                        order = self.createOrder(resultType)
+                        return StrategyStochDivergeResult(self.currentBar.contract, self.currentBar, resultType, targetPrice, percentage, min(candlesToHold, self.maxPeriodsToHoldPosition), order)
 
         return StrategyStochDivergeResult(self.strategyData.contract, self.currentBar, StrategyResultType.IgnoreEvent)
 
@@ -248,3 +250,53 @@ class StrategyStochDiverge(Strategy):
                 self.maxStochK > 0 and
                 self.crossMaxPeriods > 0 and
                 self.divergenceMaxPeriods > 0)
+
+    # Calculations
+    
+    def positonSizing(self, balance: float, r: float) -> int:
+        willingToLose = self.willingToLose
+        value = (balance*willingToLose)/(r)
+        return int(round_down(value, 0))
+
+    def getPriceTarget(self, action: OrderAction) -> float:
+        gap = self.getGap()
+        target = self.currentBar.high if action == OrderAction.Buy else self.currentBar.low
+
+        return target+gap if action == OrderAction.Buy else target-gap
+
+    def getStopLossPrice(self, action: OrderAction) -> float:
+        gap = self.getGap()
+        target = self.currentBar.low if action == OrderAction.Buy else self.currentBar.high
+
+        return target-gap if action == OrderAction.Buy else target+gap
+    
+    def getOrderPrice(self, action: OrderAction):
+        return self.getPriceTarget(action)
+
+    def calculatePnl(self, action: OrderAction):
+        targetPrice = self.getPriceTarget(action)
+        stopLossPrice = self.getStopLossPrice(action)
+        r = (targetPrice-stopLossPrice)*2.5 if action == OrderAction.Buy else (stopLossPrice-targetPrice)*2.5
+        return targetPrice+r if action == OrderAction.Buy else targetPrice-r
+
+    def getSize(self, action: OrderAction):
+        targetPrice = self.getPriceTarget(action)
+        stopLossPrice = self.getStopLossPrice(action)
+        balance = self.strategyData.totalCash
+        r = targetPrice-stopLossPrice if action == OrderAction.Buy else stopLossPrice-targetPrice
+        return self.positonSizing(balance, r)
+
+    def getGap(self) -> float:
+        if self.currentBar.close < 5 :
+            return 0.03
+        elif self.currentBar.close >= 5 and self.currentBar.close < 10:
+            return 0.04
+        elif self.currentBar.close >= 10 and self.currentBar.close < 50:
+            return 0.06
+        elif self.currentBar.close >= 50 and self.currentBar.close < 100:
+            return 0.08
+        elif self.currentBar.close >= 100 and self.currentBar.close < 200:
+            return 0.12
+        elif self.currentBar.close >= 200:
+            return 0.18
+        return 0.0

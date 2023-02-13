@@ -35,15 +35,15 @@ $ python -m pip install -r requirements.txt
 >In TWS 974, IBKR have changed the way the autologoff function works within TWS. Starting with that version, when the time approaches the configured autologoff time, logoff can be deferred once by changing the autologoff time in the 'Exit Session Setting' dialog as in earlier versions, but when the new autologoff time arrives, TWS will logoff even if the user (or IBC) changes the autologoff time again.
 > IBC enables Interactive Brokers' Trader Workstation (TWS) to be run in 'hands-free' mode, so that a user need not be present. This makes possible the deployment of unattended automated trading systems.
 ### Min versions
-* TWS Offline - 981 · [Download TWS Offline](https://www.interactivebrokers.com/en/index.php?f=14099#tws-software)
-* IBC Controller - 3.8.5 · [Download IBC Controller](https://github.com/IbcAlpha/IBC/releases/tag/3.8.5)
+* TWS Offline - 10.12 · [Download TWS Offline](https://www.interactivebrokers.com/en/index.php?f=14099#tws-software)
+* IBC Controller - 3.12.0 · [Download IBC Controller](https://github.com/IbcAlpha/IBC/releases/tag/3.12.0)
 
 ### Steps
 * Install the TWS Offline version
-* After Downloading IBC Controller Zip (IBCMacos-3.8.5.zip), you need to move the content to a specific folder and set all the files as executable. 
+* After Downloading IBC Controller Zip (IBCMacos-3.12.0.zip), you need to move the content to a specific folder and set all the files as executable. 
 Run this commands:
 ```
-$ sudo unzip ~/Downloads/IBCMacos-3.8.5.zip -d /opt/ibc
+$ sudo unzip ~/Downloads/IBCMacos-3.12.0.zip -d /opt/ibc
 $ cd /opt/ibc
 $ sudo chmod o+x *.sh */*.sh
 ```

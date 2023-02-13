@@ -10,7 +10,7 @@ from strategy.configs.models import StrategyType
 runStartegyFilename = "scan_to_run_strategy.csv"
 downloadFilename = "scan_to_download.csv"
 
-scannerPath = "backtest/scanner/Data/CSV/%s/%s/%s/%s"
+scannerPath = "backtest/scanner/data/CSV/%s/%s/%s/%s"
 dataCSVStocksPath = "backtest/data/CSV/%s/%s/%s/Stocks"
 dataCSVStockFilePath = "backtest/data/CSV/%s/%s/%s/Stocks/%s.csv"
 dataCSVReportsPath = "backtest/data/CSV/%s/%s/%s/Report/%s"

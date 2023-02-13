@@ -31,7 +31,7 @@ class Strategy:
 
     # Create Order
 
-    def createOrder(self, type: StrategyResultType):
+    def createOrder(self, type: StrategyResultType) -> BracketOrder:
         action = OrderAction.Buy if type == StrategyResultType.Buy else OrderAction.Sell
         price = self.getOrderPrice(action)
         profitTarget = self.calculatePnl(action)
