@@ -5,7 +5,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 class TelegramService():
     updater: Updater
     dispatcher: dispatcher
-    token = "1692171028:AAF-1Z16YHRNIjaeOuhTdb6Q2-99TdYpYgg"
+    token = ""
 
     __init__(self):
         logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
